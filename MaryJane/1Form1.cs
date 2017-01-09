@@ -19,7 +19,8 @@ namespace MaryJane
         private void Form1_Load(object sender, EventArgs e)
         {
             MinimumSize = MaximumSize = Size;
-            Database.Update();
+
+            Database.Initialize();
 
             GetLibrary();
         }

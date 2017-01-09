@@ -14,8 +14,7 @@ namespace MaryJane
 {
     public static class Toolbelt
     {
-        private static Database Db { get; set; }
-        public static Database Database => Db ?? (Db = new Database());
+        public static Database Database { get; internal set; }
 
         private static Settings _settings { get; set; }
 

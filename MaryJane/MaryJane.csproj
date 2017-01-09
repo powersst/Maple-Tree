@@ -40,9 +40,11 @@
   <ItemGroup>
     <Reference Include="CefSharp">
       <HintPath>3rdParty\CefSharp\CefSharp.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="CefSharp.WinForms">
       <HintPath>3rdParty\CefSharp\CefSharp.WinForms.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Cemu-UI">
       <HintPath>Resources\Cemu-UI.exe</HintPath>
@@ -278,7 +280,7 @@
     <Compile Include="1Form1.Designer.cs">
       <DependentUpon>1Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Plugin.cs" />
+    <Compile Include="UpdaterPlugin.cs" />
     <Compile Include="Network.cs" />
     <Compile Include="Resources\GlobalSuppressions.cs" />
     <Compile Include="Program.cs" />

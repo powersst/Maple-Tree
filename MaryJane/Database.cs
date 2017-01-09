@@ -17,10 +17,13 @@ namespace MaryJane
 
         private event EventHandler DownloadTitleCompleted;
 
-        public static void Update()
+        public static void Initialize()
         {
             try
             {
+                if (Toolbelt.Database == null)
+                    Toolbelt.Database = new Database();
+
                 if (DateTime.Now > new FileInfo(DatabaseFile).LastWriteTime.AddDays(1))
                 {
                     var data = Network.DownloadData(TitleKeys + "/json");
@@ -125,14 +128,17 @@ namespace MaryJane
             outputDir = Path.Combine(outputDir, wiiUTitle.ToString());
 
             //Download TMD
-            var tmdFile = "tmd";
-            var ticket = "ticket";
             Toolbelt.AppendLog("  - Downloading TMD...");
             TMD tmd;
             try
             {
-                var tmdFileWithCerts = Network.DownloadData(titleUrl + tmdFile);
+                var tmdFileWithCerts = Network.DownloadData(titleUrl + "tmd");
                 tmd = TMD.Load(tmdFileWithCerts);
+
+                //Parse TMD
+                Toolbelt.AppendLog("  - Parsing TMD...");
+                Toolbelt.AppendLog($"    + Title Version: {tmd.TitleVersion}");
+                Toolbelt.AppendLog($"    + {tmd.NumOfContents} Contents");
             }
             catch (Exception ex)
             {
@@ -140,15 +146,8 @@ namespace MaryJane
                 return string.Empty;
             }
 
-            //Parse TMD
-            Toolbelt.AppendLog("  - Parsing TMD...");
-
-            Toolbelt.AppendLog($"    + Title Version: {tmd.TitleVersion}");
-            Toolbelt.AppendLog($"    + {tmd.NumOfContents} Contents");
-
-            File.WriteAllBytes(Path.Combine(outputDir, tmdFile), tmdFileWithCerts);
-
-            //Download cetk
+            //Download cetk / ticket
+            var ticket = "ticket";
             Toolbelt.AppendLog("  - Downloading Ticket...");
             try
             {
