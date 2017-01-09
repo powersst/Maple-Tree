@@ -19,7 +19,7 @@ namespace MaryJane
         private void Form1_Load(object sender, EventArgs e)
         {
             MinimumSize = MaximumSize = Size;
-            Toolbelt.Database.Update();
+            Database.Update();
 
             GetLibrary();
         }
@@ -27,7 +27,7 @@ namespace MaryJane
         private void listBox1_DoubleClick(object sender, EventArgs e)
         {
             var item = listBox1.SelectedItem as string;
-            var title = Toolbelt.Database.Find(item);
+            var title = Database.Find(item);
             if (item != null)
                 Toolbelt.Database.UpdateGame(title.TitleID, Path.Combine(Toolbelt.Settings.TitleDirectory, item));
 

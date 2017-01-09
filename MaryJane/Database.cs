@@ -17,7 +17,7 @@ namespace MaryJane
 
         private event EventHandler DownloadTitleCompleted;
 
-        public void Update()
+        public static void Update()
         {
             try
             {
@@ -59,7 +59,7 @@ namespace MaryJane
             Toolbelt.Form1.listBox1.Invoke(new Action(() => { Toolbelt.Form1.listBox1.Enabled = true; }));
         }
 
-        public WiiUTitle Find(string game_name)
+        public static WiiUTitle Find(string game_name)
         {
             if (game_name == null) return new WiiUTitle();
 
@@ -83,7 +83,7 @@ namespace MaryJane
             return new WiiUTitle {Name = "NULL"};
         }
 
-        private WiiUTitle FindByTitleId(string titleId)
+        private static WiiUTitle FindByTitleId(string titleId)
         {
             return titleId == null ? new WiiUTitle() : DbObject.Find(t => t.TitleID.ToLower() == titleId.ToLower());
         }
@@ -95,7 +95,7 @@ namespace MaryJane
             DbObject.RemoveAll(t => t.ToString().Contains("()"));
         }
 
-        private void CleanUpdate(string outputDir)
+        private static void CleanUpdate(string outputDir)
         {
             Toolbelt.AppendLog("  - Deleting CDecrypt and libeay32...");
             File.Delete(Path.Combine(outputDir, "CDecrypt.exe"));
@@ -129,10 +129,9 @@ namespace MaryJane
             var ticket = "ticket";
             Toolbelt.AppendLog("  - Downloading TMD...");
             TMD tmd;
-            byte[] tmdFileWithCerts;
             try
             {
-                tmdFileWithCerts = Network.DownloadData(titleUrl + tmdFile);
+                var tmdFileWithCerts = Network.DownloadData(titleUrl + tmdFile);
                 tmd = TMD.Load(tmdFileWithCerts);
             }
             catch (Exception ex)
