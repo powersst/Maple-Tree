@@ -23,6 +23,8 @@ namespace MaryJane
             Database.Initialize();
 
             GetLibrary();
+
+            status.Text = Settings.Instance.TitleDirectory;
         }
 
         private void listBox1_DoubleClick(object sender, EventArgs e)

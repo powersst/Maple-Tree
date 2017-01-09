@@ -32,6 +32,7 @@ namespace MaryJane
             }
         }
 
+        public static Settings Instance => Toolbelt.Settings;
         private static string ConfigFile => "configuration.ini";
         private static string ConfigName => "MaryJane";
 

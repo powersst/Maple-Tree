@@ -25,18 +25,12 @@ namespace MaryJane
 
         public static async void AppendLog(string msg, Color color = default(Color))
         {
-            await Task.Run(() =>
-            {
-                Logger.log(msg);
-
-                Form1?.AppendLog(msg, color);
-            });
+            //try{ Logger.log(msg); } catch { }
+            await Task.Run(() => Form1?.AppendLog(msg, color));
         }
 
         public static void SetStatus(string msg, Color color = default(Color))
         {
-            Logger.log(msg);
-
             Form1?.SetStatus(msg, color);
         }
 

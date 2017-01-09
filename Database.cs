@@ -11,11 +11,10 @@ namespace MaryJane
 {
     public class Database
     {
-        private static List<WiiUTitle> DbObject { get; set; }
         private static string TitleKeys => "https://wiiu.titlekeys.com";
         private static string DatabaseFile => "database.json";
-
-        private event EventHandler DownloadTitleCompleted;
+        private static List<WiiUTitle> DbObject { get; set; } = new List<WiiUTitle>();
+        private event EventHandler DownloadTitleCompleted = (sender, args) => { };
 
         public static void Initialize()
         {
@@ -41,8 +40,15 @@ namespace MaryJane
                 Toolbelt.AppendLog($"{e.Message}\n{e.StackTrace}");
             }
 
-            PopulateTables();
+            var json = File.ReadAllText(DatabaseFile);
+            DbObject = JsonConvert.DeserializeObject<List<WiiUTitle>>(json);
+            DbObject.RemoveAll(t => t.ToString().Contains("()"));
             Toolbelt.AppendLog("Database Update to date!");
+        }
+
+        public void updateGame(string s, string f)
+        {
+            UpdateGame(s, f);
         }
 
         public async void UpdateGame(string titleId, string fullPath)
@@ -51,7 +57,8 @@ namespace MaryJane
 
             var game = FindByTitleId(titleId);
 
-            game.TitleID = game.TitleID.Replace("00050000", "0005000e");
+            if (!Toolbelt.Form1.fullTitle.Checked)
+                game.TitleID = game.TitleID.Replace("00050000", "0005000e");
 
             DownloadTitleCompleted += (outputDir, args) =>
             {
@@ -64,7 +71,8 @@ namespace MaryJane
 
             await Task.Run(() => DownloadTitle(game));
 
-            Toolbelt.Form1.listBox1.Invoke(new Action(() => { Toolbelt.Form1.listBox1.Enabled = true; }));
+            Toolbelt.Form1?.listBox1.Invoke(new Action(() => { Toolbelt.Form1.listBox1.Enabled = true; }));
+            Toolbelt.SetStatus(string.Empty);
         }
 
         public static WiiUTitle Find(string game_name)
@@ -95,14 +103,7 @@ namespace MaryJane
         {
             return titleId == null ? new WiiUTitle() : DbObject.Find(t => t.TitleID.ToLower() == titleId.ToLower());
         }
-
-        private static void PopulateTables()
-        {
-            var json = File.ReadAllText(DatabaseFile);
-            DbObject = JsonConvert.DeserializeObject<List<WiiUTitle>>(json);
-            DbObject.RemoveAll(t => t.ToString().Contains("()"));
-        }
-
+        
         private static void CleanUpdate(string outputDir)
         {
             Toolbelt.AppendLog("  - Deleting CDecrypt and libeay32...");

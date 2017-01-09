@@ -35,6 +35,7 @@
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.fullTitle = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // progressBar
@@ -89,11 +90,22 @@
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = "";
             // 
+            // fullTitle
+            // 
+            this.fullTitle.AutoSize = true;
+            this.fullTitle.Location = new System.Drawing.Point(12, 266);
+            this.fullTitle.Name = "fullTitle";
+            this.fullTitle.Size = new System.Drawing.Size(126, 17);
+            this.fullTitle.TabIndex = 11;
+            this.fullTitle.Text = "Download Full Title";
+            this.fullTitle.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(755, 375);
+            this.Controls.Add(this.fullTitle);
             this.Controls.Add(this.richTextBox1);
             this.Controls.Add(this.listBox1);
             this.Controls.Add(this.status);
@@ -117,6 +129,7 @@
         internal System.Windows.Forms.ListBox listBox1;
         internal System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         private System.Windows.Forms.RichTextBox richTextBox1;
+        internal System.Windows.Forms.CheckBox fullTitle;
     }
 }
 
