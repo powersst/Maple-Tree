@@ -13,7 +13,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -34,7 +34,14 @@
   <PropertyGroup>
     <ApplicationIcon>Resources\leaf.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Cemu-UI">
+      <HintPath>Resources\Cemu-UI.exe</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
@@ -251,6 +258,13 @@
     <Compile Include="3rdParty\Json\Utilities\TypeExtensions.cs" />
     <Compile Include="3rdParty\Json\Utilities\ValidationUtils.cs" />
     <Compile Include="3rdParty\Json\WriteState.cs" />
+    <Compile Include="3rdParty\libWiiUSharp\CommonKey.cs" />
+    <Compile Include="3rdParty\libWiiUSharp\ContentIndices.cs" />
+    <Compile Include="3rdParty\libWiiUSharp\GZip.cs" />
+    <Compile Include="3rdParty\libWiiUSharp\MessageEventArgs.cs" />
+    <Compile Include="3rdParty\libWiiUSharp\Shared.cs" />
+    <Compile Include="3rdParty\libWiiUSharp\Ticket.cs" />
+    <Compile Include="3rdParty\libWiiUSharp\TMD.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="1Form1.cs">
       <SubType>Form</SubType>
@@ -258,9 +272,12 @@
     <Compile Include="1Form1.Designer.cs">
       <DependentUpon>1Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="CUIPlugin.cs" />
+    <Compile Include="Network.cs" />
     <Compile Include="Resources\GlobalSuppressions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="Structs\WiiUTitle.cs" />
     <Compile Include="Toolbelt.cs" />
     <EmbeddedResource Include="1Form1.resx">
@@ -274,6 +291,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="3rdParty\Json\Dynamic.snk" />
     <None Include="3rdParty\Json\Newtonsoft.Json.Dotnet.xproj" />
@@ -302,6 +320,10 @@
     <Content Include="3rdParty\Json\Newtonsoft.Json.Net40.csproj" />
     <Content Include="3rdParty\Json\Newtonsoft.Json.Portable.csproj" />
     <Content Include="3rdParty\Json\Newtonsoft.Json.Portable40.csproj" />
+    <None Include="Resources\msvcr120d.dll" />
+    <None Include="Resources\libeay32.dll" />
+    <None Include="Resources\Cemu-UI.exe" />
+    <None Include="Resources\CDecrypt.exe" />
     <Content Include="Resources\leaf.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
