@@ -15,16 +15,8 @@ namespace MaryJane
     public static class Toolbelt
     {
         public static Database Database { get; internal set; }
-
-        private static Settings _settings { get; set; }
-
+        public static Settings Settings { get; internal set; }
         public static Form1 Form1 { get; set; }
-
-        public static Settings Settings
-        {
-            get { return _settings ?? (_settings = new Settings()); }
-            set { _settings = value; }
-        }
 
         public static string RemoveInvalidCharacters(string str)
         {

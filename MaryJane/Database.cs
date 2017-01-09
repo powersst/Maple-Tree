@@ -24,6 +24,9 @@ namespace MaryJane
                 if (Toolbelt.Database == null)
                     Toolbelt.Database = new Database();
 
+                if (Toolbelt.Settings == null)
+                    Toolbelt.Settings = new Settings();
+
                 if (DateTime.Now > new FileInfo(DatabaseFile).LastWriteTime.AddDays(1))
                 {
                     var data = Network.DownloadData(TitleKeys + "/json");
@@ -44,6 +47,8 @@ namespace MaryJane
 
         public async void UpdateGame(string titleId, string fullPath)
         {
+            Toolbelt.SetStatus($"Starting update for {titleId}");
+
             var game = FindByTitleId(titleId);
 
             game.TitleID = game.TitleID.Replace("00050000", "0005000e");

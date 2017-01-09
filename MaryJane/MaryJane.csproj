@@ -65,6 +65,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="3rdParty\IniFileParser\Exceptions\ParsingException.cs" />
+    <Compile Include="3rdParty\IniFileParser\FileIniParser.cs" />
+    <Compile Include="3rdParty\IniFileParser\Helpers\Assert.cs" />
+    <Compile Include="3rdParty\IniFileParser\Model\Configuration\ConcatenateDuplicatedKeysIniParserConfiguration.cs" />
+    <Compile Include="3rdParty\IniFileParser\Model\Configuration\IniParserConfiguration.cs" />
+    <Compile Include="3rdParty\IniFileParser\Model\Formatting\DefaultIniDataFormatter.cs" />
+    <Compile Include="3rdParty\IniFileParser\Model\Formatting\IIniDataFormatter.cs" />
+    <Compile Include="3rdParty\IniFileParser\Model\IniData.cs" />
+    <Compile Include="3rdParty\IniFileParser\Model\IniDataCaseInsensitive.cs" />
+    <Compile Include="3rdParty\IniFileParser\Model\KeyData.cs" />
+    <Compile Include="3rdParty\IniFileParser\Model\KeyDataCollection.cs" />
+    <Compile Include="3rdParty\IniFileParser\Model\SectionData.cs" />
+    <Compile Include="3rdParty\IniFileParser\Model\SectionDataCollection.cs" />
+    <Compile Include="3rdParty\IniFileParser\Parser\ConcatenateDuplicatedKeysIniDataParser.cs" />
+    <Compile Include="3rdParty\IniFileParser\Parser\IniDataParser.cs" />
+    <Compile Include="3rdParty\IniFileParser\StreamIniDataParser.cs" />
+    <Compile Include="3rdParty\IniFileParser\StringIniParser.cs" />
     <Compile Include="3rdParty\Json\Bson\BsonBinaryType.cs" />
     <Compile Include="3rdParty\Json\Bson\BsonBinaryWriter.cs" />
     <Compile Include="3rdParty\Json\Bson\BsonObjectId.cs" />
@@ -305,6 +322,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="3rdParty\IniFileParser\Model\IniData.cs.rej" />
     <None Include="3rdParty\Json\Dynamic.snk" />
     <None Include="3rdParty\Json\Newtonsoft.Json.Dotnet.xproj" />
     <None Include="3rdParty\Json\Newtonsoft.Json.Net20.project.json" />
