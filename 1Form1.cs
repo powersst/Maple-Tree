@@ -19,6 +19,7 @@ namespace MaryJane
         private void Form1_Load(object sender, EventArgs e)
         {
             MinimumSize = MaximumSize = Size;
+            Text += Toolbelt.Version;
 
             Database.Initialize();
 

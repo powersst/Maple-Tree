@@ -110,5 +110,26 @@ namespace MaryJane.Properties {
                 return ResourceManager.GetString("Settings_DefaultSettings", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///using System.Collections.Generic;
+        ///using System.Linq;
+        ///using System.Text;
+        ///using System.Threading.Tasks;
+        ///
+        ///namespace MaryJane
+        ///{
+        ///    class version
+        ///    {
+        ///    }
+        ///}
+        ///.
+        /// </summary>
+        internal static string version {
+            get {
+                return ResourceManager.GetString("version", resourceCulture);
+            }
+        }
     }
 }

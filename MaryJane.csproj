@@ -312,6 +312,7 @@
     <Content Include="3rdParty\CefSharp\CefSharp.WinForms.dll" />
     <Content Include="TODO.txt" />
     <Compile Include="Toolbelt.cs" />
+    <Content Include="version.txt" />
     <EmbeddedResource Include="1Form1.resx">
       <DependentUpon>1Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -360,4 +361,8 @@
     <Content Include="Resources\leaf.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>"C:\Program Files\Git\bin\git.exe" rev-parse --short HEAD &gt; "$(ProjectDir)\version.txt"
+</PreBuildEvent>
+  </PropertyGroup>
 </Project>

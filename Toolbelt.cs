@@ -1,5 +1,4 @@
-﻿using Cemu_UI;
-using libWiiSharp;
+﻿using libWiiSharp;
 using MaryJane.Properties;
 using NUS_Downloader;
 using System;
@@ -14,6 +13,8 @@ namespace MaryJane
 {
     public static class Toolbelt
     {
+        public static readonly string Version = $" - Git {Resources.version.Trim('\n')}";
+
         public static Database Database { get; internal set; }
         public static Settings Settings { get; internal set; }
         public static Form1 Form1 { get; set; }
