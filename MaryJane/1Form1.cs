@@ -46,13 +46,9 @@ namespace MaryJane
         private void ListBoxAddItem(object obj)
         {
             if (listBox1.InvokeRequired)
-            {
                 listBox1.BeginInvoke(new Action(() => { listBox1.Items.Add(obj); }));
-            }
             else
-            {
                 listBox1.Items.Add(obj);
-            }
         }
 
         public void AppendLog(string msg, Color color = default(Color))

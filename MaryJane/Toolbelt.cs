@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Cemu_UI;
+using libWiiSharp;
+using MaryJane.Properties;
+using NUS_Downloader;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Cemu_UI;
-using libWiiSharp;
-using MaryJane.Properties;
-using NUS_Downloader;
 
 namespace MaryJane
 {
@@ -19,13 +19,18 @@ namespace MaryJane
 
         private static Settings _settings { get; set; }
 
+        public static Form1 Form1 { get; set; }
+
         public static Settings Settings
         {
             get { return _settings ?? (_settings = new Settings()); }
             set { _settings = value; }
         }
 
-        public static Form1 Form1 { get; set; }
+        public static string RemoveInvalidCharacters(string str)
+        {
+            return Path.GetInvalidPathChars().Aggregate(str, (current, c) => current.Replace(c.ToString(), ""));
+        }
 
         public static async void AppendLog(string msg, Color color = default(Color))
         {
@@ -124,9 +129,6 @@ namespace MaryJane
                 }
                 cdecryptP.WaitForExit();
                 cdecryptP.Dispose();
-
-                File.Delete(cdecrypt);
-                File.Delete(libeay32);
 
                 AppendLog("Finished decrypting contents.");
             }
