@@ -10,7 +10,7 @@
 
         public override string ToString()
         {
-            return $"{Name} ({Region})";
+            return Toolbelt.RIC($"{Name} ({Region})");
         }
     }
 }

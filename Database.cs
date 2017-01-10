@@ -197,7 +197,7 @@ namespace MaryJane
                     {
                         var downloadUrl = titleUrl + tmd.Contents[i].ContentID.ToString("x8");
                         var outputdir = Path.Combine(outputDir, tmd.Contents[i].ContentID.ToString("x8"));
-                        await Network.DownloadFile(downloadUrl, outputdir);
+                        await Network.DownloadFile(downloadUrl, Toolbelt.RIC(outputdir));
                     }
                     catch (Exception ex)
                     {

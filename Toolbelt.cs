@@ -19,9 +19,14 @@ namespace MaryJane
         public static Settings Settings { get; internal set; }
         public static Form1 Form1 { get; set; }
 
+        public static string RIC(string str)
+        {
+            return RemoveInvalidCharacters(str);
+        }
+
         public static string RemoveInvalidCharacters(string str)
         {
-            return Path.GetInvalidPathChars().Aggregate(str, (current, c) => current.Replace(c.ToString(), ""));
+            return Path.GetInvalidPathChars().Aggregate(str, (current, c) => current.Replace(c.ToString(), "")).Replace(':', ' ');
         }
 
         public static async void AppendLog(string msg, Color color = default(Color))
