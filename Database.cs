@@ -14,7 +14,6 @@ namespace MaryJane
         private static string TitleKeys => "https://wiiu.titlekeys.com";
         private static string DatabaseFile => "database.json";
         private static List<WiiUTitle> DbObject { get; set; } = new List<WiiUTitle>();
-        private event EventHandler DownloadTitleCompleted = (sender, args) => { };
 
         public static async void Initialize()
         {
@@ -55,14 +54,17 @@ namespace MaryJane
         {
             var game = FindByTitleId(titleId);
 
-            if (!Toolbelt.Form1.fullTitle.Checked)
+            if (Toolbelt.Form1 != null)
+                if (!Toolbelt.Form1.fullTitle.Checked)
                 game.TitleID = game.TitleID.Replace("00050000", "0005000e");
 
             Toolbelt.SetStatus($"Updating {titleId}");
 
             DownloadTitle(game, fullPath);
 
-            Toolbelt.Form1.listBox1.Enabled = true;
+            if (Toolbelt.Form1 != null)
+                Toolbelt.Form1.listBox1.Enabled = true;
+
             Toolbelt.SetStatus(string.Empty);
         }
 

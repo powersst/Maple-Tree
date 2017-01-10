@@ -38,6 +38,19 @@ namespace MaryJane
             listBox1.Enabled = false;
         }
 
+        public void UpdateProgress(int percentage, long recvd, long toRecv)
+        {
+            if (Toolbelt.Form1 != null)
+            {
+                var pg = Toolbelt.Form1.progressBar;
+                pg.Invoke(new Action(() => pg.Value = percentage));
+            }
+
+            var received = Toolbelt.SizeSuffix(recvd);
+            var toReceive = Toolbelt.SizeSuffix(toRecv);
+            SetStatus($"{percentage}% | {received} / {toReceive}");
+        }
+
         private void GetLibrary()
         {
             Library = new List<string>(Directory.GetDirectories(Toolbelt.Settings.TitleDirectory));

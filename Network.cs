@@ -1,4 +1,9 @@
-﻿using System;
+﻿// Project: MaryJane
+// File: Network.cs
+// Created By: Jared
+// Last Update: 01 10, 2017 6:01 AM
+
+using System;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
@@ -36,18 +41,16 @@ namespace MaryJane
 
         private static void DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
-            var pg = Toolbelt.Form1.progressBar;
-            pg.Invoke(new Action(() => pg.Value = e.ProgressPercentage));
-
-            var received = Toolbelt.SizeSuffix(e.BytesReceived);
-            var toReceive = Toolbelt.SizeSuffix(e.TotalBytesToReceive);
-            Toolbelt.SetStatus($"{e.ProgressPercentage}% | {received} / {toReceive}");
+            Toolbelt.Form1?.UpdateProgress(e.ProgressPercentage, e.BytesReceived, e.TotalBytesToReceive);
         }
 
         private static void DownloadDataCompleted(object sender, DownloadDataCompletedEventArgs e)
         {
-            var pg = Toolbelt.Form1.progressBar;
-            pg.Invoke(new Action(() => { pg.Value = 0; }));
+            if (Toolbelt.Form1 != null)
+            {
+                var pg = Toolbelt.Form1.progressBar;
+                pg.Invoke(new Action(() => pg.Value = 0));
+            }
             Toolbelt.SetStatus(string.Empty);
         }
     }

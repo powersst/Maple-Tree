@@ -18,7 +18,7 @@ namespace MaryJane
         public static Database Database { get; internal set; }
         public static Settings Settings { get; internal set; }
         public static Form1 Form1 { get; set; }
-
+        
         public static string RIC(string str)
         {
             return RemoveInvalidCharacters(str);
@@ -31,7 +31,7 @@ namespace MaryJane
 
         public static async void AppendLog(string msg, Color color = default(Color))
         {
-            //try{ Logger.log(msg); } catch { }
+            try{ Cemu_UI.Logger.log(msg); } catch { }
             await Task.Run(() => Form1?.AppendLog(msg, color));
         }
 
@@ -44,19 +44,28 @@ namespace MaryJane
         {
             var sourcePath = source.TrimEnd('\\', ' ');
             var targetPath = target.TrimEnd('\\', ' ');
-            var files = Directory.EnumerateFiles(sourcePath, "*", SearchOption.AllDirectories).GroupBy(Path.GetDirectoryName);
-            foreach (var folder in files)
+            var files = Directory.EnumerateFiles(sourcePath, "*", SearchOption.AllDirectories);
+
+            foreach (var file in files)
             {
-                var targetFolder = folder.Key.Replace(sourcePath, targetPath);
-                Directory.CreateDirectory(targetFolder);
-                foreach (var file in folder)
+                var newPath = Path.Combine(file.Replace(sourcePath, targetPath));
+                
+                var attr = File.GetAttributes(file);
+                if (attr.HasFlag(FileAttributes.Directory))
                 {
-                    var targetFile = Path.Combine(targetFolder, Path.GetFileName(file));
-                    if (File.Exists(targetFile)) File.Delete(targetFile);
-                    File.Move(file, targetFile);
+                    if (!Directory.Exists(newPath))
+                        Directory.CreateDirectory(newPath);
+                }
+                else
+                {
+                    if (File.Exists(newPath))
+                        File.Delete(newPath);
+
+                    FileSystem.MoveFile(file, newPath);
                 }
             }
-            Directory.Delete(source, true);
+
+            //Directory.Delete(source, true);
         }
 
         public static string SizeSuffix(long bytes)
