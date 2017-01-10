@@ -39,8 +39,7 @@ namespace MaryJane
         {
             var sourcePath = source.TrimEnd('\\', ' ');
             var targetPath = target.TrimEnd('\\', ' ');
-            var files =
-                Directory.EnumerateFiles(sourcePath, "*", SearchOption.AllDirectories).GroupBy(Path.GetDirectoryName);
+            var files = Directory.EnumerateFiles(sourcePath, "*", SearchOption.AllDirectories).GroupBy(Path.GetDirectoryName);
             foreach (var folder in files)
             {
                 var targetFolder = folder.Key.Replace(sourcePath, targetPath);
@@ -96,7 +95,7 @@ namespace MaryJane
                     StartInfo =
                     {
                         FileName = cdecrypt,
-                        Arguments = "tmd ticket",
+                        Arguments = "tmd cetk",
                         WorkingDirectory = tdir,
                         RedirectStandardInput = true,
                         RedirectStandardOutput = true,
@@ -110,7 +109,7 @@ namespace MaryJane
                 while (!cdecryptP.StandardOutput.EndOfStream)
                 {
                     cdecryptP.StandardOutput.ReadLine();
-                    //AppendLog(cdecryptP.StandardOutput.ReadLine());
+                    AppendLog(cdecryptP.StandardOutput.ReadLine());
                     Application.DoEvents();
                 }
                 cdecryptP.WaitForExit();
