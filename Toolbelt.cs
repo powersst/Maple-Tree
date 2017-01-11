@@ -31,7 +31,9 @@ namespace MaryJane
 
         public static async void AppendLog(string msg, Color color = default(Color))
         {
-            try{ Cemu_UI.Logger.log(msg); } catch { }
+#if (DEBUG)
+            try { Cemu_UI.Logger.log(msg); } catch { }
+#endif
             await Task.Run(() => Form1?.AppendLog(msg, color));
         }
 

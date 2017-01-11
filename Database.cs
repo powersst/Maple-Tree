@@ -45,9 +45,10 @@ namespace MaryJane
             Toolbelt.AppendLog("Database Update to date!");
         }
 
-        public void updateGame(string s, string f)
+        public void updateGame(string titleId, string fullPath)
         {
-            UpdateGame(s, f);
+            titleId = titleId.Replace("00050000", "0005000e");
+            UpdateGame(titleId, fullPath);
         }
 
         public void UpdateGame(string titleId, string fullPath)
@@ -55,8 +56,12 @@ namespace MaryJane
             var game = FindByTitleId(titleId);
 
             if (Toolbelt.Form1 != null)
-                if (!Toolbelt.Form1.fullTitle.Checked)
-                game.TitleID = game.TitleID.Replace("00050000", "0005000e");
+            {
+                if (Toolbelt.Form1.fullTitle.Checked)
+                {
+                    game.TitleID = game.TitleID.Replace("00050000", "0005000e");
+                }
+            }
 
             Toolbelt.SetStatus($"Updating {titleId}");
 
@@ -175,7 +180,7 @@ namespace MaryJane
             File.WriteAllBytes(Path.Combine(outputDir, "cetk"), buffer);
 
             // Parse Ticket
-            if (buffer.Length > 500)
+            if (buffer.Length > 0)
             {
                 Toolbelt.AppendLog("   + Parsing Ticket...");
                 Ticket.Load(buffer);
@@ -219,7 +224,18 @@ namespace MaryJane
 
         private async void DownloadTitle(WiiUTitle wiiUTitle, string fullPath)
         {
-            var outputDir = fullPath;
+            var outputDir = Path.Combine(fullPath);
+
+            //If rpx 
+            if (fullPath.EndsWith(".rpx"))
+            {
+                var dirName = Path.GetDirectoryName(fullPath);
+                if (dirName.ToLower() == "code")
+                {
+                    var fileName = Path.GetFileName(fullPath);
+                    outputDir = Path.Combine(outputDir.Replace(fileName, ""), "../");
+                }
+            }
 
             Toolbelt.AppendLog($"Downloading Title {wiiUTitle.TitleID} v[Latest]...");
 
