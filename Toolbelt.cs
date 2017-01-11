@@ -24,7 +24,7 @@ namespace MaryJane
             return RemoveInvalidCharacters(str);
         }
 
-        public static string RemoveInvalidCharacters(string str)
+        private static string RemoveInvalidCharacters(string str)
         {
             return Path.GetInvalidPathChars().Aggregate(str, (current, c) => current.Replace(c.ToString(), "")).Replace(':', ' ');
         }
@@ -38,34 +38,6 @@ namespace MaryJane
         public static void SetStatus(string msg, Color color = default(Color))
         {
             Form1?.SetStatus(msg, color);
-        }
-
-        public static void MoveDirectory(string source, string target)
-        {
-            var sourcePath = source.TrimEnd('\\', ' ');
-            var targetPath = target.TrimEnd('\\', ' ');
-            var files = Directory.EnumerateFiles(sourcePath, "*", SearchOption.AllDirectories);
-
-            foreach (var file in files)
-            {
-                var newPath = Path.Combine(file.Replace(sourcePath, targetPath));
-                
-                var attr = File.GetAttributes(file);
-                if (attr.HasFlag(FileAttributes.Directory))
-                {
-                    if (!Directory.Exists(newPath))
-                        Directory.CreateDirectory(newPath);
-                }
-                else
-                {
-                    if (File.Exists(newPath))
-                        File.Delete(newPath);
-
-                    FileSystem.MoveFile(file, newPath);
-                }
-            }
-
-            //Directory.Delete(source, true);
         }
 
         public static string SizeSuffix(long bytes)

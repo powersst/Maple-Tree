@@ -109,29 +109,34 @@ namespace MaryJane
                 Toolbelt.AppendLog("  - Deleting CDecrypt and libeay32...");
                 File.Delete(Path.Combine(outputDir, "CDecrypt.exe"));
                 File.Delete(Path.Combine(outputDir, "libeay32.dll"));
-
-                Toolbelt.AppendLog("  - Deleting TMD and Ticket...");
-                File.Delete(Path.Combine(outputDir, "tmd"));
-                File.Delete(Path.Combine(outputDir, "cetk"));
             }
             catch
             {
             }
         }
 
-        private static async Task<TMD> HandleTmd(WiiUTitle wiiUTitle, string titleUrl)
+        private static async Task<TMD> HandleTmd(string outputDir, string titleUrl)
         {
             try
             {
-                Toolbelt.AppendLog("  - Downloading TMD...");
-                var buffer = await Network.DownloadData(titleUrl + "tmd");
-                var tmd = TMD.Load(buffer);
+                var tmdFile = Path.Combine(outputDir, "tmd");
+
+                if (!File.Exists(tmdFile))
+                {
+                    Toolbelt.AppendLog("  - Downloading TMD...");
+                    var buffer = await Network.DownloadData(titleUrl + "tmd");
+
+                    Toolbelt.AppendLog("  - Saving TMD...");
+                    File.WriteAllBytes(Path.Combine(outputDir, "tmd"), buffer);
+                }
+
+                Toolbelt.AppendLog("  - Loading TMD...");
+                var tmd = TMD.Load(tmdFile);
 
                 Toolbelt.AppendLog("  - Parsing TMD...");
                 Toolbelt.AppendLog($"    + Title Version: {tmd.TitleVersion}");
                 Toolbelt.AppendLog($"    + {tmd.NumOfContents} Contents");
 
-                File.WriteAllBytes(Path.Combine("temp", $"{wiiUTitle}", "tmd"), buffer);
                 return tmd;
             }
             catch (Exception ex)
@@ -142,12 +147,12 @@ namespace MaryJane
             return null;
         }
 
-        private static async Task<int> TicketHandled(WiiUTitle wiiUTitle, string titleUrl)
+        private static async Task<int> TicketHandled(WiiUTitle wiiUTitle, string outputDir, string titleUrl)
         {
             var buffer = new byte[0];
-            Toolbelt.AppendLog("  - Downloading Ticket...");
             try
             {
+                Toolbelt.AppendLog("  - Downloading Ticket...");
                 buffer = await Network.DownloadData(Path.Combine(titleUrl, "cetk"));
             }
             catch (Exception ex)
@@ -167,7 +172,7 @@ namespace MaryJane
                     return 0;
                 }
             }
-            File.WriteAllBytes(Path.Combine("temp", $"{wiiUTitle}", "cetk"), buffer);
+            File.WriteAllBytes(Path.Combine(outputDir, "cetk"), buffer);
 
             // Parse Ticket
             if (buffer.Length > 500)
@@ -199,7 +204,7 @@ namespace MaryJane
                     {
                         var downloadUrl = titleUrl + tmd.Contents[i].ContentID.ToString("x8");
                         var outputdir = Path.Combine(outputDir, tmd.Contents[i].ContentID.ToString("x8"));
-                        await Network.DownloadFile(downloadUrl, Toolbelt.RIC(outputdir));
+                        await Network.DownloadFile(downloadUrl, outputdir);
                     }
                     catch (Exception ex)
                     {
@@ -214,25 +219,20 @@ namespace MaryJane
 
         private async void DownloadTitle(WiiUTitle wiiUTitle, string fullPath)
         {
-            var outputDir = Path.Combine("temp");
+            var outputDir = fullPath;
 
             Toolbelt.AppendLog($"Downloading Title {wiiUTitle.TitleID} v[Latest]...");
 
-            var WII_NUS_URL = "http://nus.cdn.shop.wii.com/ccs/download/";
-            var WII_WUP_URL = "http://ccs.cdn.wup.shop.nintendo.net/ccs/download/";
-            string titleUrl = $"{WII_WUP_URL}{wiiUTitle.TitleID}/";
-            string titleUrl2 = $"{WII_NUS_URL}{wiiUTitle.TitleID}/";
-
-            if (!Directory.Exists(outputDir)) Directory.CreateDirectory(outputDir);
-            if (!Directory.Exists(Path.Combine(outputDir, wiiUTitle.ToString())))
-                Directory.CreateDirectory(Path.Combine(outputDir, Toolbelt.RemoveInvalidCharacters(wiiUTitle.ToString())));
-            outputDir = Path.Combine(outputDir, Toolbelt.RemoveInvalidCharacters(wiiUTitle.ToString()));
-
+            const string wiiNusUrl = "http://nus.cdn.shop.wii.com/ccs/download/";
+            const string wiiWupUrl = "http://ccs.cdn.wup.shop.nintendo.net/ccs/download/";
+            string titleUrl = $"{wiiWupUrl}{wiiUTitle.TitleID}/";
+            string titleUrl2 = $"{wiiNusUrl}{wiiUTitle.TitleID}/";
+            
             //Download Ticket
-            if (await TicketHandled(wiiUTitle, titleUrl) == 0) return;
+            if (await TicketHandled(wiiUTitle, outputDir, titleUrl) == 0) return;
 
             //Download TMD
-            var tmd = await HandleTmd(wiiUTitle, titleUrl);
+            var tmd = await HandleTmd(outputDir, titleUrl);
 
             //Download Content
             if (await ContentHandled(tmd, outputDir, titleUrl) == 0) return;
@@ -243,13 +243,6 @@ namespace MaryJane
             CleanUpdate(outputDir, tmd);
 
             Toolbelt.Form1?.listBox1.Invoke(new Action(() => { Toolbelt.Form1.listBox1.Enabled = true; }));
-
-            if (!string.IsNullOrEmpty(outputDir))
-            {
-                Toolbelt.AppendLog("  - Updating local files...");
-                Toolbelt.MoveDirectory(outputDir, fullPath);
-            }
-
             Toolbelt.AppendLog($"Downloading Title '{wiiUTitle}' v{tmd.TitleVersion} Finished.");
         }
     }
