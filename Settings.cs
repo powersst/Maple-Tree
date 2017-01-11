@@ -55,6 +55,19 @@ namespace MaryJane
             }
         }
 
+        public bool FullScreenMode
+        {
+            get
+            {
+                return bool.Parse(GetKeyValue("FullScreenMode"));;
+            }
+
+            set
+            {
+                WriteKeyValue("FullScreenMode", value.ToString());
+            }
+        }
+
         public static Settings Instance => Toolbelt.Settings;
         private static string ConfigFile => "configuration.ini";
         private static string ConfigName => "MaryJane";

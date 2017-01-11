@@ -75,12 +75,13 @@ namespace MaryJane
                 var workingDir = Path.GetDirectoryName(cemuPath);
                 if (workingDir == null) return;
 
+                var o1 = Settings.FullScreenMode ? "-f" : "";
                 var process = new Process
                 {
                     StartInfo =
                     {
                         FileName = cemuPath,
-                        Arguments = $"-f -g \"{rpx}\"",
+                        Arguments = $"{o1} -g \"{rpx}\"",
                         WorkingDirectory = workingDir,
                         RedirectStandardInput = true,
                         RedirectStandardOutput = true,
@@ -91,7 +92,7 @@ namespace MaryJane
                 };
 
                 process.Start();
-                Program.MoveWindow(flash.MainWindowHandle, 0, 0, 500, 500, true);
+                //MoveWindow(process.MainWindowHandle, 0, 0, 0, 0, true);
                 AppendLog("Started playing a game!");
             }
             catch (Exception ex)

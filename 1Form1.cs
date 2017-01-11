@@ -143,5 +143,10 @@ namespace MaryJane
 
             listBox1.Enabled = false;
         }
+
+        private void fullScreen_CheckedChanged(object sender, EventArgs e)
+        {
+            Toolbelt.Settings.FullScreenMode = fullScreen.Checked;
+        }
     }
 }

@@ -37,6 +37,7 @@
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.fullTitle = new System.Windows.Forms.CheckBox();
             this.updateBtn = new System.Windows.Forms.Button();
+            this.fullScreen = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // progressBar
@@ -113,11 +114,23 @@
             this.updateBtn.UseVisualStyleBackColor = true;
             this.updateBtn.Click += new System.EventHandler(this.updateBtn_Click);
             // 
+            // fullScreen
+            // 
+            this.fullScreen.AutoSize = true;
+            this.fullScreen.Location = new System.Drawing.Point(145, 284);
+            this.fullScreen.Name = "fullScreen";
+            this.fullScreen.Size = new System.Drawing.Size(115, 17);
+            this.fullScreen.TabIndex = 13;
+            this.fullScreen.Text = "Full Screen Mode";
+            this.fullScreen.UseVisualStyleBackColor = true;
+            this.fullScreen.CheckedChanged += new System.EventHandler(this.fullScreen_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(755, 375);
+            this.Controls.Add(this.fullScreen);
             this.Controls.Add(this.updateBtn);
             this.Controls.Add(this.fullTitle);
             this.Controls.Add(this.richTextBox1);
@@ -145,6 +158,7 @@
         private System.Windows.Forms.RichTextBox richTextBox1;
         internal System.Windows.Forms.CheckBox fullTitle;
         private System.Windows.Forms.Button updateBtn;
+        private System.Windows.Forms.CheckBox fullScreen;
     }
 }
 
