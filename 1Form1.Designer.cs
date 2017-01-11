@@ -36,6 +36,7 @@
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.fullTitle = new System.Windows.Forms.CheckBox();
+            this.updateBtn = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // progressBar
@@ -70,7 +71,7 @@
             this.listBox1.FormattingEnabled = true;
             this.listBox1.Location = new System.Drawing.Point(12, 9);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(250, 251);
+            this.listBox1.Size = new System.Drawing.Size(250, 264);
             this.listBox1.Sorted = true;
             this.listBox1.TabIndex = 10;
             this.listBox1.DoubleClick += new System.EventHandler(this.listBox1_DoubleClick);
@@ -87,25 +88,37 @@
             this.richTextBox1.ReadOnly = true;
             this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
             this.richTextBox1.ShortcutsEnabled = false;
-            this.richTextBox1.Size = new System.Drawing.Size(475, 251);
+            this.richTextBox1.Size = new System.Drawing.Size(475, 264);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = "";
             // 
             // fullTitle
             // 
             this.fullTitle.AutoSize = true;
-            this.fullTitle.Location = new System.Drawing.Point(12, 266);
+            this.fullTitle.Location = new System.Drawing.Point(12, 284);
             this.fullTitle.Name = "fullTitle";
             this.fullTitle.Size = new System.Drawing.Size(126, 17);
             this.fullTitle.TabIndex = 11;
             this.fullTitle.Text = "Download Full Title";
             this.fullTitle.UseVisualStyleBackColor = true;
+            this.fullTitle.CheckedChanged += new System.EventHandler(this.fullTitle_CheckedChanged);
+            // 
+            // updateBtn
+            // 
+            this.updateBtn.Location = new System.Drawing.Point(668, 284);
+            this.updateBtn.Name = "updateBtn";
+            this.updateBtn.Size = new System.Drawing.Size(75, 23);
+            this.updateBtn.TabIndex = 12;
+            this.updateBtn.Text = "Update";
+            this.updateBtn.UseVisualStyleBackColor = true;
+            this.updateBtn.Click += new System.EventHandler(this.updateBtn_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(755, 375);
+            this.Controls.Add(this.updateBtn);
             this.Controls.Add(this.fullTitle);
             this.Controls.Add(this.richTextBox1);
             this.Controls.Add(this.listBox1);
@@ -131,6 +144,7 @@
         internal System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         private System.Windows.Forms.RichTextBox richTextBox1;
         internal System.Windows.Forms.CheckBox fullTitle;
+        private System.Windows.Forms.Button updateBtn;
     }
 }
 

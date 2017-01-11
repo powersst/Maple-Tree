@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 
 namespace MaryJane
 {
@@ -28,29 +30,6 @@ namespace MaryJane
             status.Text = Settings.Instance.TitleDirectory;
         }
 
-        private void listBox1_DoubleClick(object sender, EventArgs e)
-        {
-            var item = listBox1.SelectedItem as string;
-            var title = Database.Find(item);
-            if (item != null)
-                Toolbelt.Database.UpdateGame(title.TitleID, Path.Combine(Toolbelt.Settings.TitleDirectory, item));
-
-            listBox1.Enabled = false;
-        }
-
-        public void UpdateProgress(int percentage, long recvd, long toRecv)
-        {
-            if (Toolbelt.Form1 != null)
-            {
-                var pg = Toolbelt.Form1.progressBar;
-                pg.Invoke(new Action(() => pg.Value = percentage));
-            }
-
-            var received = Toolbelt.SizeSuffix(recvd);
-            var toReceive = Toolbelt.SizeSuffix(toRecv);
-            SetStatus($"{percentage}% | {received} / {toReceive}");
-        }
-
         private void GetLibrary()
         {
             Library = new List<string>(Directory.GetDirectories(Toolbelt.Settings.TitleDirectory));
@@ -66,6 +45,19 @@ namespace MaryJane
                 listBox1.BeginInvoke(new Action(() => { listBox1.Items.Add(obj); }));
             else
                 listBox1.Items.Add(obj);
+        }
+
+        public void UpdateProgress(int percentage, long recvd, long toRecv)
+        {
+            if (Toolbelt.Form1 != null)
+            {
+                var pg = Toolbelt.Form1.progressBar;
+                pg.Invoke(new Action(() => pg.Value = percentage));
+            }
+
+            var received = Toolbelt.SizeSuffix(recvd);
+            var toReceive = Toolbelt.SizeSuffix(toRecv);
+            SetStatus($"{percentage}% | {received} / {toReceive}");
         }
 
         public void AppendLog(string msg, Color color = default(Color))
@@ -102,6 +94,54 @@ namespace MaryJane
                 status.Text = msg;
                 status.ForeColor = color;
             }
+        }
+
+        private void listBox1_DoubleClick(object sender, EventArgs e)
+        {
+            string rpx = null, gamePath = null;
+            var item = listBox1.SelectedItem as string;
+
+            string[] files = {};
+
+            if (item != null)
+                gamePath = Path.Combine(Toolbelt.Settings.TitleDirectory, item);
+
+            if (gamePath != null)
+                files = Directory.GetFiles(gamePath, "*.rpx", SearchOption.AllDirectories);
+
+            if (files.Length > 0)
+                rpx = files[0];
+
+            var cemuPath = Path.Combine(Settings.Instance.CemuDirectory, "cemu.exe");
+            if (File.Exists(cemuPath) && File.Exists(rpx))
+            {
+                Toolbelt.RunCemu(cemuPath, rpx);
+            }
+            else
+            {
+                SetStatus("Could not find a valid .rpx");
+            }
+        }
+
+        private void fullTitle_CheckedChanged(object sender, EventArgs e)
+        {
+            updateBtn.Text = fullTitle.Checked ? "Download" : "Update";
+        }
+
+        private void updateBtn_Click(object sender, EventArgs e)
+        {
+            string fullPath = null, item = listBox1.SelectedItem as string;
+
+            if (item != null)
+                fullPath = Path.Combine(Toolbelt.Settings.TitleDirectory, item);
+
+            if (Toolbelt.Database != null)
+            {
+                var title = Database.Find(item);
+                Toolbelt.Database.UpdateGame(title.TitleID, fullPath);
+            }
+
+            listBox1.Enabled = false;
         }
     }
 }

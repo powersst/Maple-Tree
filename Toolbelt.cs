@@ -65,6 +65,41 @@ namespace MaryJane
             return (ulong) new FileInfo(contentFile).Length == content.Size;
         }
 
+        [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
+        internal static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
+        
+        public static void RunCemu(string cemuPath, string rpx)
+        {
+            try
+            {
+                var workingDir = Path.GetDirectoryName(cemuPath);
+                if (workingDir == null) return;
+
+                var process = new Process
+                {
+                    StartInfo =
+                    {
+                        FileName = cemuPath,
+                        Arguments = $"-f -g \"{rpx}\"",
+                        WorkingDirectory = workingDir,
+                        RedirectStandardInput = true,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true,
+                        UseShellExecute = false
+                    }
+                };
+
+                process.Start();
+                Program.MoveWindow(flash.MainWindowHandle, 0, 0, 500, 500, true);
+                AppendLog("Started playing a game!");
+            }
+            catch (Exception ex)
+            {
+                AppendLog("Error!\r\n" + ex.Message);
+            }
+        }
+
         public static void CDecrypt(string tdir)
         {
             try

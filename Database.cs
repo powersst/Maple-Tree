@@ -120,38 +120,6 @@ namespace MaryJane
             }
         }
 
-        private static async Task<TMD> HandleTmd(string outputDir, string titleUrl)
-        {
-            try
-            {
-                var tmdFile = Path.Combine(outputDir, "tmd");
-
-                if (!File.Exists(tmdFile))
-                {
-                    Toolbelt.AppendLog("  - Downloading TMD...");
-                    var buffer = await Network.DownloadData(titleUrl + "tmd");
-
-                    Toolbelt.AppendLog("  - Saving TMD...");
-                    File.WriteAllBytes(Path.Combine(outputDir, "tmd"), buffer);
-                }
-
-                Toolbelt.AppendLog("  - Loading TMD...");
-                var tmd = TMD.Load(tmdFile);
-
-                Toolbelt.AppendLog("  - Parsing TMD...");
-                Toolbelt.AppendLog($"    + Title Version: {tmd.TitleVersion}");
-                Toolbelt.AppendLog($"    + {tmd.NumOfContents} Contents");
-
-                return tmd;
-            }
-            catch (Exception ex)
-            {
-                Toolbelt.AppendLog($"   + Downloading TMD Failed...\n{ex.Message}");
-            }
-
-            return null;
-        }
-
         private static async Task<int> TicketHandled(WiiUTitle wiiUTitle, string outputDir, string titleUrl)
         {
             var buffer = new byte[0];
@@ -194,6 +162,38 @@ namespace MaryJane
             return 1;
         }
 
+        private static async Task<TMD> HandleTmd(string outputDir, string titleUrl)
+        {
+            try
+            {
+                var tmdFile = Path.Combine(outputDir, "tmd");
+
+                if (!File.Exists(tmdFile))
+                {
+                    Toolbelt.AppendLog("  - Downloading TMD...");
+                    var buffer = await Network.DownloadData(titleUrl + "tmd");
+
+                    Toolbelt.AppendLog("  - Saving TMD...");
+                    File.WriteAllBytes(Path.Combine(outputDir, "tmd"), buffer);
+                }
+
+                Toolbelt.AppendLog("  - Loading TMD...");
+                var tmd = TMD.Load(tmdFile);
+
+                Toolbelt.AppendLog("  - Parsing TMD...");
+                Toolbelt.AppendLog($"    + Title Version: {tmd.TitleVersion}");
+                Toolbelt.AppendLog($"    + {tmd.NumOfContents} Contents");
+
+                return tmd;
+            }
+            catch (Exception ex)
+            {
+                Toolbelt.AppendLog($"   + Downloading TMD Failed...\n{ex.Message}");
+            }
+
+            return null;
+        }
+
         private static async Task<int> ContentHandled(TMD tmd, string outputDir, string titleUrl)
         {
             for (var i = 0; i < tmd.NumOfContents; i++)
@@ -224,18 +224,18 @@ namespace MaryJane
 
         private async void DownloadTitle(WiiUTitle wiiUTitle, string fullPath)
         {
-            var outputDir = Path.Combine(fullPath);
+            var outputDir = Path.GetFullPath(fullPath);
 
-            //If rpx 
             if (fullPath.EndsWith(".rpx"))
             {
-                var dirName = Path.GetDirectoryName(fullPath);
-                if (dirName.ToLower() == "code")
+                var folder = Path.GetDirectoryName(fullPath);
+                if (folder.EndsWith("code"))
                 {
-                    var fileName = Path.GetFileName(fullPath);
-                    outputDir = Path.Combine(outputDir.Replace(fileName, ""), "../");
+                    outputDir = Path.GetDirectoryName(folder);
                 }
             }
+
+            Toolbelt.AppendLog($"Output Directory '{outputDir}'");
 
             Toolbelt.AppendLog($"Downloading Title {wiiUTitle.TitleID} v[Latest]...");
 

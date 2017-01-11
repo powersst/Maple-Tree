@@ -20,7 +20,7 @@ namespace MaryJane
                 var value = GetKeyValue("TitleDirectory");
 
                 if (!string.IsNullOrEmpty(value)) return value;
-                var fbd = new FolderBrowserDialog();
+                var fbd = new FolderBrowserDialog { Description = "Please select your Cemu Game Directory" };
                 var result = fbd.ShowDialog();
 
                 if (string.IsNullOrWhiteSpace(fbd.SelectedPath) && result == DialogResult.OK)
@@ -28,6 +28,29 @@ namespace MaryJane
                 value = fbd.SelectedPath;
 
                 WriteKeyValue("TitleDirectory", value);
+                return value;
+            }
+        }
+
+        public string CemuDirectory
+        {
+            get
+            {
+                var value = GetKeyValue("CemuDirectory");
+
+                if (!string.IsNullOrEmpty(value)) return value;
+                var ofd = new OpenFileDialog
+                {
+                    CheckFileExists = true,
+                    Filter = "Cemu Excutable |cemu.exe"
+                };
+                var result = ofd.ShowDialog();
+
+                if (string.IsNullOrWhiteSpace(ofd.FileName) && result == DialogResult.OK)
+                    return value;
+
+                value = Path.GetDirectoryName(ofd.FileName);
+                WriteKeyValue("CemuDirectory", value);
                 return value;
             }
         }
