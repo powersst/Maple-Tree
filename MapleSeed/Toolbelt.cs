@@ -1,6 +1,10 @@
-﻿using libWiiSharp;
-using MaryJane.Properties;
-using NUS_Downloader;
+﻿// Project: MapleSeed
+// File: Toolbelt.cs
+// Updated By: Jared
+// 
+
+#region usings
+
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -8,6 +12,12 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Cemu_UI;
+using libWiiSharp;
+using MaryJane.Properties;
+using NUS_Downloader;
+
+#endregion
 
 namespace MaryJane
 {
@@ -18,7 +28,7 @@ namespace MaryJane
         public static Database Database { get; internal set; }
         public static Settings Settings { get; internal set; }
         public static Form1 Form1 { get; set; }
-        
+
         public static string RIC(string str)
         {
             return RemoveInvalidCharacters(str);
@@ -26,15 +36,22 @@ namespace MaryJane
 
         private static string RemoveInvalidCharacters(string str)
         {
-            return Path.GetInvalidPathChars().Aggregate(str, (current, c) => current.Replace(c.ToString(), "")).Replace(':', ' ');
+            return
+                Path.GetInvalidPathChars()
+                    .Aggregate(str, (current, c) => current.Replace(c.ToString(), ""))
+                    .Replace(':', ' ');
         }
 
         public static async void AppendLog(string msg, Color color = default(Color))
         {
 #if (DEBUG)
-            try { Cemu_UI.Logger.log(msg); } catch { }
+            try {
+                Logger.log(msg);
+            }
+            catch {}
 #endif
-            await Task.Run(() => Form1?.AppendLog(msg, color));
+            if (Form1 != null)
+                await Task.Run(() => Form1?.AppendLog(msg, color));
         }
 
         public static void SetStatus(string msg, Color color = default(Color))
@@ -48,8 +65,7 @@ namespace MaryJane
             string[] orders = {"GB", "MB", "KB", "Bytes"};
             var max = (long) Math.Pow(scale, orders.Length - 1);
 
-            foreach (var order in orders)
-            {
+            foreach (var order in orders) {
                 if (bytes > max)
                     return $"{decimal.Divide(bytes, max):##.##} {order}";
 
@@ -65,13 +81,9 @@ namespace MaryJane
             return (ulong) new FileInfo(contentFile).Length == content.Size;
         }
 
-        [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
-        internal static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
-        
         public static void RunCemu(string cemuPath, string rpx)
         {
-            try
-            {
+            try {
                 var workingDir = Path.GetDirectoryName(cemuPath);
                 if (workingDir == null) return;
 
@@ -94,16 +106,14 @@ namespace MaryJane
                 process.Start();
                 AppendLog("Started playing a game!");
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 AppendLog("Error!\r\n" + ex.Message);
             }
         }
 
         public static void CDecrypt(string tdir)
         {
-            try
-            {
+            try {
                 var cdecrypt = Path.Combine(tdir, "CDecrypt.exe");
                 var libeay32 = Path.Combine(tdir, "libeay32.dll");
 
@@ -129,8 +139,7 @@ namespace MaryJane
                 };
 
                 cdecryptP.Start();
-                while (!cdecryptP.StandardOutput.EndOfStream)
-                {
+                while (!cdecryptP.StandardOutput.EndOfStream) {
                     cdecryptP.StandardOutput.ReadLine();
                     AppendLog(cdecryptP.StandardOutput.ReadLine());
                     Application.DoEvents();
@@ -140,8 +149,7 @@ namespace MaryJane
 
                 AppendLog("Finished decrypting contents.");
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 AppendLog("Error decrypting contents!\r\n" + ex.Message);
             }
         }

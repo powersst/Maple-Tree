@@ -1,10 +1,14 @@
 ﻿// Project: MapleRoot
 // File: Program.cs
-// Created By: Jared
-// Last Update: 01 11, 2017 9:11 AM
+// Updated By: Jared
+// 
+
+#region usings
 
 using System.Threading.Tasks;
 using MapleRoot.Network;
+
+#endregion
 
 namespace MapleRoot
 {
@@ -14,8 +18,8 @@ namespace MapleRoot
         {
             var client = Client.Create();
             Task.Run(() => Server.Init());
-            Toolkit.Sleep(1000);
-            Task.Run(() => client.Start()).Wait();
+            Toolkit.Sleep(3000);
+            client.Start();
         }
     }
 }

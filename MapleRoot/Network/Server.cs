@@ -1,12 +1,20 @@
 ﻿// Project: MapleRoot
 // File: Server.cs
-// Created By: Jared
-// Last Update: 01 11, 2017 11:19 AM
+// Updated By: Jared
+// 
+
+#region usings
 
 using System;
 using System.IO;
+using System.Net.Mime;
+using System.Threading;
+using System.Windows.Forms;
 using Lidgren.Network;
+using MapleRoot.Network.Messages;
 using ProtoBuf;
+
+#endregion
 
 namespace MapleRoot.Network
 {
@@ -14,53 +22,31 @@ namespace MapleRoot.Network
     {
         private Server()
         {
-            var config = new NetPeerConfiguration("MapleRootServer") {Port = ServerPort};
+            var config = new NetPeerConfiguration("MapleTree")
+            {
+                Port = Config.ServerPort,
+                MaximumConnections = 100
+            };
+            config.SetMessageTypeEnabled(NetIncomingMessageType.UnconnectedData, true);
 
             NetServer = new NetServer(config);
+            NetServer.RegisterReceivedCallback(Incoming.HandleServerMessage, new SynchronizationContext());
+            
             NetServer.Start();
-            StartReceiving();
         }
 
         private NetServer NetServer { get; }
 
-        private static short ServerPort => 24862;
-
-        internal static Server Instance { get; private set; }
+        private static Server Instance { get; set; }
 
         private NetSendResult Send<T>(T data, NetConnection recipient)
         {
             var ms = new MemoryStream();
             Serializer.Serialize(ms, data);
-            var msg = new NetOutgoingMessage {Data = ms.GetBuffer()};
+            var msg = NetServer.CreateMessage(ms.GetBuffer().Length);
+            msg.Data = ms.GetBuffer();
 
             return NetServer.SendMessage(msg, recipient, NetDeliveryMethod.ReliableOrdered);
-        }
-
-        private void StartReceiving()
-        {
-            while (NetServer.Status == NetPeerStatus.Running)
-            {
-                var msg = NetServer.ReadMessage();
-                if (msg == null)
-                {
-                    Toolkit.Sleep(1);
-                    continue;
-                }
-
-                switch (msg.MessageType)
-                {
-                    case NetIncomingMessageType.VerboseDebugMessage:
-                    case NetIncomingMessageType.DebugMessage:
-                    case NetIncomingMessageType.WarningMessage:
-                    case NetIncomingMessageType.ErrorMessage:
-                        Console.WriteLine(msg.ReadString());
-                        break;
-                    default:
-                        Console.WriteLine("Unhandled type: " + msg.MessageType);
-                        break;
-                }
-                NetServer.Recycle(msg);
-            }
         }
 
         public static Server Init()

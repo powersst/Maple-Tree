@@ -1,9 +1,13 @@
 ﻿// Project: MapleRoot
 // File: Toolkit.cs
-// Created By: Jared
-// Last Update: 01 11, 2017 11:27 AM
+// Updated By: Jared
+// 
 
-using System.Threading.Tasks;
+#region usings
+
+using System.Threading;
+
+#endregion
 
 namespace MapleRoot
 {
@@ -11,7 +15,7 @@ namespace MapleRoot
     {
         public static void Sleep(int ms)
         {
-            System.Threading.Thread.Sleep(ms);
+            Thread.Sleep(ms);
         }
     }
 }
