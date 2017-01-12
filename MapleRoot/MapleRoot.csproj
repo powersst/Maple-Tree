@@ -1,0 +1,235 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{4375D4C0-FEF9-46F5-942D-36C2EBE15672}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>MapleRoot</RootNamespace>
+    <AssemblyName>MapleRoot</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Interfaces\IPack.cs" />
+    <Compile Include="Network\Server.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Structs\GraphicPack.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\Encryption\NetAESEncryption.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\Encryption\NetBlockEncryptionBase.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\Encryption\NetCryptoProviderBase.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\Encryption\NetCryptoProviderEncryption.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\Encryption\NetDESEncryption.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\Encryption\NetEncryption.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\Encryption\NetRC2Encryption.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\Encryption\NetTripleDESEncryption.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\Encryption\NetXorEncryption.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\Encryption\NetXteaEncryption.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NamespaceDoc.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetBigInteger.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetBitVector.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetBitWriter.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetBuffer.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetBuffer.Peek.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetBuffer.Read.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetBuffer.Read.Reflection.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetBuffer.Write.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetBuffer.Write.Reflection.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetClient.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetConnection.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetConnection.Handshake.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetConnection.Latency.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetConnection.MTU.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetConnectionStatistics.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetConnectionStatus.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetConstants.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetDeliveryMethod.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetException.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetFragmentationHelper.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetFragmentationInfo.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetIncomingMessage.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetIncomingMessageType.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetMessageType.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetNatIntroduction.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetOutgoingMessage.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetPeer.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetPeer.Discovery.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetPeer.Fragmentation.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetPeer.Internal.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetPeer.LatencySimulation.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetPeer.Logging.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetPeer.MessagePools.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetPeer.Send.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetPeerConfiguration.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetPeerStatistics.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetPeerStatus.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetQueue.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetRandom.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetRandom.Implementations.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetRandomSeed.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetReceiverChannelBase.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetReliableOrderedReceiver.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetReliableSenderChannel.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetReliableSequencedReceiver.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetReliableUnorderedReceiver.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetSenderChannelBase.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetSendResult.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetServer.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetSRP.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetStoredReliableMessage.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetTime.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetTuple.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetUnreliableSenderChannel.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetUnreliableSequencedReceiver.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetUnreliableUnorderedReceiver.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetUPnP.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\NetUtility.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\Platform\PlatformAndroid.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\Platform\PlatformConstrained.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\Platform\PlatformUnityExtras.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\Platform\PlatformWin32.cs" />
+    <Compile Include="ThirdParty\Lidgren.Network\Platform\PlatformWinRT.cs" />
+    <Compile Include="ThirdParty\protobuf-net\BclHelpers.cs" />
+    <Compile Include="ThirdParty\protobuf-net\BufferExtension.cs" />
+    <Compile Include="ThirdParty\protobuf-net\BufferPool.cs" />
+    <Compile Include="ThirdParty\protobuf-net\CallbackAttributes.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Compiler\CompilerContext.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Compiler\CompilerDelegates.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Compiler\Local.cs" />
+    <Compile Include="ThirdParty\protobuf-net\DataFormat.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Extensible.cs" />
+    <Compile Include="ThirdParty\protobuf-net\ExtensibleUtil.cs" />
+    <Compile Include="ThirdParty\protobuf-net\GlobalSuppressions.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Helpers.cs" />
+    <Compile Include="ThirdParty\protobuf-net\IExtensible.cs" />
+    <Compile Include="ThirdParty\protobuf-net\IExtension.cs" />
+    <Compile Include="ThirdParty\protobuf-net\ImplicitFields.cs" />
+    <Compile Include="ThirdParty\protobuf-net\KeyValuePairProxy.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Meta\AttributeMap.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Meta\BasicList.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Meta\CallbackSet.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Meta\MetaType.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Meta\RuntimeTypeModel.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Meta\SubType.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Meta\TypeFormatEventArgs.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Meta\TypeModel.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Meta\ValueMember.cs" />
+    <Compile Include="ThirdParty\protobuf-net\NetObjectCache.cs" />
+    <Compile Include="ThirdParty\protobuf-net\PrefixStyle.cs" />
+    <Compile Include="ThirdParty\protobuf-net\ProtoContractAttribute.cs" />
+    <Compile Include="ThirdParty\protobuf-net\ProtoConverterAttribute.cs" />
+    <Compile Include="ThirdParty\protobuf-net\ProtoEnumAttribute.cs" />
+    <Compile Include="ThirdParty\protobuf-net\ProtoException.cs" />
+    <Compile Include="ThirdParty\protobuf-net\ProtoIgnoreAttribute.cs" />
+    <Compile Include="ThirdParty\protobuf-net\ProtoIncludeAttribute.cs" />
+    <Compile Include="ThirdParty\protobuf-net\ProtoMemberAttribute.cs" />
+    <Compile Include="ThirdParty\protobuf-net\ProtoReader.cs" />
+    <Compile Include="ThirdParty\protobuf-net\ProtoWriter.cs" />
+    <Compile Include="ThirdParty\protobuf-net\SerializationContext.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\ArrayDecorator.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\BlobSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\BooleanSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\ByteSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\CharSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\CompiledSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\DateTimeSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\DecimalSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\DefaultValueDecorator.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\DoubleSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\EnumSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\FieldDecorator.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\GuidSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\ImmutableCollectionDecorator.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\Int16Serializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\Int32Serializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\Int64Serializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\IProtoSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\IProtoTypeSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\ISerializerProxy.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\KeyValuePairDecorator.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\ListDecorator.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\MemberSpecifiedDecorator.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\NetObjectSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\NullDecorator.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\ParseableSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\PropertyDecorator.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\ProtoDecoratorBase.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\ReflectedUriDecorator.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\SByteSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\SingleSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\StringSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\SubItemSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\SurrogateSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\SystemTypeSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\TagDecorator.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\TimeSpanSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\TupleSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\TypeSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\UInt16Serializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\UInt32Serializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\UInt64Serializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\Serializers\UriDecorator.cs" />
+    <Compile Include="ThirdParty\protobuf-net\ServiceModel\ProtoBehaviorAttribute.cs" />
+    <Compile Include="ThirdParty\protobuf-net\ServiceModel\ProtoBehaviorExtensionElement.cs" />
+    <Compile Include="ThirdParty\protobuf-net\ServiceModel\ProtoEndpointBehavior.cs" />
+    <Compile Include="ThirdParty\protobuf-net\ServiceModel\ProtoOperationBehavior.cs" />
+    <Compile Include="ThirdParty\protobuf-net\ServiceModel\XmlProtoSerializer.cs" />
+    <Compile Include="ThirdParty\protobuf-net\SubItemToken.cs" />
+    <Compile Include="ThirdParty\protobuf-net\WireType.cs" />
+    <Compile Include="Toolkit.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <Compile Include="Network\Client.cs" />
+    <None Include="ThirdParty\protobuf-net\project.json" />
+    <None Include="ThirdParty\protobuf-net\protobuf_net.xproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ThirdParty\Lidgren.Network\Documentation\ChangedFromV2.txt" />
+    <Content Include="ThirdParty\Lidgren.Network\Documentation\Discovery.html" />
+    <Content Include="ThirdParty\Lidgren.Network\Documentation\Improvements.txt" />
+    <Content Include="ThirdParty\Lidgren.Network\Documentation\PacketLayout.txt" />
+    <Content Include="ThirdParty\Lidgren.Network\Documentation\SimulatingBadNetwork.html" />
+    <Content Include="ThirdParty\Lidgren.Network\Documentation\TODO.txt" />
+    <Content Include="ThirdParty\Lidgren.Network\Documentation\Tutorial.html" />
+    <Content Include="ThirdParty\protobuf-net\Web\TODO.txt" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
