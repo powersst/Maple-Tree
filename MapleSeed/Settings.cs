@@ -1,9 +1,9 @@
 ﻿using System.IO;
 using System.Windows.Forms;
 using IniParser;
-using MaryJane.Properties;
+using MapleSeed.Properties;
 
-namespace MaryJane
+namespace MapleSeed
 {
     public class Settings
     {

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace MaryJane.Properties {
+namespace MapleSeed.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

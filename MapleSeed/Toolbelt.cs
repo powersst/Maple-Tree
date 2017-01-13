@@ -14,12 +14,14 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Cemu_UI;
 using libWiiSharp;
-using MaryJane.Properties;
+using MapleSeed.Properties;
+using MaryJane;
 using NUS_Downloader;
+using Settings = MapleSeed.Settings;
 
 #endregion
 
-namespace MaryJane
+namespace MapleSeed
 {
     public static class Toolbelt
     {

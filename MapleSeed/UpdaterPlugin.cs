@@ -1,5 +1,6 @@
 ﻿using CefSharp;
 using Cemu_UI;
+using MapleSeed;
 
 namespace MaryJane
 {

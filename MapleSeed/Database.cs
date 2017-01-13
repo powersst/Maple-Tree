@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
 using libWiiSharp;
+using MapleSeed;
 using MaryJane.Structs;
 using Newtonsoft.Json;
 

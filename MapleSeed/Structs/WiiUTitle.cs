@@ -1,4 +1,6 @@
-﻿namespace MaryJane.Structs
+﻿using MapleSeed;
+
+namespace MaryJane.Structs
 {
     public struct WiiUTitle
     {

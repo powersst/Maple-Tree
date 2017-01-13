@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace MaryJane.Properties {
+namespace MapleSeed.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace MaryJane.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("MaryJane.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("MapleSeed.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -112,7 +112,7 @@ namespace MaryJane.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 46e260e
+        ///   Looks up a localized string similar to e230102
         ///.
         /// </summary>
         internal static string version {

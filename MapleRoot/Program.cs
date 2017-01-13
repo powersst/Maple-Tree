@@ -5,6 +5,7 @@
 
 #region usings
 
+using System;
 using System.Threading.Tasks;
 using MapleRoot.Network;
 
@@ -16,10 +17,13 @@ namespace MapleRoot
     {
         private static void Main(string[] args)
         {
-            var client = Client.Create();
-            Task.Run(() => Server.Init());
-            Toolkit.Sleep(3000);
-            client.Start();
+            MapleServer.Init();
+
+            var key = new ConsoleKeyInfo('q', ConsoleKey.Q, false, false, false);
+            while (Console.ReadKey() != key) {
+                Console.Write("\r");
+                Toolkit.Sleep(1);
+            }
         }
     }
 }

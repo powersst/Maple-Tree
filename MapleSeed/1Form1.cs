@@ -1,12 +1,26 @@
-﻿using System;
+﻿// Project: MapleSeed
+// File: 1Form1.cs
+// Updated By: Jared
+// 
+
+#region usings
+
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
+using MapleRoot;
+using MapleRoot.Network;
+using MapleRoot.Network.Events;
+using MapleRoot.Structs;
+using MaryJane;
+using MaryJane.Structs;
 
-namespace MaryJane
+#endregion
+
+namespace MapleSeed
 {
     public partial class Form1 : Form
     {
@@ -18,8 +32,14 @@ namespace MaryJane
 
         private static List<string> Library { get; set; }
 
+        private static MapleClient Client { get; set; }
+
         private void Form1_Load(object sender, EventArgs e)
         {
+            Client = MapleClient.Create();
+            Client.OnMessageReceived += ClientOnOnMessageReceived;
+            Client.Start();
+
             MinimumSize = MaximumSize = Size;
             Text += Toolbelt.Version;
 
@@ -28,6 +48,26 @@ namespace MaryJane
             GetLibrary();
 
             status.Text = Settings.Instance.TitleDirectory;
+            fullScreen.Checked = Settings.Instance.FullScreenMode;
+
+            Task.Run(() => {
+                while (Client.IsRunning) {
+                    SetStatus($@"Total In {Client.Stats.ReceivedBytes} bytes, Total Out {Client.Stats.SentBytes} bytes", Color.Gray);
+                    Toolkit.Sleep(250);
+                }
+            });
+        }
+
+        private void ClientOnOnMessageReceived(object sender, OnMessageReceivedEventArgs e)
+        {
+            
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (Client.IsRunning) {
+                Client.Stop();
+            }
         }
 
         private void GetLibrary()
@@ -49,8 +89,7 @@ namespace MaryJane
 
         public void UpdateProgress(int percentage, long recvd, long toRecv)
         {
-            if (Toolbelt.Form1 != null)
-            {
+            if (Toolbelt.Form1 != null) {
                 var pg = Toolbelt.Form1.progressBar;
                 pg.Invoke(new Action(() => pg.Value = percentage));
             }
@@ -63,16 +102,13 @@ namespace MaryJane
         public void AppendLog(string msg, Color color = default(Color))
         {
             msg += '\n';
-            if (richTextBox1.InvokeRequired)
-            {
-                richTextBox1.BeginInvoke(new Action(() =>
-                {
+            if (richTextBox1.InvokeRequired) {
+                richTextBox1.BeginInvoke(new Action(() => {
                     richTextBox1.AppendText(msg);
                     richTextBox1.ScrollToCaret();
                 }));
             }
-            else
-            {
+            else {
                 richTextBox1.AppendText(msg);
                 richTextBox1.ScrollToCaret();
             }
@@ -81,16 +117,13 @@ namespace MaryJane
         public void SetStatus(string msg, Color color = default(Color))
         {
             msg += '\n';
-            if (status.InvokeRequired)
-            {
-                status.BeginInvoke(new Action(() =>
-                {
+            if (status.InvokeRequired) {
+                status.BeginInvoke(new Action(() => {
                     status.Text = msg;
                     status.ForeColor = color;
                 }));
             }
-            else
-            {
+            else {
                 status.Text = msg;
                 status.ForeColor = color;
             }
@@ -114,13 +147,9 @@ namespace MaryJane
 
             var cemuPath = Path.Combine(Settings.Instance.CemuDirectory, "cemu.exe");
             if (File.Exists(cemuPath) && File.Exists(rpx))
-            {
                 Toolbelt.RunCemu(cemuPath, rpx);
-            }
             else
-            {
                 SetStatus("Could not find a valid .rpx");
-            }
         }
 
         private void fullTitle_CheckedChanged(object sender, EventArgs e)
@@ -135,8 +164,7 @@ namespace MaryJane
             if (item != null)
                 fullPath = Path.Combine(Toolbelt.Settings.TitleDirectory, item);
 
-            if (Toolbelt.Database != null)
-            {
+            if (Toolbelt.Database != null) {
                 var title = Database.Find(item);
                 Toolbelt.Database.UpdateGame(title.TitleID, fullPath);
             }
@@ -147,6 +175,11 @@ namespace MaryJane
         private void fullScreen_CheckedChanged(object sender, EventArgs e)
         {
             Toolbelt.Settings.FullScreenMode = fullScreen.Checked;
+        }
+
+        private void shareToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
