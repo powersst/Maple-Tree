@@ -3,14 +3,14 @@
 // Updated By: Jared
 // 
 
+using System.Dynamic;
 using MapleRoot.Enums;
+using MapleRoot.Structs;
 
 namespace MapleRoot.Network.Events
 {
     public class OnMessageReceivedEventArgs
     {
-        public int lenth { get; set; }
-        public byte[] buffer { get; set; }
-        public MessageType messageType { get; set; }
+        public MessageHeader Header { get; set; }
     }
 }

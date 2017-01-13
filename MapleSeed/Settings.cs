@@ -55,11 +55,24 @@ namespace MapleSeed
             }
         }
 
+        public string Username
+        {
+            get
+            {
+                return GetKeyValue("Username");
+            }
+
+            set
+            {
+                WriteKeyValue("Username", value);
+            }
+        }
+
         public bool FullScreenMode
         {
             get
             {
-                return bool.Parse(GetKeyValue("FullScreenMode"));;
+                return bool.Parse(GetKeyValue("FullScreenMode")); ;
             }
 
             set

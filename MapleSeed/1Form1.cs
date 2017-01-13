@@ -17,10 +17,7 @@ using MapleRoot.Enums;
 using MapleRoot.Network;
 using MapleRoot.Network.Events;
 using MapleRoot.Network.Messages;
-using MapleRoot.Structs;
 using MaryJane;
-using MaryJane.Structs;
-using Newtonsoft.Json;
 
 #endregion
 
@@ -54,9 +51,16 @@ namespace MapleSeed
             status.Text = Settings.Instance.TitleDirectory;
             fullScreen.Checked = Settings.Instance.FullScreenMode;
 
+            if (string.IsNullOrEmpty(Settings.Instance.Username))
+                username.Text = Settings.Instance.Username = Toolkit.TempName();
+            else
+                username.Text = Settings.Instance.Username;
+
             Task.Run(() => {
                 while (Client.IsRunning) {
-                    SetStatus($@"Total In {Client.Stats.ReceivedBytes} bytes, Total Out {Client.Stats.SentBytes} bytes", Color.Gray);
+                    SetStatus(
+                        $@"Total In {Client.Stats.ReceivedBytes} bytes, Total Out {Client.Stats.SentBytes} bytes",
+                        Color.Gray);
                     Toolkit.Sleep(250);
                 }
             });
@@ -64,22 +68,25 @@ namespace MapleSeed
 
         private void ClientOnOnMessageReceived(object sender, OnMessageReceivedEventArgs e)
         {
-            switch (e.messageType) {
+            var header = e.Header;
+
+            switch (header.Type) {
                 case MessageType.Userlist:
-                    HandleUserList.Init(e.buffer, userList);
+                    HandleUserList.Init(header.Data, userList);
                     break;
                 case MessageType.ChatMessage:
-                    var msg = Encoding.UTF8.GetString(e.buffer);
+                    var msg = Encoding.UTF8.GetString(header.Data);
                     Toolbelt.AppendLog(msg);
+                    break;
+                case MessageType.ModUsername:
+                    UpdateUsername(Encoding.UTF8.GetString(e.Header.Data));
                     break;
             }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (Client.IsRunning) {
-                Client.Stop();
-            }
+            if (Client.IsRunning) Client.Stop();
         }
 
         private void GetLibrary()
@@ -189,19 +196,27 @@ namespace MapleSeed
             Toolbelt.Settings.FullScreenMode = fullScreen.Checked;
         }
 
-        private void shareToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
+        private void shareToolStripMenuItem_Click(object sender, EventArgs e) {}
 
         private void chatInput_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == (char) Keys.Return) {
+            if (e.KeyChar == (char) Keys.Return && !string.IsNullOrEmpty(chatInput.Text))
                 if (Client.NetClient.ServerConnection != null) {
-                    Client.Send($"[{Client.NetClient.ServerConnection.RemoteUniqueIdentifier}]: {chatInput.Text}", MessageType.ChatMessage);
+                    Client.Send($"[{username.Text}]: {chatInput.Text}", MessageType.ChatMessage);
                     chatInput.Text = string.Empty;
                 }
-            }
+        }
+
+        private void username_TextChanged(object sender, EventArgs e)
+        {
+            Settings.Instance.Username = username.Text;
+            Client.SetUsername(username.Text);
+        }
+
+        private void UpdateUsername(string name)
+        {
+            Settings.Instance.Username = name;
+            username.Invoke(new Action(() => { username.Text = name; }));
         }
     }
 }

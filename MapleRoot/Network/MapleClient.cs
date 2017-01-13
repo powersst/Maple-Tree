@@ -12,24 +12,25 @@ using System.Threading;
 using Lidgren.Network;
 using MapleRoot.Enums;
 using MapleRoot.Network.Events;
+using MapleRoot.Structs;
+using Newtonsoft.Json;
 using ProtoBuf;
 
 #endregion
 
 namespace MapleRoot.Network
 {
-    public class MapleClient
+    public class MapleClient : MapleBase
     {
         public NetClient NetClient { get; private set; }
         public NetPeerStatistics Stats => NetClient.Statistics;
         public bool IsRunning => NetClient.Status == NetPeerStatus.Running;
+        internal string Username { get; private set; }
 
         public void Start()
         {
-            var approval = NetClient.CreateMessage();
-            approval.Write("secret");
             NetClient.RegisterReceivedCallback(ReadMessage, new SynchronizationContext());
-            NetClient.Connect(Config.ServerIP, Config.ServerPort, approval);
+            NetClient.Connect(Config.ServerIP, Config.ServerPort);
         }
 
         public void Stop()
@@ -38,18 +39,16 @@ namespace MapleRoot.Network
             NetClient.Shutdown($"Bye! -{NetClient.UniqueIdentifier}");
         }
 
+        public void SetUsername(string username)
+        {
+            Username = username;
+            Send(username, MessageType.ModUsername);
+        }
+
         public NetSendResult Send(string message, MessageType m_type)
         {
             var buf = Encoding.UTF8.GetBytes(message);
-            var length = buf.Length;
-
-            var msg = NetClient.CreateMessage();
-            msg.Write(length);
-            msg.Write((byte) m_type);
-            msg.Write(message);
-
-            var result = NetClient.SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
-            if (result == NetSendResult.Sent) Console.WriteLine("Message Sent!");
+            var result = Send(NetClient, NetClient.ServerConnection, buf, m_type);
             return result;
         }
 
@@ -57,15 +56,7 @@ namespace MapleRoot.Network
         {
             var ms = new MemoryStream();
             Serializer.Serialize(ms, data);
-            var len = (int) ms.Length;
-
-            var msg = NetClient.CreateMessage();
-            msg.Write(len);
-            msg.Write((byte) m_type);
-            msg.Write(ms.ToArray());
-
-            var result = NetClient.SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
-            if (result == NetSendResult.Sent) Console.WriteLine("Message Sent!");
+            var result = Send(NetClient, NetClient.ServerConnection, ms.ToArray(), m_type);
             return result;
         }
 
@@ -109,11 +100,9 @@ namespace MapleRoot.Network
 
                     case NetIncomingMessageType.Data:
                         try {
-                            var len = inMsg.ReadInt32();
-                            var m_type = (MessageType)inMsg.ReadByte();
-                            var buf = inMsg.ReadBytes(len);
+                            var header = MessageHeader.Parse(inMsg);
                             OnMessageReceived.Invoke(m_client,
-                                new OnMessageReceivedEventArgs {lenth = len, buffer = buf, messageType = m_type});
+                                new OnMessageReceivedEventArgs {Header = header});
                         }
                         catch (Exception e) {
                             Console.WriteLine(e.Message);

@@ -5,9 +5,6 @@
 
 #region usings
 
-using Lidgren.Network;
-using MapleRoot.Network.Events;
-using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,17 +12,22 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Lidgren.Network;
 using MapleRoot.Enums;
+using MapleRoot.Network.Events;
+using MapleRoot.Structs;
 using Newtonsoft.Json;
+using ProtoBuf;
 
 #endregion
 
 namespace MapleRoot.Network
 {
-    public class MapleServer
+    public class MapleServer : MapleBase
     {
         private MapleServer()
         {
+            Connections = new List<NetConnection>();
             var config = new NetPeerConfiguration("MapleTree")
             {
                 Port = Config.ServerPort,
@@ -39,79 +41,68 @@ namespace MapleRoot.Network
 
             Task.Run(() => {
                 while (NetServer.Status == NetPeerStatus.Running) {
-                    var names = NetServer.Connections.Select(c => c.RemoteUniqueIdentifier.ToString()).ToList();
-                    var json = JsonConvert.SerializeObject(names);
-                    var buf = Encoding.UTF8.GetBytes(json);
+                    var names =
+                    (from c in NetServer.Connections
+                        select (UserData) c.Tag into mc select mc.Username).ToList();
 
-                    var msg = NetServer.CreateMessage();
-                    msg.Write(buf.Length);
-                    msg.Write((byte) MessageType.Userlist);
-                    msg.Write(buf);
+                    if (names.Count > 0) {
+                        var json = JsonConvert.SerializeObject(names);
+                        var buf = Encoding.UTF8.GetBytes(json);
 
-                    NetServer.SendToAll(msg, NetDeliveryMethod.ReliableOrdered);
-                    Toolkit.Sleep(3000);
+                        var msg = NetServer.CreateMessage();
+                        msg.Write(buf.Length);
+                        msg.Write((byte)MessageType.Userlist);
+                        msg.Write(buf);
+
+                        NetServer.SendToAll(msg, NetDeliveryMethod.ReliableOrdered);
+                    }
+                    
+                    Toolkit.Sleep(1000);
                 }
             });
-        }
-
-        private void m_OnMessageReceived(object sender, OnMessageReceivedEventArgs e)
-        {
-            var from = (NetConnection) sender;
-
-            switch (e.messageType) {
-                case MessageType.Userlist:
-                    break;
-                case MessageType.ChatMessage:
-                    var str = Encoding.UTF8.GetString(e.buffer);
-                    SendToAll(str, MessageType.ChatMessage);
-                    break;
-            }
         }
 
         private NetServer NetServer { get; }
 
         private static MapleServer Instance { get; set; }
 
+        private static List<NetConnection> Connections { get; set; }
+
+        private void m_OnMessageReceived(object sender, OnMessageReceivedEventArgs e)
+        {
+            var from = (NetConnection) sender;
+
+            switch (e.Header.Type) {
+                case MessageType.Userlist:
+                    break;
+                case MessageType.ChatMessage:
+                    var str = Encoding.UTF8.GetString(e.Header.Data);
+                    SendToAll(str, MessageType.ChatMessage);
+                    break;
+                case MessageType.ModUsername:
+                    var name = Encoding.UTF8.GetString(e.Header.Data);
+                    var mc = (UserData) from.Tag;
+                    mc.Username = name;
+                    from.Tag = mc;
+                    break;
+            }
+        }
+
         private void SendToAll(string message, MessageType m_type)
         {
             var buf = Encoding.UTF8.GetBytes(message);
-            var length = buf.Length;
-
             var msg = NetServer.CreateMessage();
-            msg.Write(length);
-            msg.Write((byte)m_type);
-            msg.Write(message);
-
+            msg.Write(buf.Length);
+            msg.Write((byte) m_type);
+            msg.Write(buf);
             NetServer.SendToAll(msg, NetDeliveryMethod.ReliableOrdered);
-        }
-
-        private NetSendResult Send(string message, NetConnection recipient, MessageType m_type)
-        {
-            var buf = Encoding.UTF8.GetBytes(message);
-            var length = buf.Length;
-
-            var msg = NetServer.CreateMessage();
-            msg.Write(length);
-            msg.Write((byte)m_type);
-            msg.Write(message);
-
-            var result = NetServer.SendMessage(msg, recipient, NetDeliveryMethod.ReliableOrdered);
-            if (result == NetSendResult.Sent) Console.WriteLine("Message Sent!");
-            return result;
         }
 
         private NetSendResult Send<T>(T data, NetConnection recipient, MessageType m_type)
         {
             var ms = new MemoryStream();
             Serializer.Serialize(ms, data);
-            var len = (int)ms.Length;
-
-            var msg = NetServer.CreateMessage();
-            msg.Write(len);
-            msg.Write((byte) m_type);
-            msg.Write(ms.ToArray());
-
-            return NetServer.SendMessage(msg, recipient, NetDeliveryMethod.ReliableOrdered);
+            return Send(NetServer, recipient, ms.ToArray(), m_type);
         }
 
         private void ReadMessage(object state)
@@ -133,30 +124,18 @@ namespace MapleRoot.Network
                         var status = (NetConnectionStatus) inMsg.ReadByte();
                         switch (status) {
                             case NetConnectionStatus.Connected:
+                                inMsg.SenderConnection.Tag = new UserData();
+                                Connections.Add(inMsg.SenderConnection);
                                 Console.WriteLine($"{inMsg.SenderConnection} has connected!");
                                 break;
                         }
                         break;
 
-                    case NetIncomingMessageType.ConnectionApproval:
-                        var uid = inMsg.SenderConnection.RemoteUniqueIdentifier;
-                        var s = inMsg.ReadString();
-                        if (s == "secret") {
-                            inMsg.SenderConnection.Approve();
-                            Console.WriteLine($"Connection Approved! {uid}");
-                        }
-                        else {
-                            inMsg.SenderConnection.Deny();
-                            Console.WriteLine($"Connection Denied! -{uid}");
-                        }
-                        break;
                     case NetIncomingMessageType.Data:
                         try {
-                            var len = inMsg.ReadInt32();
-                            var m_type = (MessageType) inMsg.ReadByte();
-                            var buf = inMsg.ReadBytes(len);
+                            var header = MessageHeader.Parse(inMsg);
                             OnMessageReceived.Invoke(inMsg.SenderConnection,
-                                new OnMessageReceivedEventArgs {lenth = len, buffer = buf, messageType = m_type});
+                                new OnMessageReceivedEventArgs {Header = header});
                         }
                         catch (Exception e) {
                             Console.WriteLine(e.Message);

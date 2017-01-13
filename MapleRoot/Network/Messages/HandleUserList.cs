@@ -22,8 +22,13 @@ namespace MapleRoot.Network.Messages
             var json = Encoding.UTF8.GetString(buffer);
             var names = JsonConvert.DeserializeObject<List<string>>(json);
             userList.Invoke(new Action(() => { userList.Items.Clear(); }));
-            foreach (var name in names)
-                userList.Invoke(new Action(() => { userList.Items.Add(name); }));
+
+            foreach (var name in names) {
+                userList.Invoke(new Action(() => {
+                    if (!string.IsNullOrEmpty(name))
+                        userList.Items.Add(name);
+                }));
+            }
         }
     }
 }

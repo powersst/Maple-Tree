@@ -46,6 +46,7 @@
             this.fullScreen = new System.Windows.Forms.CheckBox();
             this.userList = new System.Windows.Forms.ListBox();
             this.chatInput = new System.Windows.Forms.TextBox();
+            this.username = new System.Windows.Forms.TextBox();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -181,20 +182,27 @@
             // 
             // chatInput
             // 
-            this.chatInput.AcceptsReturn = true;
-            this.chatInput.AcceptsTab = true;
             this.chatInput.Location = new System.Drawing.Point(268, 370);
             this.chatInput.Name = "chatInput";
-            this.chatInput.ShortcutsEnabled = false;
             this.chatInput.Size = new System.Drawing.Size(475, 22);
             this.chatInput.TabIndex = 0;
             this.chatInput.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.chatInput_KeyPress);
+            // 
+            // username
+            // 
+            this.username.Location = new System.Drawing.Point(749, 370);
+            this.username.MaxLength = 12;
+            this.username.Name = "username";
+            this.username.Size = new System.Drawing.Size(108, 22);
+            this.username.TabIndex = 15;
+            this.username.TextChanged += new System.EventHandler(this.username_TextChanged);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(865, 472);
+            this.Controls.Add(this.username);
             this.Controls.Add(this.chatInput);
             this.Controls.Add(this.userList);
             this.Controls.Add(this.fullScreen);
@@ -235,6 +243,7 @@
         private System.Windows.Forms.ToolStripMenuItem uploadToolStripMenuItem;
         private System.Windows.Forms.ListBox userList;
         private System.Windows.Forms.TextBox chatInput;
+        private System.Windows.Forms.TextBox username;
     }
 }
 
