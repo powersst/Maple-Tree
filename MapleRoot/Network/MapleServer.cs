@@ -5,14 +5,18 @@
 
 #region usings
 
-using System;
-using System.IO;
-using System.Text;
-using System.Threading;
 using Lidgren.Network;
 using MapleRoot.Network.Events;
-using MapleRoot.Structs;
 using ProtoBuf;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using MapleRoot.Enums;
+using Newtonsoft.Json;
 
 #endregion
 
@@ -29,22 +33,82 @@ namespace MapleRoot.Network
             };
             NetServer = new NetServer(config);
             NetServer.RegisterReceivedCallback(ReadMessage, new SynchronizationContext());
+            OnMessageReceived += m_OnMessageReceived;
 
             NetServer.Start();
+
+            Task.Run(() => {
+                while (NetServer.Status == NetPeerStatus.Running) {
+                    var names = NetServer.Connections.Select(c => c.RemoteUniqueIdentifier.ToString()).ToList();
+                    var json = JsonConvert.SerializeObject(names);
+                    var buf = Encoding.UTF8.GetBytes(json);
+
+                    var msg = NetServer.CreateMessage();
+                    msg.Write(buf.Length);
+                    msg.Write((byte) MessageType.Userlist);
+                    msg.Write(buf);
+
+                    NetServer.SendToAll(msg, NetDeliveryMethod.ReliableOrdered);
+                    Toolkit.Sleep(3000);
+                }
+            });
+        }
+
+        private void m_OnMessageReceived(object sender, OnMessageReceivedEventArgs e)
+        {
+            var from = (NetConnection) sender;
+
+            switch (e.messageType) {
+                case MessageType.Userlist:
+                    break;
+                case MessageType.ChatMessage:
+                    var str = Encoding.UTF8.GetString(e.buffer);
+                    SendToAll(str, MessageType.ChatMessage);
+                    break;
+            }
         }
 
         private NetServer NetServer { get; }
 
         private static MapleServer Instance { get; set; }
 
-        private NetSendResult Send<T>(T data, NetConnection recipient)
+        private void SendToAll(string message, MessageType m_type)
+        {
+            var buf = Encoding.UTF8.GetBytes(message);
+            var length = buf.Length;
+
+            var msg = NetServer.CreateMessage();
+            msg.Write(length);
+            msg.Write((byte)m_type);
+            msg.Write(message);
+
+            NetServer.SendToAll(msg, NetDeliveryMethod.ReliableOrdered);
+        }
+
+        private NetSendResult Send(string message, NetConnection recipient, MessageType m_type)
+        {
+            var buf = Encoding.UTF8.GetBytes(message);
+            var length = buf.Length;
+
+            var msg = NetServer.CreateMessage();
+            msg.Write(length);
+            msg.Write((byte)m_type);
+            msg.Write(message);
+
+            var result = NetServer.SendMessage(msg, recipient, NetDeliveryMethod.ReliableOrdered);
+            if (result == NetSendResult.Sent) Console.WriteLine("Message Sent!");
+            return result;
+        }
+
+        private NetSendResult Send<T>(T data, NetConnection recipient, MessageType m_type)
         {
             var ms = new MemoryStream();
             Serializer.Serialize(ms, data);
             var len = (int)ms.Length;
 
-            var msg = NetServer.CreateMessage(len);
+            var msg = NetServer.CreateMessage();
             msg.Write(len);
+            msg.Write((byte) m_type);
             msg.Write(ms.ToArray());
 
             return NetServer.SendMessage(msg, recipient, NetDeliveryMethod.ReliableOrdered);
@@ -89,8 +153,10 @@ namespace MapleRoot.Network
                     case NetIncomingMessageType.Data:
                         try {
                             var len = inMsg.ReadInt32();
+                            var m_type = (MessageType) inMsg.ReadByte();
                             var buf = inMsg.ReadBytes(len);
-                            OnMessageReceived.Invoke(Instance, new OnMessageReceivedEventArgs { lenth = len, buffer = buf });
+                            OnMessageReceived.Invoke(inMsg.SenderConnection,
+                                new OnMessageReceivedEventArgs {lenth = len, buffer = buf, messageType = m_type});
                         }
                         catch (Exception e) {
                             Console.WriteLine(e.Message);

@@ -9,14 +9,18 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using MapleRoot;
+using MapleRoot.Enums;
 using MapleRoot.Network;
 using MapleRoot.Network.Events;
+using MapleRoot.Network.Messages;
 using MapleRoot.Structs;
 using MaryJane;
 using MaryJane.Structs;
+using Newtonsoft.Json;
 
 #endregion
 
@@ -60,7 +64,15 @@ namespace MapleSeed
 
         private void ClientOnOnMessageReceived(object sender, OnMessageReceivedEventArgs e)
         {
-            
+            switch (e.messageType) {
+                case MessageType.Userlist:
+                    HandleUserList.Init(e.buffer, userList);
+                    break;
+                case MessageType.ChatMessage:
+                    var msg = Encoding.UTF8.GetString(e.buffer);
+                    Toolbelt.AppendLog(msg);
+                    break;
+            }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -180,6 +192,16 @@ namespace MapleSeed
         private void shareToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void chatInput_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char) Keys.Return) {
+                if (Client.NetClient.ServerConnection != null) {
+                    Client.Send($"[{Client.NetClient.ServerConnection.RemoteUniqueIdentifier}]: {chatInput.Text}", MessageType.ChatMessage);
+                    chatInput.Text = string.Empty;
+                }
+            }
         }
     }
 }

@@ -10,6 +10,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using Lidgren.Network;
+using MapleRoot.Enums;
 using MapleRoot.Network.Events;
 using ProtoBuf;
 
@@ -19,7 +20,7 @@ namespace MapleRoot.Network
 {
     public class MapleClient
     {
-        private NetClient NetClient { get; set; }
+        public NetClient NetClient { get; private set; }
         public NetPeerStatistics Stats => NetClient.Statistics;
         public bool IsRunning => NetClient.Status == NetPeerStatus.Running;
 
@@ -37,13 +38,14 @@ namespace MapleRoot.Network
             NetClient.Shutdown($"Bye! -{NetClient.UniqueIdentifier}");
         }
 
-        public NetSendResult Send(string message)
+        public NetSendResult Send(string message, MessageType m_type)
         {
             var buf = Encoding.UTF8.GetBytes(message);
             var length = buf.Length;
 
-            var msg = NetClient.CreateMessage(length);
+            var msg = NetClient.CreateMessage();
             msg.Write(length);
+            msg.Write((byte) m_type);
             msg.Write(message);
 
             var result = NetClient.SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
@@ -51,14 +53,15 @@ namespace MapleRoot.Network
             return result;
         }
 
-        public NetSendResult Send<T>(T data)
+        public NetSendResult Send<T>(T data, MessageType m_type)
         {
             var ms = new MemoryStream();
             Serializer.Serialize(ms, data);
             var len = (int) ms.Length;
 
-            var msg = NetClient.CreateMessage(len);
+            var msg = NetClient.CreateMessage();
             msg.Write(len);
+            msg.Write((byte) m_type);
             msg.Write(ms.ToArray());
 
             var result = NetClient.SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
@@ -107,8 +110,10 @@ namespace MapleRoot.Network
                     case NetIncomingMessageType.Data:
                         try {
                             var len = inMsg.ReadInt32();
+                            var m_type = (MessageType)inMsg.ReadByte();
                             var buf = inMsg.ReadBytes(len);
-                            OnMessageReceived.Invoke(m_client, new OnMessageReceivedEventArgs{lenth = len, buffer = buf});
+                            OnMessageReceived.Invoke(m_client,
+                                new OnMessageReceivedEventArgs {lenth = len, buffer = buf, messageType = m_type});
                         }
                         catch (Exception e) {
                             Console.WriteLine(e.Message);
