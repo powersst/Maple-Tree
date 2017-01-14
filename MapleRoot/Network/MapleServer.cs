@@ -85,6 +85,14 @@ namespace MapleRoot.Network
                     mc.Username = name;
                     from.Tag = mc;
                     break;
+                case MessageType.StorageUpload:
+                    var ms = new MemoryStream(e.Header.Data);
+                    var sd = Serializer.Deserialize<StorageData>(ms);
+                    if (Storage.AddToStorage(sd)) {
+                        sd.Data = null;
+                        Send(sd, from, MessageType.StorageUpload);
+                    }
+                    break;
             }
         }
 

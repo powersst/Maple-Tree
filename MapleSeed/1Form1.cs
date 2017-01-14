@@ -5,6 +5,12 @@
 
 #region usings
 
+using MapleRoot;
+using MapleRoot.Enums;
+using MapleRoot.Network;
+using MapleRoot.Network.Events;
+using MapleRoot.Network.Messages;
+using MaryJane;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -12,12 +18,9 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using MapleRoot;
-using MapleRoot.Enums;
-using MapleRoot.Network;
-using MapleRoot.Network.Events;
-using MapleRoot.Network.Messages;
-using MaryJane;
+using Lidgren.Network;
+using MapleRoot.Structs;
+using ProtoBuf;
 
 #endregion
 
@@ -46,7 +49,12 @@ namespace MapleSeed
 
             Database.Initialize();
 
-            GetLibrary();
+            Library = new List<string>(Directory.GetDirectories(Toolbelt.Settings.TitleDirectory));
+            foreach (var item in Library) {
+                if (!string.IsNullOrEmpty(item)) {
+                    ListBoxAddItem(new FileInfo(item).Name);
+                }
+            }
 
             status.Text = Settings.Instance.TitleDirectory;
             fullScreen.Checked = Settings.Instance.FullScreenMode;
@@ -81,6 +89,9 @@ namespace MapleSeed
                 case MessageType.ModUsername:
                     UpdateUsername(Encoding.UTF8.GetString(e.Header.Data));
                     break;
+                case MessageType.StorageUpload:
+                    ConfirmStorageUpload(e.Header);
+                    break;
             }
         }
 
@@ -88,16 +99,7 @@ namespace MapleSeed
         {
             if (Client.IsRunning) Client.Stop();
         }
-
-        private void GetLibrary()
-        {
-            Library = new List<string>(Directory.GetDirectories(Toolbelt.Settings.TitleDirectory));
-
-            foreach (var item in Library)
-                if (!string.IsNullOrEmpty(item))
-                    ListBoxAddItem(new FileInfo(item).Name);
-        }
-
+        
         private void ListBoxAddItem(object obj)
         {
             if (listBox1.InvokeRequired)
@@ -165,25 +167,7 @@ namespace MapleSeed
 
         private void listBox1_DoubleClick(object sender, EventArgs e)
         {
-            string rpx = null, gamePath = null;
-            var item = listBox1.SelectedItem as string;
-
-            string[] files = {};
-
-            if (item != null)
-                gamePath = Path.Combine(Toolbelt.Settings.TitleDirectory, item);
-
-            if (gamePath != null)
-                files = Directory.GetFiles(gamePath, "*.rpx", SearchOption.AllDirectories);
-
-            if (files.Length > 0)
-                rpx = files[0];
-
-            var cemuPath = Path.Combine(Settings.Instance.CemuDirectory, "cemu.exe");
-            if (File.Exists(cemuPath) && File.Exists(rpx))
-                Toolbelt.RunCemu(cemuPath, rpx);
-            else
-                SetStatus("Could not find a valid .rpx");
+            
         }
 
         private void fullTitle_CheckedChanged(object sender, EventArgs e)
@@ -222,14 +206,49 @@ namespace MapleSeed
             var ofd = new OpenFileDialog
             {
                 CheckFileExists = true,
-                Filter = "Graphic Pack|rules.txt|Tansferable Cache |*.bin",
+                Filter = @"Tansferable Data |*.bin;rules.txt",
                 InitialDirectory = Toolbelt.Settings.CemuDirectory
             };
             var result = ofd.ShowDialog();
+            if (!File.Exists(ofd.FileName))
+                return;
 
-            if (string.IsNullOrWhiteSpace(ofd.FileName) && result == DialogResult.OK) {
-                
+            if (result != DialogResult.OK)
+                return;
+
+            var file = Path.GetFullPath(ofd.FileName);
+
+            if (string.IsNullOrWhiteSpace(file))
+                return;
+
+            if (new FileInfo(file).Extension == ".txt") {
+                var folder = Path.GetDirectoryName(file);
+                folder = Path.GetFileName(folder);
+                //Storage.Upload(Client, file, folder, false);
             }
+            else {
+                var filename = Path.GetFileName(file);
+                Storage.Upload(Client, file, filename, true);
+            }
+        }
+
+        private void ConfirmStorageUpload(MessageHeader header)
+        {
+            using (var ms = new MemoryStream(header.Data))
+            {
+                var sd = Serializer.Deserialize<StorageData>(ms);
+                if (sd.Length <= 0) return;
+
+                AppendLog(!sd.Shader
+                    ? $"Graphic Pack, {sd.Name} has been uploaded!"
+                    : $"Transferable Shader, {sd.Name} has been uploaded!");
+            }
+        }
+
+        private void playBtn_Click(object sender, EventArgs e)
+        {
+            if (listBox1.SelectedItem != null)
+                Toolbelt.LaunchCemu(listBox1.SelectedItem as string);
         }
     }
 }

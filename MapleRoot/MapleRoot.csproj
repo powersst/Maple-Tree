@@ -67,8 +67,10 @@
     <Compile Include="Network\Messages\HandleUserList.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Storage.cs" />
     <Compile Include="Structs\GraphicPack.cs" />
     <Compile Include="Structs\MessageHeader.cs" />
+    <Compile Include="Structs\StorageData.cs" />
     <Compile Include="Structs\UserData.cs" />
     <Compile Include="ThirdParty\Newtonsoft.Json\Bson\BsonBinaryType.cs" />
     <Compile Include="ThirdParty\Newtonsoft.Json\Bson\BsonBinaryWriter.cs" />
@@ -436,7 +438,6 @@
     <Compile Include="Toolkit.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <Compile Include="Network\MapleClient.cs" />
     <None Include="ThirdParty\Newtonsoft.Json\Dynamic.snk" />
     <None Include="ThirdParty\Newtonsoft.Json\Newtonsoft.Json.Dotnet.xproj" />

@@ -135,7 +135,6 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="3rdParty\IniFileParser\Model\IniData.cs.rej" />
-    <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

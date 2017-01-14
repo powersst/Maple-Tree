@@ -42,6 +42,7 @@
             this.chatInput = new System.Windows.Forms.TextBox();
             this.username = new System.Windows.Forms.TextBox();
             this.shareBtn = new System.Windows.Forms.Button();
+            this.playBtn = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // progressBar
@@ -158,7 +159,7 @@
             // 
             // shareBtn
             // 
-            this.shareBtn.Location = new System.Drawing.Point(12, 7);
+            this.shareBtn.Location = new System.Drawing.Point(93, 7);
             this.shareBtn.Name = "shareBtn";
             this.shareBtn.Size = new System.Drawing.Size(75, 23);
             this.shareBtn.TabIndex = 16;
@@ -166,11 +167,22 @@
             this.shareBtn.UseVisualStyleBackColor = true;
             this.shareBtn.Click += new System.EventHandler(this.shareBtn_Click);
             // 
+            // playBtn
+            // 
+            this.playBtn.Location = new System.Drawing.Point(12, 7);
+            this.playBtn.Name = "playBtn";
+            this.playBtn.Size = new System.Drawing.Size(75, 23);
+            this.playBtn.TabIndex = 17;
+            this.playBtn.Text = "Play!";
+            this.playBtn.UseVisualStyleBackColor = true;
+            this.playBtn.Click += new System.EventHandler(this.playBtn_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(865, 497);
+            this.Controls.Add(this.playBtn);
             this.Controls.Add(this.shareBtn);
             this.Controls.Add(this.username);
             this.Controls.Add(this.chatInput);
@@ -209,6 +221,7 @@
         private System.Windows.Forms.TextBox chatInput;
         private System.Windows.Forms.TextBox username;
         private System.Windows.Forms.Button shareBtn;
+        private System.Windows.Forms.Button playBtn;
     }
 }
 

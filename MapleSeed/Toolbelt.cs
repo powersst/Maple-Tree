@@ -31,6 +31,28 @@ namespace MapleSeed
         public static Settings Settings { get; internal set; }
         public static Form1 Form1 { get; set; }
 
+        public static void LaunchCemu(string game)
+        {
+            string rpx = null, gamePath = null;
+
+            string[] files = { };
+
+            if (game != null)
+                gamePath = Path.Combine(Toolbelt.Settings.TitleDirectory, game);
+
+            if (gamePath != null)
+                files = Directory.GetFiles(gamePath, "*.rpx", SearchOption.AllDirectories);
+
+            if (files.Length > 0)
+                rpx = files[0];
+
+            var cemuPath = Path.Combine(Settings.Instance.CemuDirectory, "cemu.exe");
+            if (File.Exists(cemuPath) && File.Exists(rpx))
+                Toolbelt.RunCemu(cemuPath, rpx);
+            else
+                SetStatus("Could not find a valid .rpx");
+        }
+
         public static string RIC(string str)
         {
             return RemoveInvalidCharacters(str);
@@ -48,7 +70,7 @@ namespace MapleSeed
         {
 #if (DEBUG)
             try {
-                Logger.log(msg);
+                //Logger.log(msg);
             }
             catch {}
 #endif

@@ -20,7 +20,7 @@ namespace MapleSeed
                 var value = GetKeyValue("TitleDirectory");
 
                 if (!string.IsNullOrEmpty(value)) return value;
-                var fbd = new FolderBrowserDialog { Description = "Please select your Cemu Game Directory" };
+                var fbd = new FolderBrowserDialog { Description = @"Please select your Cemu Game Directory" };
                 var result = fbd.ShowDialog();
 
                 if (string.IsNullOrWhiteSpace(fbd.SelectedPath) && result == DialogResult.OK)
@@ -42,7 +42,7 @@ namespace MapleSeed
                 var ofd = new OpenFileDialog
                 {
                     CheckFileExists = true,
-                    Filter = "Cemu Excutable |cemu.exe"
+                    Filter = @"Cemu Excutable |cemu.exe"
                 };
                 var result = ofd.ShowDialog();
 
@@ -83,7 +83,7 @@ namespace MapleSeed
 
         public static Settings Instance => Toolbelt.Settings;
         private static string ConfigFile => "configuration.ini";
-        private static string ConfigName => "MaryJane";
+        private static string ConfigName => "MapleTree";
 
         private string GetKeyValue(string key)
         {

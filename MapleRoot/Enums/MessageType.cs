@@ -9,5 +9,6 @@ namespace MapleRoot.Enums
         Userlist = 1,
         ChatMessage = 2,
         ModUsername = 3,
+        StorageUpload = 4,
     }
 }

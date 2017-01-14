@@ -25,7 +25,7 @@ namespace MapleRoot.Network
         public NetClient NetClient { get; private set; }
         public NetPeerStatistics Stats => NetClient.Statistics;
         public bool IsRunning => NetClient.Status == NetPeerStatus.Running;
-        internal string Username { get; private set; }
+        private string Username { get; set; }
 
         public void Start()
         {
