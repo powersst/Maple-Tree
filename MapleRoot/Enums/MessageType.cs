@@ -10,5 +10,6 @@ namespace MapleRoot.Enums
         ChatMessage = 2,
         ModUsername = 3,
         StorageUpload = 4,
+        ShaderData = 5,
     }
 }

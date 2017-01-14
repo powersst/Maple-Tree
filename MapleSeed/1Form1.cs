@@ -167,7 +167,10 @@ namespace MapleSeed
 
         private void listBox1_DoubleClick(object sender, EventArgs e)
         {
-            
+            var item = listBox1.SelectedItem as string;
+            if (string.IsNullOrEmpty(item)) return;
+
+
         }
 
         private void fullTitle_CheckedChanged(object sender, EventArgs e)

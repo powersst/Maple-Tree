@@ -88,10 +88,13 @@ namespace MapleRoot.Network
                 case MessageType.StorageUpload:
                     var ms = new MemoryStream(e.Header.Data);
                     var sd = Serializer.Deserialize<StorageData>(ms);
-                    if (Storage.AddToStorage(sd)) {
+                    if (Storage.AddToStorage(sd))
+                    {
                         sd.Data = null;
                         Send(sd, from, MessageType.StorageUpload);
                     }
+                    break;
+                case MessageType.ShaderData:
                     break;
             }
         }
