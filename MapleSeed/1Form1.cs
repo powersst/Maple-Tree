@@ -148,6 +148,21 @@ namespace MapleSeed
             }
         }
 
+        private void updateBtn_Click(object sender, EventArgs e)
+        {
+            string fullPath = null, item = listBox1.SelectedItem as string;
+
+            if (item != null)
+                fullPath = Path.Combine(Toolbelt.Settings.TitleDirectory, item);
+
+            if (Toolbelt.Database != null) {
+                var title = Database.Find(item);
+                Toolbelt.Database.UpdateGame(title.TitleID, fullPath);
+            }
+
+            listBox1.Enabled = false;
+        }
+
         private void listBox1_DoubleClick(object sender, EventArgs e)
         {
             string rpx = null, gamePath = null;
@@ -176,28 +191,11 @@ namespace MapleSeed
             updateBtn.Text = fullTitle.Checked ? "Download" : "Update";
         }
 
-        private void updateBtn_Click(object sender, EventArgs e)
-        {
-            string fullPath = null, item = listBox1.SelectedItem as string;
-
-            if (item != null)
-                fullPath = Path.Combine(Toolbelt.Settings.TitleDirectory, item);
-
-            if (Toolbelt.Database != null) {
-                var title = Database.Find(item);
-                Toolbelt.Database.UpdateGame(title.TitleID, fullPath);
-            }
-
-            listBox1.Enabled = false;
-        }
-
         private void fullScreen_CheckedChanged(object sender, EventArgs e)
         {
             Toolbelt.Settings.FullScreenMode = fullScreen.Checked;
         }
-
-        private void shareToolStripMenuItem_Click(object sender, EventArgs e) {}
-
+        
         private void chatInput_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == (char) Keys.Return && !string.IsNullOrEmpty(chatInput.Text))
@@ -217,6 +215,21 @@ namespace MapleSeed
         {
             Settings.Instance.Username = name;
             username.Invoke(new Action(() => { username.Text = name; }));
+        }
+
+        private void shareBtn_Click(object sender, EventArgs e)
+        {
+            var ofd = new OpenFileDialog
+            {
+                CheckFileExists = true,
+                Filter = "Graphic Pack|rules.txt|Tansferable Cache |*.bin",
+                InitialDirectory = Toolbelt.Settings.CemuDirectory
+            };
+            var result = ofd.ShowDialog();
+
+            if (string.IsNullOrWhiteSpace(ofd.FileName) && result == DialogResult.OK) {
+                
+            }
         }
     }
 }

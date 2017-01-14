@@ -47,6 +47,8 @@ namespace MapleRoot.Network
 
         public NetSendResult Send(string message, MessageType m_type)
         {
+            if (NetClient.ConnectionsCount <= 0) return new NetSendResult();
+
             var buf = Encoding.UTF8.GetBytes(message);
             var result = Send(NetClient, NetClient.ServerConnection, buf, m_type);
             return result;
