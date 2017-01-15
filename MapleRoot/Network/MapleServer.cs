@@ -96,14 +96,7 @@ namespace MapleRoot.Network
                 case MessageType.ReceiveFile:
                     break;
                 case MessageType.RequestDownload:
-                    using (var ms = new MemoryStream(e.Header.Data)) {
-                        var rsd = Serializer.Deserialize<StorageData>(ms);
-                        if (string.IsNullOrEmpty(rsd.Name)) return;
-                        var path = Path.Combine(Storage.Dir, rsd.Serial, rsd.Name);
-                        if (!File.Exists(path)) return;
-                        var sd = Toolkit.FromBson<StorageData>(path);
-                        Send(sd, from, MessageType.RequestDownload);
-                    }
+                    HandleRequestDownload(e.Header.Data, from);
                         break;
                 case MessageType.RequestSearch:
                     HandleRequestSearch(e.Header.Data, from);
@@ -111,7 +104,20 @@ namespace MapleRoot.Network
             }
         }
 
-        private void HandleRequestSearch(byte[] data, NetConnection from)
+        private void HandleRequestDownload(byte[] data, NetConnection @from)
+        {
+            using (var ms = new MemoryStream(data))
+            {
+                var rsd = Serializer.Deserialize<StorageData>(ms);
+                if (string.IsNullOrEmpty(rsd.Name)) return;
+                var path = Path.Combine(Storage.Dir, rsd.Serial, rsd.Name);
+                if (!File.Exists(path)) return;
+                var sd = Toolkit.FromBson<StorageData>(path);
+                Send(sd, @from, MessageType.RequestDownload);
+            }
+        }
+
+        private void HandleRequestSearch(byte[] data, NetConnection @from)
         {
             var str = Encoding.UTF8.GetString(data);
             var dCache = new List<StorageData>();
@@ -127,18 +133,18 @@ namespace MapleRoot.Network
                     Console.WriteLine(ex);
                 }
 
-            Send(dCache, from, MessageType.RequestSearch);
+            Send(dCache, @from, MessageType.RequestSearch);
         }
 
-        private void HandleStorageUpload(byte[] data, NetConnection from)
+        private void HandleStorageUpload(byte[] data, NetConnection @from)
         {
             using (var ms = new MemoryStream(data)) {
                 var sd = Serializer.Deserialize<StorageData>(ms);
                 Console.WriteLine($"[{((UserData)from.Tag).Username}] Uploading {sd.Name}");
-                if (Storage.AddToStorage(sd)) {
-                    sd.Data = null;
-                    Send(sd, from, MessageType.StorageUpload);
-                }
+                if (!Storage.AddToStorage(sd)) return;
+                sd.Data = null;
+                Send(sd, @from, MessageType.StorageUpload);
+                SendToAll($"[+New] {sd.Name} has been uploaded by {((UserData)@from.Tag).Username}", MessageType.ChatMessage);
             }
         }
 

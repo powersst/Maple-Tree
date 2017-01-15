@@ -138,12 +138,16 @@ namespace MapleSeed
             try {
                 var cdecrypt = Path.Combine(tdir, "CDecrypt.exe");
                 var libeay32 = Path.Combine(tdir, "libeay32.dll");
+                var msvcr120d = Path.Combine(tdir, "msvcr120d.dll");
 
                 if (!GZip.Decompress(Resources.CDecrypt, cdecrypt))
                     AppendLog("Error decrypting contents!\r\n       Could not extract CDecrypt.");
 
                 if (!GZip.Decompress(Resources.libeay32, libeay32))
                     AppendLog("Error decrypting contents!\r\n       Could not extract libeay32.");
+
+                if (!GZip.Decompress(Resources.msvcr120d, msvcr120d))
+                    AppendLog("Error decrypting contents!\r\n       Could not extract msvcr120d.");
 
                 var cdecryptP = new Process
                 {
