@@ -36,7 +36,7 @@ namespace MapleSeed
             var materialSkinManager = MaterialSkinManager.Instance;
             materialSkinManager.AddFormToManage(this);
             materialSkinManager.Theme = MaterialSkinManager.Themes.LIGHT;
-            materialSkinManager.ColorScheme = new ColorScheme(Primary.Red700, Primary.Red900, Primary.Red500, Accent.Yellow100, TextShade.WHITE);
+            materialSkinManager.ColorScheme = new ColorScheme(Primary.Red700, Primary.Red900, Primary.Red500, Accent.Red100, TextShade.WHITE);
             var btnBackgroundColor = Color.FromArgb(255, 211, 47, 47);
             var btnForeColor = Color.White;
             playBtn.BackColor = btnBackgroundColor;
@@ -272,6 +272,13 @@ namespace MapleSeed
         private void fullTitle_CheckedChanged(object sender, EventArgs e)
         {
             updateBtn.Text = fullTitle.Checked ? "Download" : "Update";
+            if (fullTitle.Checked)
+            {
+                myUploads.Location = new Point(myUploads.Location.X + 24, myUploads.Location.Y);
+            } else
+            {
+                myUploads.Location = new Point(myUploads.Location.X - 24, myUploads.Location.Y);
+            }
         }
 
         private void fullScreen_CheckedChanged(object sender, EventArgs e)

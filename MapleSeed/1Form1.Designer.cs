@@ -35,9 +35,9 @@
             this.titleList = new System.Windows.Forms.ListBox();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
-            this.fullTitle = new System.Windows.Forms.CheckBox();
+            this.fullTitle = new MaterialSkin.Controls.MaterialCheckBox();
             this.updateBtn = new MaterialSkin.Controls.MaterialFlatButton();
-            this.fullScreen = new System.Windows.Forms.CheckBox();
+            this.fullScreen = new MaterialSkin.Controls.MaterialCheckBox();
             this.userList = new System.Windows.Forms.ListBox();
             this.chatInput = new System.Windows.Forms.TextBox();
             this.username = new System.Windows.Forms.TextBox();
@@ -116,9 +116,15 @@
             // fullTitle
             // 
             this.fullTitle.AutoSize = true;
+            this.fullTitle.Depth = 0;
+            this.fullTitle.Font = new System.Drawing.Font("Roboto", 10F);
             this.fullTitle.Location = new System.Drawing.Point(12, 599);
+            this.fullTitle.Margin = new System.Windows.Forms.Padding(0);
+            this.fullTitle.MouseLocation = new System.Drawing.Point(-1, -1);
+            this.fullTitle.MouseState = MaterialSkin.MouseState.HOVER;
             this.fullTitle.Name = "fullTitle";
-            this.fullTitle.Size = new System.Drawing.Size(126, 17);
+            this.fullTitle.Ripple = true;
+            this.fullTitle.Size = new System.Drawing.Size(147, 30);
             this.fullTitle.TabIndex = 11;
             this.fullTitle.Text = "Download Full Title";
             this.fullTitle.UseVisualStyleBackColor = true;
@@ -144,9 +150,15 @@
             // fullScreen
             // 
             this.fullScreen.AutoSize = true;
-            this.fullScreen.Location = new System.Drawing.Point(145, 599);
+            this.fullScreen.Depth = 0;
+            this.fullScreen.Font = new System.Drawing.Font("Roboto", 10F);
+            this.fullScreen.Location = new System.Drawing.Point(168, 599);
+            this.fullScreen.Margin = new System.Windows.Forms.Padding(0);
+            this.fullScreen.MouseLocation = new System.Drawing.Point(-1, -1);
+            this.fullScreen.MouseState = MaterialSkin.MouseState.HOVER;
             this.fullScreen.Name = "fullScreen";
-            this.fullScreen.Size = new System.Drawing.Size(115, 17);
+            this.fullScreen.Ripple = true;
+            this.fullScreen.Size = new System.Drawing.Size(137, 30);
             this.fullScreen.TabIndex = 13;
             this.fullScreen.Text = "Full Screen Mode";
             this.fullScreen.UseVisualStyleBackColor = true;
@@ -395,9 +407,9 @@
         internal System.Windows.Forms.ListBox titleList;
         internal System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         private System.Windows.Forms.RichTextBox richTextBox1;
-        internal System.Windows.Forms.CheckBox fullTitle;
+        internal MaterialSkin.Controls.MaterialCheckBox fullTitle;
         private MaterialSkin.Controls.MaterialFlatButton updateBtn;
-        private System.Windows.Forms.CheckBox fullScreen;
+        private MaterialSkin.Controls.MaterialCheckBox fullScreen;
         private System.Windows.Forms.ListBox userList;
         private System.Windows.Forms.TextBox chatInput;
         private System.Windows.Forms.TextBox username;
