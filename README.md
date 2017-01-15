@@ -2,14 +2,15 @@
 An application created for the Cemu community to allow for easy sharing of transferable shaders and graphic packs.
 
 ***Working Features***
-- Game Starting
+- Game Launching
 - Content Updating
 - Content Downloads
 - Multi-file uploads
-- Uploading Graphic Packs
-- Uploading Transferable Shaders
+- Upload/Download Graphic Packs
+- Upload/Download TransCache
 - Full Title Downloads
 - Chat feature
+- Search by file name
 
 ***Work In Progress***
 - Basic Network Code
