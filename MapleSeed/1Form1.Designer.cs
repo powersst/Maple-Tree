@@ -91,7 +91,7 @@
             this.titleList.FormattingEnabled = true;
             this.titleList.Location = new System.Drawing.Point(12, 101);
             this.titleList.Name = "titleList";
-            this.titleList.Size = new System.Drawing.Size(250, 485);
+            this.titleList.Size = new System.Drawing.Size(244, 485);
             this.titleList.Sorted = true;
             this.titleList.TabIndex = 10;
             this.titleList.DoubleClick += new System.EventHandler(this.listBox1_DoubleClick);
@@ -167,9 +167,9 @@
             // userList
             // 
             this.userList.FormattingEnabled = true;
-            this.userList.Location = new System.Drawing.Point(1143, 125);
+            this.userList.Location = new System.Drawing.Point(1143, 138);
             this.userList.Name = "userList";
-            this.userList.Size = new System.Drawing.Size(109, 433);
+            this.userList.Size = new System.Drawing.Size(109, 420);
             this.userList.TabIndex = 14;
             // 
             // chatInput
@@ -181,7 +181,7 @@
             // 
             // username
             // 
-            this.username.Location = new System.Drawing.Point(1143, 96);
+            this.username.Location = new System.Drawing.Point(1143, 97);
             this.username.MaxLength = 12;
             this.username.Name = "username";
             this.username.ReadOnly = true;
@@ -214,7 +214,7 @@
             this.playBtn.Depth = 0;
             this.playBtn.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
             this.playBtn.Icon = global::MapleSeed.Properties.Resources.icon1;
-            this.playBtn.Location = new System.Drawing.Point(13, 40);
+            this.playBtn.Location = new System.Drawing.Point(12, 40);
             this.playBtn.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.playBtn.MouseState = MaterialSkin.MouseState.HOVER;
             this.playBtn.Name = "playBtn";
@@ -353,10 +353,10 @@
             // 
             this.materialTabSelector1.BaseTabControl = this.tabControl1;
             this.materialTabSelector1.Depth = 0;
-            this.materialTabSelector1.Location = new System.Drawing.Point(269, 90);
+            this.materialTabSelector1.Location = new System.Drawing.Point(268, 90);
             this.materialTabSelector1.MouseState = MaterialSkin.MouseState.HOVER;
             this.materialTabSelector1.Name = "materialTabSelector1";
-            this.materialTabSelector1.Size = new System.Drawing.Size(868, 36);
+            this.materialTabSelector1.Size = new System.Drawing.Size(996, 36);
             this.materialTabSelector1.TabIndex = 22;
             this.materialTabSelector1.Text = "materialTabSelector1";
             // 
@@ -365,7 +365,9 @@
             this.AcceptButton = this.sendChat;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(1264, 681);
+            this.Controls.Add(this.username);
             this.Controls.Add(this.materialTabSelector1);
             this.Controls.Add(this.sendChat);
             this.Controls.Add(this.myUploads);
@@ -373,7 +375,6 @@
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.playBtn);
             this.Controls.Add(this.shareBtn);
-            this.Controls.Add(this.username);
             this.Controls.Add(this.chatInput);
             this.Controls.Add(this.userList);
             this.Controls.Add(this.fullScreen);

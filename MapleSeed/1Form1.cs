@@ -36,8 +36,8 @@ namespace MapleSeed
             var materialSkinManager = MaterialSkinManager.Instance;
             materialSkinManager.AddFormToManage(this);
             materialSkinManager.Theme = MaterialSkinManager.Themes.LIGHT;
-            materialSkinManager.ColorScheme = new ColorScheme(Primary.Red700, Primary.Red900, Primary.Red500, Accent.Red100, TextShade.WHITE);
-            var btnBackgroundColor = Color.FromArgb(255, 211, 47, 47);
+            materialSkinManager.ColorScheme = new ColorScheme(Primary.Amber700, Primary.Amber900, Primary.Amber500, Accent.Amber100, TextShade.WHITE);
+            var btnBackgroundColor = Color.FromArgb(255, 255, 160, 0);
             var btnForeColor = Color.White;
             playBtn.BackColor = btnBackgroundColor;
             shareBtn.BackColor = btnBackgroundColor;
