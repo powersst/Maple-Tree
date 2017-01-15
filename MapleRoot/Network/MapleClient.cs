@@ -25,7 +25,7 @@ namespace MapleRoot.Network
         public NetClient NetClient { get; private set; }
         public NetPeerStatistics Stats => NetClient.Statistics;
         public bool IsRunning => NetClient.Status == NetPeerStatus.Running;
-        private string Username { get; set; }
+        public UserData UserData { get; set; }
 
         public void Start()
         {
@@ -39,10 +39,15 @@ namespace MapleRoot.Network
             NetClient.Shutdown($"Bye! -{NetClient.UniqueIdentifier}");
         }
 
-        public void SetUsername(string username)
+        public void UpdateUsername(string username)
         {
-            Username = username;
-            Send(username, MessageType.ModUsername);
+            if (UserData == null) return;
+            UserData = new UserData
+            {
+                Username = username,
+                Serial = UserData.Serial
+            };
+            Send(UserData, MessageType.ModUsername);
         }
 
         public NetSendResult Send(string message, MessageType m_type)
@@ -55,6 +60,14 @@ namespace MapleRoot.Network
         }
 
         public NetSendResult Send<T>(T data, MessageType m_type)
+        {
+            var ms = new MemoryStream();
+            Serializer.Serialize(ms, data);
+            var result = Send(NetClient, NetClient.ServerConnection, ms.ToArray(), m_type);
+            return result;
+        }
+
+        public NetSendResult SendWithProgress<T>(T data, MessageType m_type)
         {
             var ms = new MemoryStream();
             Serializer.Serialize(ms, data);

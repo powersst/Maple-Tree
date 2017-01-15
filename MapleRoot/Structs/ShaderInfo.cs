@@ -1,5 +1,5 @@
 ﻿// Project: MapleRoot
-// File: StorageData.cs
+// File: ShaderInfo.cs
 // Updated By: Jared
 // 
 
@@ -12,24 +12,18 @@ using ProtoBuf;
 namespace MapleRoot.Structs
 {
     [ProtoContract]
-    public struct StorageData
+    public class ShaderInfo
     {
         [ProtoMember(1)]
         public string Name { get; set; }
 
         [ProtoMember(2)]
-        public long Length { get; set; }
+        public string Hash { get; set; }
 
         [ProtoMember(3)]
-        public string Hash { get; set; }
+        public long Length { get; set; }
 
         [ProtoMember(4)]
         public byte[] Data { get; set; }
-
-        [ProtoMember(5)]
-        public bool Shader { get; set; }
-
-        [ProtoMember(6)]
-        public string Serial { get; set; }
     }
 }

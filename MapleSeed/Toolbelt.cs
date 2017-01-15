@@ -12,12 +12,10 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Cemu_UI;
 using libWiiSharp;
 using MapleSeed.Properties;
 using MaryJane;
 using NUS_Downloader;
-using Settings = MapleSeed.Settings;
 
 #endregion
 
@@ -26,7 +24,7 @@ namespace MapleSeed
     public static class Toolbelt
     {
         public static readonly string Version = $" - Git {Resources.version.Trim('\n')}";
-
+        public static string Serial => Settings.Serial;
         public static Database Database { get; internal set; }
         public static Settings Settings { get; internal set; }
         public static Form1 Form1 { get; set; }
@@ -35,10 +33,10 @@ namespace MapleSeed
         {
             string rpx = null, gamePath = null;
 
-            string[] files = { };
+            string[] files = {};
 
             if (game != null)
-                gamePath = Path.Combine(Toolbelt.Settings.TitleDirectory, game);
+                gamePath = Path.Combine(Settings.TitleDirectory, game);
 
             if (gamePath != null)
                 files = Directory.GetFiles(gamePath, "*.rpx", SearchOption.AllDirectories);
@@ -48,7 +46,7 @@ namespace MapleSeed
 
             var cemuPath = Path.Combine(Settings.Instance.CemuDirectory, "cemu.exe");
             if (File.Exists(cemuPath) && File.Exists(rpx))
-                Toolbelt.RunCemu(cemuPath, rpx);
+                RunCemu(cemuPath, rpx);
             else
                 SetStatus("Could not find a valid .rpx");
         }

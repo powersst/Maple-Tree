@@ -6,7 +6,9 @@
 #region usings
 
 using System;
+using System.Configuration;
 using System.IO;
+using System.Text;
 using Lidgren.Network;
 using MapleRoot.Enums;
 using MapleRoot.Network;
@@ -19,31 +21,29 @@ namespace MapleRoot
 {
     public static class Storage
     {
-        private static string StorageDir => Path.GetFullPath("storage");
+        public static string Dir => Path.GetFullPath("storage");
 
         public static bool AddToStorage(StorageData sd)
         {
             try {
-                if (!Directory.Exists(StorageDir))
-                    Directory.CreateDirectory(StorageDir);
+                var dir = Path.Combine(Dir, sd.Serial);
 
-                using (var ms = new MemoryStream()) {
-                    Serializer.Serialize(ms, sd);
-                    var file = Path.Combine(StorageDir, sd.Name);
+                if (!Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
 
-                    if (!File.Exists(file))
-                        File.WriteAllBytes($"{file}", ms.ToArray());
+                var bson = Toolkit.ToBson(sd);
+                var file = Path.Combine(dir, sd.Name);
 
-                    if (!sd.Shader) {
-                        Console.WriteLine($"[+Share] {sd.Name} - {NetUtility.ToHumanReadable(sd.Length)}");
-                        return true;
-                    }
-
-                    var c_sd = Serializer.Deserialize<StorageData>(File.OpenRead(file));
-                    if (sd.Length > c_sd.Length) {
-                        Console.WriteLine($"[^Share] {sd.Name} - {NetUtility.ToHumanReadable(sd.Length)}");
-                        File.WriteAllBytes($"{file}", ms.ToArray());
-                    }
+                if (!File.Exists(file))
+                    File.WriteAllBytes($"{file}", bson);
+                
+                var c_sd = Toolkit.FromBson<StorageData>(file);
+                if (sd.Length <= c_sd.Length) {
+                    Console.WriteLine($"[+Share] {sd.Name} - {NetUtility.ToHumanReadable(sd.Length)}");
+                }
+                else {
+                    Console.WriteLine($"[^Share] {sd.Name} - {NetUtility.ToHumanReadable(sd.Length)}");
+                    File.WriteAllBytes($"{file}", bson);
                 }
 
                 return true;
@@ -54,14 +54,14 @@ namespace MapleRoot
             }
         }
 
-        public static StorageData Upload(MapleClient client, string file, string name, bool shader)
+        public static StorageData Upload(MapleClient client, string file, string name, string serial, bool shader)
         {
-            var sd = ParseFile(file, name, shader);
+            var sd = ParseFile(file, name, serial, shader);
             client.Send(sd, MessageType.StorageUpload);
             return sd;
         }
 
-        private static StorageData ParseFile(string file, string name, bool shader)
+        private static StorageData ParseFile(string file, string name, string serial, bool shader)
         {
             if (!File.Exists(file))
                 throw new Exception($"File [{file}] doesn't exist!");
@@ -82,6 +82,7 @@ namespace MapleRoot
             var bHash = NetUtility.ComputeSHAHash(sd.Data);
             sd.Hash = $"{BitConverter.ToString(bHash).Replace("-", ""),12}";
             sd.Shader = shader;
+            sd.Serial = serial;
             return sd;
         }
     }

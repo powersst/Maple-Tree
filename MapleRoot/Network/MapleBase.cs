@@ -17,6 +17,16 @@ namespace MapleRoot.Network
             msg.Write(data.Length);
             msg.Write((byte)m_type);
             msg.Write(data);
+            
+            return peer.SendMessage(msg, recipient, NetDeliveryMethod.ReliableOrdered);
+        }
+
+        internal NetSendResult SendFile(NetPeer peer, NetConnection recipient, byte[] data)
+        {
+            var msg = peer.CreateMessage();
+            msg.Write(data.Length);
+            msg.Write((byte) MessageType.ReceiveFile);
+            msg.Write(data);
 
             return peer.SendMessage(msg, recipient, NetDeliveryMethod.ReliableOrdered);
         }

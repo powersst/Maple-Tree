@@ -1,14 +1,23 @@
-﻿using System;
+﻿// Project: MapleSeed
+// File: Database.cs
+// Updated By: Jared
+// 
+
+#region usings
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
 using libWiiSharp;
-using MapleSeed;
+using MaryJane;
 using MaryJane.Structs;
 using Newtonsoft.Json;
 
-namespace MaryJane
+#endregion
+
+namespace MapleSeed
 {
     public class Database
     {
@@ -18,16 +27,14 @@ namespace MaryJane
 
         public static async void Initialize()
         {
-            try
-            {
+            try {
                 if (Toolbelt.Database == null)
                     Toolbelt.Database = new Database();
 
                 if (Toolbelt.Settings == null)
                     Toolbelt.Settings = new Settings();
 
-                if (DateTime.Now > new FileInfo(DatabaseFile).LastWriteTime.AddDays(1))
-                {
+                if (DateTime.Now > new FileInfo(DatabaseFile).LastWriteTime.AddDays(1)) {
                     var data = await Network.DownloadData(TitleKeys + "/json");
 
                     if (File.Exists(DatabaseFile))
@@ -35,8 +42,7 @@ namespace MaryJane
                     File.WriteAllBytes(DatabaseFile, data);
                 }
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 Toolbelt.AppendLog($"{e.Message}\n{e.StackTrace}");
             }
 
@@ -57,19 +63,15 @@ namespace MaryJane
             var game = FindByTitleId(titleId);
 
             if (Toolbelt.Form1 != null)
-            {
                 if (Toolbelt.Form1.fullTitle.Checked)
-                {
                     game.TitleID = game.TitleID.Replace("00050000", "0005000e");
-                }
-            }
 
             Toolbelt.SetStatus($"Updating {titleId}");
 
             DownloadTitle(game, fullPath);
 
             if (Toolbelt.Form1 != null)
-                Toolbelt.Form1.listBox1.Enabled = true;
+                Toolbelt.Form1.titleList.Enabled = true;
 
             Toolbelt.SetStatus(string.Empty);
         }
@@ -86,8 +88,7 @@ namespace MaryJane
             xml.Load(entries[0]);
             var titleId_tag = xml.GetElementsByTagName("title_id");
 
-            if (titleId_tag.Count > 0)
-            {
+            if (titleId_tag.Count > 0) {
                 var titleId = titleId_tag[0].InnerText;
 
                 var title = DbObject.Find(t => t.TitleID.ToLower() == titleId.ToLower());
@@ -105,8 +106,7 @@ namespace MaryJane
 
         private static void CleanUpdate(string outputDir, TMD tmd)
         {
-            try
-            {
+            try {
                 Toolbelt.AppendLog("  - Deleting Encrypted Contents...");
                 foreach (var t in tmd.Contents)
                     if (File.Exists(Path.Combine(outputDir, t.ContentID.ToString("x8"))))
@@ -116,32 +116,25 @@ namespace MaryJane
                 File.Delete(Path.Combine(outputDir, "CDecrypt.exe"));
                 File.Delete(Path.Combine(outputDir, "libeay32.dll"));
             }
-            catch
-            {
-            }
+            catch {}
         }
 
         private static async Task<int> TicketHandled(WiiUTitle wiiUTitle, string outputDir, string titleUrl)
         {
             var buffer = new byte[0];
-            try
-            {
+            try {
                 Toolbelt.AppendLog("  - Downloading Ticket...");
                 buffer = await Network.DownloadData(Path.Combine(titleUrl, "cetk"));
             }
-            catch (Exception ex)
-            {
-                try
-                {
-                    if (wiiUTitle.Ticket == "1")
-                    {
+            catch (Exception ex) {
+                try {
+                    if (wiiUTitle.Ticket == "1") {
                         var WII_TIK_URL = "https://wiiu.titlekeys.com/ticket/";
                         var cetkUrl = $"{WII_TIK_URL}{wiiUTitle.TitleID.ToLower()}.tik";
                         buffer = await Network.DownloadData(cetkUrl);
                     }
                 }
-                catch
-                {
+                catch {
                     Toolbelt.AppendLog($"   + Downloading Ticket Failed...\n{ex.Message}");
                     return 0;
                 }
@@ -149,13 +142,11 @@ namespace MaryJane
             File.WriteAllBytes(Path.Combine(outputDir, "cetk"), buffer);
 
             // Parse Ticket
-            if (buffer.Length > 0)
-            {
+            if (buffer.Length > 0) {
                 Toolbelt.AppendLog("   + Parsing Ticket...");
                 Ticket.Load(buffer);
             }
-            else
-            {
+            else {
                 Toolbelt.AppendLog("   + Ticket Unavailable...");
                 return 0;
             }
@@ -165,12 +156,10 @@ namespace MaryJane
 
         private static async Task<TMD> HandleTmd(string outputDir, string titleUrl)
         {
-            try
-            {
+            try {
                 var tmdFile = Path.Combine(outputDir, "tmd");
 
-                if (!File.Exists(tmdFile))
-                {
+                if (!File.Exists(tmdFile)) {
                     Toolbelt.AppendLog("  - Downloading TMD...");
                     var buffer = await Network.DownloadData(titleUrl + "tmd");
 
@@ -187,8 +176,7 @@ namespace MaryJane
 
                 return tmd;
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Toolbelt.AppendLog($"   + Downloading TMD Failed...\n{ex.Message}");
             }
 
@@ -197,8 +185,7 @@ namespace MaryJane
 
         private static async Task<int> ContentHandled(TMD tmd, string outputDir, string titleUrl)
         {
-            for (var i = 0; i < tmd.NumOfContents; i++)
-            {
+            for (var i = 0; i < tmd.NumOfContents; i++) {
                 var size = Toolbelt.SizeSuffix((long) tmd.Contents[i].Size);
                 Toolbelt.AppendLog($"  - Downloading Content #{i + 1} of {tmd.NumOfContents}... ({size} bytes)");
 
@@ -206,14 +193,12 @@ namespace MaryJane
                 if (Toolbelt.IsValid(tmd.Contents[i], contentPath))
                     Toolbelt.AppendLog("   + Using Local File, Skipping...");
                 else
-                    try
-                    {
+                    try {
                         var downloadUrl = titleUrl + tmd.Contents[i].ContentID.ToString("x8");
                         var outputdir = Path.Combine(outputDir, tmd.Contents[i].ContentID.ToString("x8"));
                         await Network.DownloadFile(downloadUrl, outputdir);
                     }
-                    catch (Exception ex)
-                    {
+                    catch (Exception ex) {
                         Toolbelt.AppendLog(
                             $"  - Downloading Content #{i + 1} of {tmd.NumOfContents} failed...\n{ex.Message}");
                         return 0;
@@ -227,13 +212,10 @@ namespace MaryJane
         {
             var outputDir = Path.GetFullPath(fullPath);
 
-            if (fullPath.EndsWith(".rpx"))
-            {
+            if (fullPath.EndsWith(".rpx")) {
                 var folder = Path.GetDirectoryName(fullPath);
                 if (folder.EndsWith("code"))
-                {
                     outputDir = Path.GetDirectoryName(folder);
-                }
             }
 
             Toolbelt.AppendLog($"Output Directory '{outputDir}'");
@@ -244,7 +226,7 @@ namespace MaryJane
             const string wiiWupUrl = "http://ccs.cdn.wup.shop.nintendo.net/ccs/download/";
             string titleUrl = $"{wiiWupUrl}{wiiUTitle.TitleID}/";
             string titleUrl2 = $"{wiiNusUrl}{wiiUTitle.TitleID}/";
-            
+
             //Download Ticket
             if (await TicketHandled(wiiUTitle, outputDir, titleUrl) == 0) return;
 
@@ -252,14 +234,14 @@ namespace MaryJane
             var tmd = await HandleTmd(outputDir, titleUrl);
 
             //Download Content
-            if (await ContentHandled(tmd, outputDir, titleUrl) == 0) return;
+            if (await ContentHandled(tmd, outputDir, titleUrl2) == 0) return;
 
             Toolbelt.AppendLog("  - Decrypting Content...");
             Toolbelt.CDecrypt(outputDir);
 
             CleanUpdate(outputDir, tmd);
 
-            Toolbelt.Form1?.listBox1.Invoke(new Action(() => { Toolbelt.Form1.listBox1.Enabled = true; }));
+            Toolbelt.Form1?.titleList.Invoke(new Action(() => { Toolbelt.Form1.titleList.Enabled = true; }));
             Toolbelt.AppendLog($"Downloading Title '{wiiUTitle}' v{tmd.TitleVersion} Finished.");
         }
     }

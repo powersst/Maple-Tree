@@ -1,7 +1,17 @@
-﻿using System.IO;
+﻿// Project: MapleSeed
+// File: Settings.cs
+// Updated By: Jared
+// 
+
+#region usings
+
+using System.IO;
 using System.Windows.Forms;
 using IniParser;
+using MapleRoot;
 using MapleSeed.Properties;
+
+#endregion
 
 namespace MapleSeed
 {
@@ -9,18 +19,16 @@ namespace MapleSeed
     {
         public Settings()
         {
-            if (!File.Exists(ConfigFile))
+            if (!File.Exists(ConfigFile) || new FileInfo(ConfigFile).Length <= 0)
                 File.WriteAllText(ConfigFile, Resources.Settings_DefaultSettings);
         }
 
-        public string TitleDirectory
-        {
-            get
-            {
+        public string TitleDirectory {
+            get {
                 var value = GetKeyValue("TitleDirectory");
 
                 if (!string.IsNullOrEmpty(value)) return value;
-                var fbd = new FolderBrowserDialog { Description = @"Please select your Cemu Game Directory" };
+                var fbd = new FolderBrowserDialog {Description = @"Please select your Cemu Game Directory"};
                 var result = fbd.ShowDialog();
 
                 if (string.IsNullOrWhiteSpace(fbd.SelectedPath) && result == DialogResult.OK)
@@ -32,10 +40,8 @@ namespace MapleSeed
             }
         }
 
-        public string CemuDirectory
-        {
-            get
-            {
+        public string CemuDirectory {
+            get {
                 var value = GetKeyValue("CemuDirectory");
 
                 if (!string.IsNullOrEmpty(value)) return value;
@@ -55,30 +61,28 @@ namespace MapleSeed
             }
         }
 
-        public string Username
-        {
-            get
-            {
-                return GetKeyValue("Username");
-            }
+        public string Username {
+            get { return GetKeyValue("Username"); }
 
-            set
-            {
-                WriteKeyValue("Username", value);
+            set { WriteKeyValue("Username", value); }
+        }
+
+        public string Serial {
+            get {
+                var value = GetKeyValue("Serial");
+                if (string.IsNullOrEmpty(value)) WriteKeyValue("Serial", Toolkit.UniqueID());
+                return value;
             }
         }
 
-        public bool FullScreenMode
-        {
-            get
-            {
-                return bool.Parse(GetKeyValue("FullScreenMode")); ;
+        public bool FullScreenMode {
+            get {
+                var value = GetKeyValue("FullScreenMode");
+                if (string.IsNullOrEmpty(value)) WriteKeyValue("FullScreenMode", false.ToString());
+                return value == "True";
             }
 
-            set
-            {
-                WriteKeyValue("FullScreenMode", value.ToString());
-            }
+            set { WriteKeyValue("FullScreenMode", value.ToString()); }
         }
 
         public static Settings Instance => Toolbelt.Settings;
@@ -89,7 +93,7 @@ namespace MapleSeed
         {
             var parser = new FileIniDataParser();
             var data = parser.ReadFile(ConfigFile);
-            return data[ConfigName][key];
+            return data[ConfigName][key] ?? "";
         }
 
         private void WriteKeyValue(string key, string value)

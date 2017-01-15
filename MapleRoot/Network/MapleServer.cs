@@ -41,22 +41,7 @@ namespace MapleRoot.Network
 
             Task.Run(() => {
                 while (NetServer.Status == NetPeerStatus.Running) {
-                    var names =
-                    (from c in NetServer.Connections
-                        select (UserData) c.Tag into mc select mc.Username).ToList();
-
-                    if (names.Count > 0) {
-                        var json = JsonConvert.SerializeObject(names);
-                        var buf = Encoding.UTF8.GetBytes(json);
-
-                        var msg = NetServer.CreateMessage();
-                        msg.Write(buf.Length);
-                        msg.Write((byte)MessageType.Userlist);
-                        msg.Write(buf);
-
-                        NetServer.SendToAll(msg, NetDeliveryMethod.ReliableOrdered);
-                    }
-                    
+                    SendUserList();
                     Toolkit.Sleep(1000);
                 }
             });
@@ -68,6 +53,22 @@ namespace MapleRoot.Network
 
         private static List<NetConnection> Connections { get; set; }
 
+        private void SendUserList()
+        {
+            var names = (from c in NetServer.Connections select (UserData) c.Tag into mc select mc.Username).ToList();
+
+            if (names.Count <= 0) return;
+            var json = JsonConvert.SerializeObject(names);
+            var buf = Encoding.UTF8.GetBytes(json);
+
+            var msg = NetServer.CreateMessage();
+            msg.Write(buf.Length);
+            msg.Write((byte) MessageType.Userlist);
+            msg.Write(buf);
+
+            NetServer.SendToAll(msg, NetDeliveryMethod.ReliableOrdered);
+        }
+
         private void m_OnMessageReceived(object sender, OnMessageReceivedEventArgs e)
         {
             var from = (NetConnection) sender;
@@ -76,27 +77,90 @@ namespace MapleRoot.Network
                 case MessageType.Userlist:
                     break;
                 case MessageType.ChatMessage:
-                    var str = Encoding.UTF8.GetString(e.Header.Data);
-                    SendToAll(str, MessageType.ChatMessage);
+                    SendToAll(Encoding.UTF8.GetString(e.Header.Data), MessageType.ChatMessage);
                     break;
                 case MessageType.ModUsername:
-                    var name = Encoding.UTF8.GetString(e.Header.Data);
-                    var mc = (UserData) from.Tag;
-                    mc.Username = name;
-                    from.Tag = mc;
-                    break;
-                case MessageType.StorageUpload:
-                    var ms = new MemoryStream(e.Header.Data);
-                    var sd = Serializer.Deserialize<StorageData>(ms);
-                    if (Storage.AddToStorage(sd))
-                    {
-                        sd.Data = null;
-                        Send(sd, from, MessageType.StorageUpload);
+                    using (var ms = new MemoryStream(e.Header.Data)) {
+                        from.Tag = Serializer.Deserialize<UserData>(ms);
                     }
                     break;
-                case MessageType.ShaderData:
+                case MessageType.StorageUpload:
+                    HandleStorageUpload(e.Header.Data, from);
                     break;
+                case MessageType.ShaderData:
+                    HandleShaderData(e.Header, from);
+                    break;
+                case MessageType.ReceiveFile:
+                    break;
+                case MessageType.RequestDownload:
+                    using (var ms = new MemoryStream(e.Header.Data)) {
+                        var rsd = Serializer.Deserialize<StorageData>(ms);
+                        if (string.IsNullOrEmpty(rsd.Name)) return;
+                        var path = Path.Combine(Storage.Dir, rsd.Serial, rsd.Name);
+                        if (!File.Exists(path)) return;
+                        var sd = Toolkit.FromBson<StorageData>(path);
+                        Send(sd, from, MessageType.RequestDownload);
+                    }
+                        break;
+                case MessageType.RequestSearch:
+                    HandleRequestSearch(e.Header.Data, from);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
+        }
+
+        private void HandleRequestSearch(byte[] data, NetConnection from)
+        {
+            var str = Encoding.UTF8.GetString(data);
+            var dCache = new List<StorageData>();
+            var dir = Path.GetFullPath(Storage.Dir);
+            var files = Directory.GetFiles(dir, $"*{str}*", SearchOption.AllDirectories);
+            foreach (var file in files)
+                try {
+                    var sd = Toolkit.FromBson<StorageData>(file);
+                    sd.Data = null; //dont send data
+                    dCache.Add(sd);
+                }
+                catch (Exception ex) {
+                    Console.WriteLine(ex);
+                }
+
+            Send(dCache, from, MessageType.RequestSearch);
+        }
+
+        private void HandleStorageUpload(byte[] data, NetConnection from)
+        {
+            using (var ms = new MemoryStream(data)) {
+                var sd = Serializer.Deserialize<StorageData>(ms);
+                if (Storage.AddToStorage(sd)) {
+                    sd.Data = null;
+                    Send(sd, from, MessageType.StorageUpload);
+                }
+            }
+        }
+
+        private void HandleShaderData(MessageHeader header, NetConnection from)
+        {
+            var ud = (UserData) from.Tag;
+            if (ud == null) return;
+
+            var dCache = new List<StorageData>();
+            var dir = Path.GetFullPath(Path.Combine(Storage.Dir, ud.Serial));
+
+            var files = Directory.GetFiles(dir, "*.*", SearchOption.TopDirectoryOnly);
+
+            foreach (var file in files)
+                try {
+                    var sd = Toolkit.FromBson<StorageData>(file);
+                    sd.Data = null; //dont send byte array
+                    dCache.Add(sd);
+                }
+                catch (Exception e) {
+                    Console.WriteLine(e);
+                }
+
+            Send(dCache, from, MessageType.ShaderData);
         }
 
         private void SendToAll(string message, MessageType m_type)

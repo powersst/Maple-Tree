@@ -5,21 +5,21 @@
 
 #region usings
 
-using MapleRoot;
-using MapleRoot.Enums;
-using MapleRoot.Network;
-using MapleRoot.Network.Events;
-using MapleRoot.Network.Messages;
-using MaryJane;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Forms;
-using Lidgren.Network;
+using MapleRoot;
+using MapleRoot.Enums;
+using MapleRoot.Network;
+using MapleRoot.Network.Events;
+using MapleRoot.Network.Messages;
 using MapleRoot.Structs;
+using MaryJane;
 using ProtoBuf;
 
 #endregion
@@ -40,21 +40,19 @@ namespace MapleSeed
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            Database.Initialize();
+
             Client = MapleClient.Create();
             Client.OnMessageReceived += ClientOnOnMessageReceived;
+            Client.OnConnected += ClientOnConnected;
             Client.Start();
 
+            Text += $@" - Serial {Toolbelt.Settings.Serial}";
             MinimumSize = MaximumSize = Size;
             Text += Toolbelt.Version;
 
-            Database.Initialize();
-
             Library = new List<string>(Directory.GetDirectories(Toolbelt.Settings.TitleDirectory));
-            foreach (var item in Library) {
-                if (!string.IsNullOrEmpty(item)) {
-                    ListBoxAddItem(new FileInfo(item).Name);
-                }
-            }
+            foreach (var item in Library) if (!string.IsNullOrEmpty(item)) ListBoxAddItem(new FileInfo(item).Name);
 
             status.Text = Settings.Instance.TitleDirectory;
             fullScreen.Checked = Settings.Instance.FullScreenMode;
@@ -64,13 +62,28 @@ namespace MapleSeed
             else
                 username.Text = Settings.Instance.Username;
 
+            Toolkit.GlobalTimer.Elapsed += GlobalTimer_Elapsed;
+        }
+
+        private void GlobalTimer_Elapsed(object sender, ElapsedEventArgs e) {}
+
+        private static void ClientOnConnected(object sender, EventArgs e)
+        {
+            Client.UserData = new UserData
+            {
+                Username = Settings.Instance.Username,
+                Serial = Settings.Instance.Serial
+            };
+            Client.Send(Client.UserData, MessageType.ModUsername);
+
             Task.Run(() => {
-                while (Client.IsRunning) {
-                    SetStatus(
+                while (Client.NetClient.ConnectionsCount > 0) {
+                    Toolbelt.SetStatus(
                         $@"Total In {Client.Stats.ReceivedBytes} bytes, Total Out {Client.Stats.SentBytes} bytes",
                         Color.Gray);
-                    Toolkit.Sleep(250);
+                    Toolkit.Sleep(100);
                 }
+                Toolbelt.SetStatus("Disconnected from server!!");
             });
         }
 
@@ -92,6 +105,64 @@ namespace MapleSeed
                 case MessageType.StorageUpload:
                     ConfirmStorageUpload(e.Header);
                     break;
+                case MessageType.ShaderData:
+                    HandleShaderData(e.Header);
+                    break;
+                case MessageType.ReceiveFile:
+                    break;
+                case MessageType.RequestDownload:
+                    HandleRequestDownload(e.Header);
+                    break;
+                case MessageType.RequestSearch:
+                    HandleRequestSearch(e.Header.Data);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private void HandleRequestDownload(MessageHeader header)
+        {
+            StorageData sd;
+            using (var ms = new MemoryStream(header.Data)) {
+                sd = Serializer.Deserialize<StorageData>(ms);
+            }
+
+            var saveTo = sd.Shader
+                ? Path.Combine(Toolbelt.Settings.CemuDirectory, "shaderCache", "transferable", sd.Name)
+                : Path.Combine(Toolbelt.Settings.CemuDirectory, "graphicPacks", sd.Name, "rules.txt");
+
+            File.WriteAllBytes(saveTo, sd.Data);
+            AppendLog($"[{sd.Name}] Download Complete.");
+        }
+
+        private void HandleRequestSearch(byte[] data)
+        {
+            List<StorageData> list;
+            using (var ms = new MemoryStream(data)) {
+                list = Serializer.Deserialize<List<StorageData>>(ms);
+            }
+            dataGrid1.Invoke(new Action(() => {
+                dataGrid1.DataSource = list;
+                dataGrid1.Columns.Remove("Data");
+                dataGrid1.Columns["Serial"].HeaderText = @"Owner";
+            }));
+        }
+
+        private void HandleShaderData(MessageHeader eHeader)
+        {
+            try {
+                using (var ms = new MemoryStream(eHeader.Data)) {
+                    var list = Serializer.Deserialize<List<StorageData>>(ms);
+                    dataGrid1.Invoke(new Action(() => {
+                        dataGrid1.DataSource = list;
+                        dataGrid1.Columns.Remove("Data");
+                        dataGrid1.Columns["Serial"].HeaderText = @"Owner";
+                    }));
+                }
+            }
+            catch (Exception e) {
+                Console.WriteLine(e);
             }
         }
 
@@ -99,13 +170,13 @@ namespace MapleSeed
         {
             if (Client.IsRunning) Client.Stop();
         }
-        
+
         private void ListBoxAddItem(object obj)
         {
-            if (listBox1.InvokeRequired)
-                listBox1.BeginInvoke(new Action(() => { listBox1.Items.Add(obj); }));
+            if (titleList.InvokeRequired)
+                titleList.BeginInvoke(new Action(() => { titleList.Items.Add(obj); }));
             else
-                listBox1.Items.Add(obj);
+                titleList.Items.Add(obj);
         }
 
         public void UpdateProgress(int percentage, long recvd, long toRecv)
@@ -152,25 +223,28 @@ namespace MapleSeed
 
         private void updateBtn_Click(object sender, EventArgs e)
         {
-            string fullPath = null, item = listBox1.SelectedItem as string;
+            try {
+                string fullPath = null, item = titleList.SelectedItem as string;
 
-            if (item != null)
-                fullPath = Path.Combine(Toolbelt.Settings.TitleDirectory, item);
+                if (item != null)
+                    fullPath = Path.Combine(Toolbelt.Settings.TitleDirectory, item);
 
-            if (Toolbelt.Database != null) {
-                var title = Database.Find(item);
-                Toolbelt.Database.UpdateGame(title.TitleID, fullPath);
+                if (Toolbelt.Database != null) {
+                    var title = Database.Find(item);
+                    Toolbelt.Database.UpdateGame(title.TitleID, fullPath);
+                }
+            }
+            catch (Exception ex) {
+                Console.WriteLine(ex);
             }
 
-            listBox1.Enabled = false;
+            titleList.Enabled = false;
         }
 
         private void listBox1_DoubleClick(object sender, EventArgs e)
         {
-            var item = listBox1.SelectedItem as string;
+            var item = titleList.SelectedItem as string;
             if (string.IsNullOrEmpty(item)) return;
-
-
         }
 
         private void fullTitle_CheckedChanged(object sender, EventArgs e)
@@ -182,7 +256,7 @@ namespace MapleSeed
         {
             Toolbelt.Settings.FullScreenMode = fullScreen.Checked;
         }
-        
+
         private void chatInput_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == (char) Keys.Return && !string.IsNullOrEmpty(chatInput.Text))
@@ -195,7 +269,6 @@ namespace MapleSeed
         private void username_TextChanged(object sender, EventArgs e)
         {
             Settings.Instance.Username = username.Text;
-            Client.SetUsername(username.Text);
         }
 
         private void UpdateUsername(string name)
@@ -210,7 +283,8 @@ namespace MapleSeed
             {
                 CheckFileExists = true,
                 Filter = @"Tansferable Data |*.bin;rules.txt",
-                InitialDirectory = Toolbelt.Settings.CemuDirectory
+                InitialDirectory = Toolbelt.Settings.CemuDirectory,
+                Multiselect = true
             };
             var result = ofd.ShowDialog();
             if (!File.Exists(ofd.FileName))
@@ -227,18 +301,19 @@ namespace MapleSeed
             if (new FileInfo(file).Extension == ".txt") {
                 var folder = Path.GetDirectoryName(file);
                 folder = Path.GetFileName(folder);
-                //Storage.Upload(Client, file, folder, false);
+                Storage.Upload(Client, file, folder, Toolbelt.Serial, false);
             }
             else {
-                var filename = Path.GetFileName(file);
-                Storage.Upload(Client, file, filename, true);
+                if (ofd.FileNames.Length > 0)
+                    foreach (var ofdFile in ofd.FileNames)
+                        Storage.Upload(Client, ofdFile, Path.GetFileName(ofdFile), Toolbelt.Settings.Serial, true);
+                else Storage.Upload(Client, file, Path.GetFileName(file), Toolbelt.Settings.Serial, true);
             }
         }
 
         private void ConfirmStorageUpload(MessageHeader header)
         {
-            using (var ms = new MemoryStream(header.Data))
-            {
+            using (var ms = new MemoryStream(header.Data)) {
                 var sd = Serializer.Deserialize<StorageData>(ms);
                 if (sd.Length <= 0) return;
 
@@ -250,8 +325,27 @@ namespace MapleSeed
 
         private void playBtn_Click(object sender, EventArgs e)
         {
-            if (listBox1.SelectedItem != null)
-                Toolbelt.LaunchCemu(listBox1.SelectedItem as string);
+            if (titleList.SelectedItem != null)
+                Toolbelt.LaunchCemu(titleList.SelectedItem as string);
+        }
+
+        private void refreshBtn_Click(object sender, EventArgs e)
+        {
+            Client.Send(Toolbelt.Serial, MessageType.ShaderData);
+        }
+
+        private void dataGrid1_DoubleClick(object sender, EventArgs e)
+        {
+            if (dataGrid1.SelectedRows.Count <= 0) return;
+            var row = (StorageData) dataGrid1.SelectedRows[0].DataBoundItem;
+            AppendLog($"[{row.Name}] Requesting download from storage server.");
+            Client.Send(row, MessageType.RequestDownload);
+        }
+
+        private void search_TextChanged(object sender, EventArgs e)
+        {
+            if (search.Text.Length > 5)
+                Client.Send(search.Text, MessageType.RequestSearch);
         }
     }
 }
