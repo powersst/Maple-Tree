@@ -63,16 +63,12 @@ namespace MapleSeed
             var game = FindByTitleId(titleId);
 
             if (Toolbelt.Form1 != null)
-                if (Toolbelt.Form1.fullTitle.Checked)
+                if (!Toolbelt.Form1.fullTitle.Checked)
                     game.TitleID = game.TitleID.Replace("00050000", "0005000e");
 
             Toolbelt.SetStatus($"Updating {titleId}");
 
             DownloadTitle(game, fullPath);
-
-            if (Toolbelt.Form1 != null)
-                Toolbelt.Form1.titleList.Enabled = true;
-
             Toolbelt.SetStatus(string.Empty);
         }
 

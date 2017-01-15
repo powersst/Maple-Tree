@@ -51,6 +51,7 @@
             this.myUploads = new System.Windows.Forms.Button();
             this.connectBtn = new System.Windows.Forms.Button();
             this.sendChat = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -211,6 +212,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.label1);
             this.tabPage2.Controls.Add(this.search);
             this.tabPage2.Controls.Add(this.dataGrid1);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
@@ -226,7 +228,7 @@
             this.search.Location = new System.Drawing.Point(6, 6);
             this.search.MaxLength = 12;
             this.search.Name = "search";
-            this.search.Size = new System.Drawing.Size(168, 22);
+            this.search.Size = new System.Drawing.Size(105, 22);
             this.search.TabIndex = 2;
             this.search.TextChanged += new System.EventHandler(this.search_TextChanged);
             // 
@@ -238,14 +240,14 @@
             this.dataGrid1.BackgroundColor = System.Drawing.SystemColors.ButtonHighlight;
             this.dataGrid1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGrid1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGrid1.Location = new System.Drawing.Point(3, 36);
+            this.dataGrid1.Location = new System.Drawing.Point(3, 34);
             this.dataGrid1.MultiSelect = false;
             this.dataGrid1.Name = "dataGrid1";
             this.dataGrid1.ReadOnly = true;
             this.dataGrid1.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
             this.dataGrid1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGrid1.ShowCellErrors = false;
-            this.dataGrid1.Size = new System.Drawing.Size(855, 481);
+            this.dataGrid1.Size = new System.Drawing.Size(855, 483);
             this.dataGrid1.TabIndex = 0;
             this.dataGrid1.DoubleClick += new System.EventHandler(this.dataGrid1_DoubleClick);
             // 
@@ -278,6 +280,15 @@
             this.sendChat.Text = "Send";
             this.sendChat.UseVisualStyleBackColor = true;
             this.sendChat.Click += new System.EventHandler(this.sendChat_Click);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(117, 9);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(103, 13);
+            this.label1.TabIndex = 3;
+            this.label1.Text = "Search by filename";
             // 
             // Form1
             // 
@@ -341,6 +352,7 @@
         private System.Windows.Forms.TextBox search;
         private System.Windows.Forms.Button connectBtn;
         private System.Windows.Forms.Button sendChat;
+        private System.Windows.Forms.Label label1;
     }
 }
 

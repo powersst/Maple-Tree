@@ -261,15 +261,7 @@ namespace MapleSeed
         {
             Toolbelt.Settings.FullScreenMode = fullScreen.Checked;
         }
-
-        private void chatInput_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar != (char) Keys.Return || string.IsNullOrEmpty(chatInput.Text)) return;
-            if (Client.NetClient.ServerConnection == null) return;
-            Client.Send($"[{username.Text}]: {chatInput.Text}", MessageType.ChatMessage);
-            chatInput.Text = string.Empty;
-        }
-
+        
         private void username_TextChanged(object sender, EventArgs e)
         {
             Settings.Instance.Username = username.Text;
@@ -329,8 +321,13 @@ namespace MapleSeed
 
         private void playBtn_Click(object sender, EventArgs e)
         {
-            if (titleList.SelectedItem != null)
-                Toolbelt.LaunchCemu(titleList.SelectedItem as string);
+            var title = titleList.SelectedItem as string;
+            if (title == null) return;
+
+            Toolbelt.LaunchCemu(title);
+            var msg = $"[{Client.UserData.Username}] Has started playing {title}!";
+            Client.Send(msg, MessageType.ChatMessage);
+            AppendLog(msg);
         }
 
         private void refreshBtn_Click(object sender, EventArgs e)
