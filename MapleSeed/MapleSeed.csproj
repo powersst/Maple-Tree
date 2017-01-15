@@ -117,7 +117,11 @@
     <Content Include="3rdParty\CefSharp\CefSharp.Core.dll" />
     <Content Include="3rdParty\CefSharp\CefSharp.dll" />
     <Content Include="3rdParty\CefSharp\CefSharp.WinForms.dll" />
+    <None Include="Resources\icon1.png" />
     <Content Include="Resources\Seed.ico" />
+    <None Include="Resources\sharebtn.png" />
+    <None Include="Resources\updatebtn.png" />
+    <None Include="Resources\uploadbtn.png" />
     <Content Include="TODO.txt" />
     <Compile Include="Toolbelt.cs" />
     <Content Include="version.txt" />
@@ -135,6 +139,7 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="3rdParty\IniFileParser\Model\IniData.cs.rej" />
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -155,6 +160,10 @@
     <ProjectReference Include="..\MapleRoot\MapleRoot.csproj">
       <Project>{4375d4c0-fef9-46f5-942d-36c2ebe15672}</Project>
       <Name>MapleRoot</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MaterialSkin\MaterialSkin.csproj">
+      <Project>{8eb7611b-68cd-4b8b-987a-11717e2b250c}</Project>
+      <Name>MaterialSkin</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

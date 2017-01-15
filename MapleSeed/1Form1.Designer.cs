@@ -36,22 +36,23 @@
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.fullTitle = new System.Windows.Forms.CheckBox();
-            this.updateBtn = new System.Windows.Forms.Button();
+            this.updateBtn = new MaterialSkin.Controls.MaterialFlatButton();
             this.fullScreen = new System.Windows.Forms.CheckBox();
             this.userList = new System.Windows.Forms.ListBox();
             this.chatInput = new System.Windows.Forms.TextBox();
             this.username = new System.Windows.Forms.TextBox();
-            this.shareBtn = new System.Windows.Forms.Button();
-            this.playBtn = new System.Windows.Forms.Button();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.shareBtn = new MaterialSkin.Controls.MaterialFlatButton();
+            this.playBtn = new MaterialSkin.Controls.MaterialFlatButton();
+            this.tabControl1 = new MaterialSkin.Controls.MaterialTabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.label1 = new System.Windows.Forms.Label();
             this.search = new System.Windows.Forms.TextBox();
             this.dataGrid1 = new System.Windows.Forms.DataGridView();
-            this.myUploads = new System.Windows.Forms.Button();
-            this.connectBtn = new System.Windows.Forms.Button();
-            this.sendChat = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
+            this.myUploads = new MaterialSkin.Controls.MaterialFlatButton();
+            this.connectBtn = new MaterialSkin.Controls.MaterialFlatButton();
+            this.sendChat = new MaterialSkin.Controls.MaterialFlatButton();
+            this.materialTabSelector1 = new MaterialSkin.Controls.MaterialTabSelector();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -88,9 +89,9 @@
             // titleList
             // 
             this.titleList.FormattingEnabled = true;
-            this.titleList.Location = new System.Drawing.Point(12, 36);
+            this.titleList.Location = new System.Drawing.Point(12, 101);
             this.titleList.Name = "titleList";
-            this.titleList.Size = new System.Drawing.Size(250, 550);
+            this.titleList.Size = new System.Drawing.Size(250, 485);
             this.titleList.Sorted = true;
             this.titleList.TabIndex = 10;
             this.titleList.DoubleClick += new System.EventHandler(this.listBox1_DoubleClick);
@@ -108,7 +109,7 @@
             this.richTextBox1.ReadOnly = true;
             this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
             this.richTextBox1.ShortcutsEnabled = false;
-            this.richTextBox1.Size = new System.Drawing.Size(855, 490);
+            this.richTextBox1.Size = new System.Drawing.Size(855, 397);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = "";
             // 
@@ -125,9 +126,16 @@
             // 
             // updateBtn
             // 
-            this.updateBtn.Location = new System.Drawing.Point(188, 7);
+            this.updateBtn.AutoSize = true;
+            this.updateBtn.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.updateBtn.Depth = 0;
+            this.updateBtn.Icon = global::MapleSeed.Properties.Resources.updatebtn;
+            this.updateBtn.Location = new System.Drawing.Point(208, 40);
+            this.updateBtn.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.updateBtn.MouseState = MaterialSkin.MouseState.HOVER;
             this.updateBtn.Name = "updateBtn";
-            this.updateBtn.Size = new System.Drawing.Size(74, 23);
+            this.updateBtn.Primary = false;
+            this.updateBtn.Size = new System.Drawing.Size(103, 46);
             this.updateBtn.TabIndex = 12;
             this.updateBtn.Text = "Update";
             this.updateBtn.UseVisualStyleBackColor = true;
@@ -147,9 +155,9 @@
             // userList
             // 
             this.userList.FormattingEnabled = true;
-            this.userList.Location = new System.Drawing.Point(1143, 86);
+            this.userList.Location = new System.Drawing.Point(1143, 125);
             this.userList.Name = "userList";
-            this.userList.Size = new System.Drawing.Size(109, 472);
+            this.userList.Size = new System.Drawing.Size(109, 433);
             this.userList.TabIndex = 14;
             // 
             // chatInput
@@ -161,7 +169,7 @@
             // 
             // username
             // 
-            this.username.Location = new System.Drawing.Point(1143, 58);
+            this.username.Location = new System.Drawing.Point(1143, 96);
             this.username.MaxLength = 12;
             this.username.Name = "username";
             this.username.ReadOnly = true;
@@ -171,9 +179,16 @@
             // 
             // shareBtn
             // 
-            this.shareBtn.Location = new System.Drawing.Point(101, 7);
+            this.shareBtn.AutoSize = true;
+            this.shareBtn.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.shareBtn.Depth = 0;
+            this.shareBtn.Icon = global::MapleSeed.Properties.Resources.sharebtn;
+            this.shareBtn.Location = new System.Drawing.Point(106, 40);
+            this.shareBtn.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.shareBtn.MouseState = MaterialSkin.MouseState.HOVER;
             this.shareBtn.Name = "shareBtn";
-            this.shareBtn.Size = new System.Drawing.Size(75, 23);
+            this.shareBtn.Primary = false;
+            this.shareBtn.Size = new System.Drawing.Size(94, 46);
             this.shareBtn.TabIndex = 16;
             this.shareBtn.Text = "Share";
             this.shareBtn.UseVisualStyleBackColor = true;
@@ -181,22 +196,33 @@
             // 
             // playBtn
             // 
-            this.playBtn.Location = new System.Drawing.Point(12, 7);
+            this.playBtn.AutoSize = true;
+            this.playBtn.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.playBtn.BackColor = System.Drawing.Color.Red;
+            this.playBtn.Depth = 0;
+            this.playBtn.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.playBtn.Icon = global::MapleSeed.Properties.Resources.icon1;
+            this.playBtn.Location = new System.Drawing.Point(13, 40);
+            this.playBtn.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.playBtn.MouseState = MaterialSkin.MouseState.HOVER;
             this.playBtn.Name = "playBtn";
-            this.playBtn.Size = new System.Drawing.Size(75, 23);
+            this.playBtn.Primary = false;
+            this.playBtn.Size = new System.Drawing.Size(85, 46);
             this.playBtn.TabIndex = 17;
-            this.playBtn.Text = "Play!";
-            this.playBtn.UseVisualStyleBackColor = true;
+            this.playBtn.Text = "Play";
+            this.playBtn.UseVisualStyleBackColor = false;
             this.playBtn.Click += new System.EventHandler(this.playBtn_Click);
             // 
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Location = new System.Drawing.Point(268, 36);
+            this.tabControl1.Depth = 0;
+            this.tabControl1.Location = new System.Drawing.Point(268, 129);
+            this.tabControl1.MouseState = MaterialSkin.MouseState.HOVER;
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(869, 522);
+            this.tabControl1.Size = new System.Drawing.Size(869, 429);
             this.tabControl1.TabIndex = 18;
             // 
             // tabPage1
@@ -205,7 +231,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(861, 496);
+            this.tabPage1.Size = new System.Drawing.Size(861, 403);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Console";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -218,10 +244,19 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(861, 496);
+            this.tabPage2.Size = new System.Drawing.Size(861, 403);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Uploads";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(117, 9);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(103, 13);
+            this.label1.TabIndex = 3;
+            this.label1.Text = "Search by filename";
             // 
             // search
             // 
@@ -253,9 +288,16 @@
             // 
             // myUploads
             // 
-            this.myUploads.Location = new System.Drawing.Point(268, 7);
+            this.myUploads.AutoSize = true;
+            this.myUploads.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.myUploads.Depth = 0;
+            this.myUploads.Icon = global::MapleSeed.Properties.Resources.uploadbtn;
+            this.myUploads.Location = new System.Drawing.Point(319, 40);
+            this.myUploads.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.myUploads.MouseState = MaterialSkin.MouseState.HOVER;
             this.myUploads.Name = "myUploads";
-            this.myUploads.Size = new System.Drawing.Size(86, 23);
+            this.myUploads.Primary = false;
+            this.myUploads.Size = new System.Drawing.Size(136, 46);
             this.myUploads.TabIndex = 19;
             this.myUploads.Text = "My Uploads";
             this.myUploads.UseVisualStyleBackColor = true;
@@ -263,9 +305,16 @@
             // 
             // connectBtn
             // 
-            this.connectBtn.Location = new System.Drawing.Point(1143, 638);
+            this.connectBtn.AutoSize = true;
+            this.connectBtn.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.connectBtn.Depth = 0;
+            this.connectBtn.Icon = null;
+            this.connectBtn.Location = new System.Drawing.Point(1143, 625);
+            this.connectBtn.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.connectBtn.MouseState = MaterialSkin.MouseState.HOVER;
             this.connectBtn.Name = "connectBtn";
-            this.connectBtn.Size = new System.Drawing.Size(108, 23);
+            this.connectBtn.Primary = false;
+            this.connectBtn.Size = new System.Drawing.Size(84, 36);
             this.connectBtn.TabIndex = 20;
             this.connectBtn.Text = "Connect";
             this.connectBtn.UseVisualStyleBackColor = true;
@@ -273,22 +322,31 @@
             // 
             // sendChat
             // 
+            this.sendChat.AutoSize = true;
+            this.sendChat.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.sendChat.Depth = 0;
+            this.sendChat.Icon = null;
             this.sendChat.Location = new System.Drawing.Point(1143, 564);
+            this.sendChat.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
+            this.sendChat.MouseState = MaterialSkin.MouseState.HOVER;
             this.sendChat.Name = "sendChat";
-            this.sendChat.Size = new System.Drawing.Size(109, 23);
+            this.sendChat.Primary = false;
+            this.sendChat.Size = new System.Drawing.Size(56, 36);
             this.sendChat.TabIndex = 21;
             this.sendChat.Text = "Send";
             this.sendChat.UseVisualStyleBackColor = true;
             this.sendChat.Click += new System.EventHandler(this.sendChat_Click);
             // 
-            // label1
+            // materialTabSelector1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(117, 9);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(103, 13);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Search by filename";
+            this.materialTabSelector1.BaseTabControl = this.tabControl1;
+            this.materialTabSelector1.Depth = 0;
+            this.materialTabSelector1.Location = new System.Drawing.Point(269, 90);
+            this.materialTabSelector1.MouseState = MaterialSkin.MouseState.HOVER;
+            this.materialTabSelector1.Name = "materialTabSelector1";
+            this.materialTabSelector1.Size = new System.Drawing.Size(868, 36);
+            this.materialTabSelector1.TabIndex = 22;
+            this.materialTabSelector1.Text = "materialTabSelector1";
             // 
             // Form1
             // 
@@ -296,6 +354,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1264, 681);
+            this.Controls.Add(this.materialTabSelector1);
             this.Controls.Add(this.sendChat);
             this.Controls.Add(this.myUploads);
             this.Controls.Add(this.connectBtn);
@@ -337,22 +396,23 @@
         internal System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         private System.Windows.Forms.RichTextBox richTextBox1;
         internal System.Windows.Forms.CheckBox fullTitle;
-        private System.Windows.Forms.Button updateBtn;
+        private MaterialSkin.Controls.MaterialFlatButton updateBtn;
         private System.Windows.Forms.CheckBox fullScreen;
         private System.Windows.Forms.ListBox userList;
         private System.Windows.Forms.TextBox chatInput;
         private System.Windows.Forms.TextBox username;
-        private System.Windows.Forms.Button shareBtn;
-        private System.Windows.Forms.Button playBtn;
-        private System.Windows.Forms.TabControl tabControl1;
+        private MaterialSkin.Controls.MaterialFlatButton shareBtn;
+        private MaterialSkin.Controls.MaterialFlatButton playBtn;
+        private MaterialSkin.Controls.MaterialTabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.Button myUploads;
+        private MaterialSkin.Controls.MaterialFlatButton myUploads;
         private System.Windows.Forms.DataGridView dataGrid1;
         private System.Windows.Forms.TextBox search;
-        private System.Windows.Forms.Button connectBtn;
-        private System.Windows.Forms.Button sendChat;
+        private MaterialSkin.Controls.MaterialFlatButton connectBtn;
+        private MaterialSkin.Controls.MaterialFlatButton sendChat;
         private System.Windows.Forms.Label label1;
+        private MaterialSkin.Controls.MaterialTabSelector materialTabSelector1;
     }
 }
 

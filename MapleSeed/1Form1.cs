@@ -20,16 +20,33 @@ using MapleRoot.Network.Events;
 using MapleRoot.Network.Messages;
 using MapleRoot.Structs;
 using ProtoBuf;
+using MaterialSkin.Controls;
+using MaterialSkin;
 
 #endregion
 
 namespace MapleSeed
 {
-    public partial class Form1 : Form
+    public partial class Form1 : MaterialForm
     {
         public Form1()
         {
             InitializeComponent();
+
+            var materialSkinManager = MaterialSkinManager.Instance;
+            materialSkinManager.AddFormToManage(this);
+            materialSkinManager.Theme = MaterialSkinManager.Themes.LIGHT;
+            materialSkinManager.ColorScheme = new ColorScheme(Primary.Red700, Primary.Red900, Primary.Red500, Accent.Yellow100, TextShade.WHITE);
+            var btnBackgroundColor = Color.FromArgb(255, 211, 47, 47);
+            var btnForeColor = Color.White;
+            playBtn.BackColor = btnBackgroundColor;
+            shareBtn.BackColor = btnBackgroundColor;
+            updateBtn.BackColor = btnBackgroundColor;
+            myUploads.BackColor = btnBackgroundColor;
+            playBtn.ForeColor = btnForeColor;
+            shareBtn.ForeColor = btnForeColor;
+            updateBtn.ForeColor = btnForeColor;
+            myUploads.ForeColor = btnForeColor;
             Toolbelt.Form1 = this;
         }
 
