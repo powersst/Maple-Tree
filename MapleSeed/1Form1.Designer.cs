@@ -49,6 +49,8 @@
             this.search = new System.Windows.Forms.TextBox();
             this.dataGrid1 = new System.Windows.Forms.DataGridView();
             this.myUploads = new System.Windows.Forms.Button();
+            this.connectBtn = new System.Windows.Forms.Button();
+            this.sendChat = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -105,7 +107,7 @@
             this.richTextBox1.ReadOnly = true;
             this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
             this.richTextBox1.ShortcutsEnabled = false;
-            this.richTextBox1.Size = new System.Drawing.Size(855, 514);
+            this.richTextBox1.Size = new System.Drawing.Size(855, 490);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = "";
             // 
@@ -122,9 +124,9 @@
             // 
             // updateBtn
             // 
-            this.updateBtn.Location = new System.Drawing.Point(1143, 638);
+            this.updateBtn.Location = new System.Drawing.Point(188, 7);
             this.updateBtn.Name = "updateBtn";
-            this.updateBtn.Size = new System.Drawing.Size(109, 23);
+            this.updateBtn.Size = new System.Drawing.Size(74, 23);
             this.updateBtn.TabIndex = 12;
             this.updateBtn.Text = "Update";
             this.updateBtn.UseVisualStyleBackColor = true;
@@ -144,32 +146,31 @@
             // userList
             // 
             this.userList.FormattingEnabled = true;
-            this.userList.Location = new System.Drawing.Point(1143, 34);
+            this.userList.Location = new System.Drawing.Point(1143, 86);
             this.userList.Name = "userList";
-            this.userList.Size = new System.Drawing.Size(109, 524);
+            this.userList.Size = new System.Drawing.Size(109, 472);
             this.userList.TabIndex = 14;
             // 
             // chatInput
             // 
-            this.chatInput.Location = new System.Drawing.Point(264, 564);
+            this.chatInput.Location = new System.Drawing.Point(268, 564);
             this.chatInput.Name = "chatInput";
-            this.chatInput.Size = new System.Drawing.Size(869, 22);
+            this.chatInput.Size = new System.Drawing.Size(865, 22);
             this.chatInput.TabIndex = 0;
-            this.chatInput.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.chatInput_KeyPress);
             // 
             // username
             // 
-            this.username.Location = new System.Drawing.Point(1143, 564);
+            this.username.Location = new System.Drawing.Point(1143, 58);
             this.username.MaxLength = 12;
             this.username.Name = "username";
             this.username.ReadOnly = true;
-            this.username.Size = new System.Drawing.Size(108, 22);
+            this.username.Size = new System.Drawing.Size(109, 22);
             this.username.TabIndex = 15;
             this.username.TextChanged += new System.EventHandler(this.username_TextChanged);
             // 
             // shareBtn
             // 
-            this.shareBtn.Location = new System.Drawing.Point(93, 7);
+            this.shareBtn.Location = new System.Drawing.Point(101, 7);
             this.shareBtn.Name = "shareBtn";
             this.shareBtn.Size = new System.Drawing.Size(75, 23);
             this.shareBtn.TabIndex = 16;
@@ -191,10 +192,10 @@
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Location = new System.Drawing.Point(268, 12);
+            this.tabControl1.Location = new System.Drawing.Point(268, 36);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(869, 546);
+            this.tabControl1.Size = new System.Drawing.Size(869, 522);
             this.tabControl1.TabIndex = 18;
             // 
             // tabPage1
@@ -203,7 +204,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(861, 520);
+            this.tabPage1.Size = new System.Drawing.Size(861, 496);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Console";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -215,7 +216,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(861, 520);
+            this.tabPage2.Size = new System.Drawing.Size(861, 496);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Uploads";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -250,7 +251,7 @@
             // 
             // myUploads
             // 
-            this.myUploads.Location = new System.Drawing.Point(174, 7);
+            this.myUploads.Location = new System.Drawing.Point(268, 7);
             this.myUploads.Name = "myUploads";
             this.myUploads.Size = new System.Drawing.Size(86, 23);
             this.myUploads.TabIndex = 19;
@@ -258,12 +259,35 @@
             this.myUploads.UseVisualStyleBackColor = true;
             this.myUploads.Click += new System.EventHandler(this.refreshBtn_Click);
             // 
+            // connectBtn
+            // 
+            this.connectBtn.Location = new System.Drawing.Point(1143, 638);
+            this.connectBtn.Name = "connectBtn";
+            this.connectBtn.Size = new System.Drawing.Size(108, 23);
+            this.connectBtn.TabIndex = 20;
+            this.connectBtn.Text = "Connect";
+            this.connectBtn.UseVisualStyleBackColor = true;
+            this.connectBtn.Click += new System.EventHandler(this.connectBtn_Click);
+            // 
+            // sendChat
+            // 
+            this.sendChat.Location = new System.Drawing.Point(1143, 564);
+            this.sendChat.Name = "sendChat";
+            this.sendChat.Size = new System.Drawing.Size(109, 23);
+            this.sendChat.TabIndex = 21;
+            this.sendChat.Text = "Send";
+            this.sendChat.UseVisualStyleBackColor = true;
+            this.sendChat.Click += new System.EventHandler(this.sendChat_Click);
+            // 
             // Form1
             // 
+            this.AcceptButton = this.sendChat;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1264, 681);
+            this.Controls.Add(this.sendChat);
             this.Controls.Add(this.myUploads);
+            this.Controls.Add(this.connectBtn);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.playBtn);
             this.Controls.Add(this.shareBtn);
@@ -315,6 +339,8 @@
         private System.Windows.Forms.Button myUploads;
         private System.Windows.Forms.DataGridView dataGrid1;
         private System.Windows.Forms.TextBox search;
+        private System.Windows.Forms.Button connectBtn;
+        private System.Windows.Forms.Button sendChat;
     }
 }
 

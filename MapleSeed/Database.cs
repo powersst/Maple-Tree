@@ -234,10 +234,10 @@ namespace MapleSeed
             var tmd = await HandleTmd(outputDir, titleUrl);
 
             //Download Content
-            if (await ContentHandled(tmd, outputDir, titleUrl2) == 0) return;
-
-            Toolbelt.AppendLog("  - Decrypting Content...");
-            Toolbelt.CDecrypt(outputDir);
+            if (await ContentHandled(tmd, outputDir, titleUrl2) == 1) {
+                Toolbelt.AppendLog("  - Decrypting Content...");
+                Toolbelt.CDecrypt(outputDir);
+            }
 
             CleanUpdate(outputDir, tmd);
 

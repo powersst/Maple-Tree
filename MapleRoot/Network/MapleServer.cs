@@ -77,11 +77,14 @@ namespace MapleRoot.Network
                 case MessageType.Userlist:
                     break;
                 case MessageType.ChatMessage:
-                    SendToAll(Encoding.UTF8.GetString(e.Header.Data), MessageType.ChatMessage);
+                    string msg = Encoding.UTF8.GetString(e.Header.Data);
+                    SendToAll(msg, MessageType.ChatMessage);
+                    Console.WriteLine(msg);
                     break;
                 case MessageType.ModUsername:
                     using (var ms = new MemoryStream(e.Header.Data)) {
                         from.Tag = Serializer.Deserialize<UserData>(ms);
+                        Console.WriteLine($"[{((UserData)from.Tag).Username}] Name Updated.");
                     }
                     break;
                 case MessageType.StorageUpload:
@@ -105,8 +108,6 @@ namespace MapleRoot.Network
                 case MessageType.RequestSearch:
                     HandleRequestSearch(e.Header.Data, from);
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
         }
 
@@ -133,6 +134,7 @@ namespace MapleRoot.Network
         {
             using (var ms = new MemoryStream(data)) {
                 var sd = Serializer.Deserialize<StorageData>(ms);
+                Console.WriteLine($"[{((UserData)from.Tag).Username}] Uploading {sd.Name}");
                 if (Storage.AddToStorage(sd)) {
                     sd.Data = null;
                     Send(sd, from, MessageType.StorageUpload);
@@ -160,6 +162,7 @@ namespace MapleRoot.Network
                     Console.WriteLine(e);
                 }
 
+            Console.WriteLine($"[{((UserData)from.Tag).Username}] Requested ShaderData");
             Send(dCache, from, MessageType.ShaderData);
         }
 
@@ -202,6 +205,9 @@ namespace MapleRoot.Network
                                 inMsg.SenderConnection.Tag = new UserData();
                                 Connections.Add(inMsg.SenderConnection);
                                 Console.WriteLine($"{inMsg.SenderConnection} has connected!");
+                                break;
+                            case NetConnectionStatus.Disconnected:
+                                Console.WriteLine($"{inMsg.SenderConnection} has disconnected!");
                                 break;
                         }
                         break;

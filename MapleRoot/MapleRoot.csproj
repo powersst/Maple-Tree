@@ -38,6 +38,7 @@
     <Prefer32Bit>false</Prefer32Bit>
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Resources\Seed.ico</ApplicationIcon>

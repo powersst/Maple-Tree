@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Lidgren.Network;
 using MapleRoot.Enums;
 using MapleRoot.Network.Events;
@@ -26,17 +27,16 @@ namespace MapleRoot.Network
         public NetPeerStatistics Stats => NetClient.Statistics;
         public bool IsRunning => NetClient.Status == NetPeerStatus.Running;
         public UserData UserData { get; set; }
-
-        public void Start()
+        
+        public void Start(string serverIP)
         {
             NetClient.RegisterReceivedCallback(ReadMessage, new SynchronizationContext());
-            NetClient.Connect(Config.ServerIP, Config.ServerPort);
+            NetClient.Connect(serverIP, Config.ServerPort);
         }
 
         public void Stop()
         {
             NetClient.Disconnect($"Bye! -{NetClient.UniqueIdentifier}");
-            NetClient.Shutdown($"Bye! -{NetClient.UniqueIdentifier}");
         }
 
         public void UpdateUsername(string username)

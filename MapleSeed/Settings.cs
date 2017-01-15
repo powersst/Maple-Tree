@@ -5,6 +5,7 @@
 
 #region usings
 
+using System;
 using System.IO;
 using System.Windows.Forms;
 using IniParser;
@@ -50,10 +51,10 @@ namespace MapleSeed
                     CheckFileExists = true,
                     Filter = @"Cemu Excutable |cemu.exe"
                 };
-                var result = ofd.ShowDialog();
+                DialogResult result = DialogResult.Cancel;
+                Toolbelt.Form1.Invoke(new Action(()=> result = ofd.ShowDialog()));
 
-                if (string.IsNullOrWhiteSpace(ofd.FileName) && result == DialogResult.OK)
-                    return value;
+                if (string.IsNullOrWhiteSpace(ofd.FileName) && result == DialogResult.OK) return value;
 
                 value = Path.GetDirectoryName(ofd.FileName);
                 WriteKeyValue("CemuDirectory", value);
@@ -65,6 +66,16 @@ namespace MapleSeed
             get { return GetKeyValue("Username"); }
 
             set { WriteKeyValue("Username", value); }
+        }
+
+        public string Hub
+        {
+            get {
+                var value = GetKeyValue("Hub");
+                if (string.IsNullOrEmpty(value))
+                    WriteKeyValue("Hub", value = "72.219.12.183");
+                return value;
+            }
         }
 
         public string Serial {

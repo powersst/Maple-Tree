@@ -19,7 +19,6 @@ using MapleRoot.Network;
 using MapleRoot.Network.Events;
 using MapleRoot.Network.Messages;
 using MapleRoot.Structs;
-using MaryJane;
 using ProtoBuf;
 
 #endregion
@@ -41,11 +40,12 @@ namespace MapleSeed
         private void Form1_Load(object sender, EventArgs e)
         {
             Database.Initialize();
-
-            Client = MapleClient.Create();
-            Client.OnMessageReceived += ClientOnOnMessageReceived;
-            Client.OnConnected += ClientOnConnected;
-            Client.Start();
+            if (Client == null) {
+                Client = MapleClient.Create();
+                Client.OnMessageReceived += ClientOnOnMessageReceived;
+                Client.OnConnected += ClientOnConnected;
+                Client.NetClient.Start();
+            }
 
             Text += $@" - Serial {Toolbelt.Settings.Serial}";
             MinimumSize = MaximumSize = Size;
@@ -75,6 +75,7 @@ namespace MapleSeed
                 Serial = Settings.Instance.Serial
             };
             Client.Send(Client.UserData, MessageType.ModUsername);
+            Toolbelt.SetStatus($"You are now connected to Hub[{Toolbelt.Settings.Hub}]", Color.DarkGreen);
 
             Task.Run(() => {
                 while (Client.NetClient.ConnectionsCount > 0) {
@@ -123,17 +124,21 @@ namespace MapleSeed
 
         private void HandleRequestDownload(MessageHeader header)
         {
-            StorageData sd;
-            using (var ms = new MemoryStream(header.Data)) {
-                sd = Serializer.Deserialize<StorageData>(ms);
+            try {
+                using (var ms = new MemoryStream(header.Data)) {
+                    var sd = Serializer.Deserialize<StorageData>(ms);
+
+                    var saveTo = sd.Shader
+                        ? Path.Combine(Toolbelt.Settings.CemuDirectory, "shaderCache", "transferable", sd.Name)
+                        : Path.Combine(Toolbelt.Settings.CemuDirectory, "graphicPacks", sd.Name, "rules.txt");
+
+                    File.WriteAllBytes(saveTo, sd.Data);
+                    AppendLog($"[{sd.Name}] Download Complete.");
+                }
             }
-
-            var saveTo = sd.Shader
-                ? Path.Combine(Toolbelt.Settings.CemuDirectory, "shaderCache", "transferable", sd.Name)
-                : Path.Combine(Toolbelt.Settings.CemuDirectory, "graphicPacks", sd.Name, "rules.txt");
-
-            File.WriteAllBytes(saveTo, sd.Data);
-            AppendLog($"[{sd.Name}] Download Complete.");
+            catch (Exception e) {
+                MessageBox.Show(e.Message + "\n" + e.StackTrace);
+            }
         }
 
         private void HandleRequestSearch(byte[] data)
@@ -259,11 +264,10 @@ namespace MapleSeed
 
         private void chatInput_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == (char) Keys.Return && !string.IsNullOrEmpty(chatInput.Text))
-                if (Client.NetClient.ServerConnection != null) {
-                    Client.Send($"[{username.Text}]: {chatInput.Text}", MessageType.ChatMessage);
-                    chatInput.Text = string.Empty;
-                }
+            if (e.KeyChar != (char) Keys.Return || string.IsNullOrEmpty(chatInput.Text)) return;
+            if (Client.NetClient.ServerConnection == null) return;
+            Client.Send($"[{username.Text}]: {chatInput.Text}", MessageType.ChatMessage);
+            chatInput.Text = string.Empty;
         }
 
         private void username_TextChanged(object sender, EventArgs e)
@@ -346,6 +350,26 @@ namespace MapleSeed
         {
             if (search.Text.Length > 5)
                 Client.Send(search.Text, MessageType.RequestSearch);
+        }
+
+        private void connectBtn_Click(object sender, EventArgs e)
+        {
+            if (Client.NetClient.ConnectionsCount <= 0) {
+                Client.Start(Toolbelt.Settings.Hub);
+                connectBtn.Text = @"Disconnect";
+            }
+            else {
+                Client.Stop();
+                connectBtn.Text = @"Connect";
+            }
+        }
+
+        private void sendChat_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(chatInput.Text)) return;
+            if (Client.NetClient.ServerConnection == null) return;
+            Client.Send($"[{username.Text}]: {chatInput.Text}", MessageType.ChatMessage);
+            chatInput.Text = string.Empty;
         }
     }
 }
