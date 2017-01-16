@@ -8,7 +8,7 @@ namespace MapleRoot.Enums
     {
         Userlist = 1,
         ChatMessage = 2,
-        ModUsername = 3,
+        ModUserData = 3,
         StorageUpload = 4,
         ShaderData = 5,
         ReceiveFile = 6,

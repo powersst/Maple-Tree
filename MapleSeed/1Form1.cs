@@ -13,12 +13,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Forms;
+using Lidgren.Network;
 using MapleRoot;
+using MapleRoot.Common;
 using MapleRoot.Enums;
 using MapleRoot.Network;
 using MapleRoot.Network.Events;
-using MapleRoot.Network.Messages;
 using MapleRoot.Structs;
+using Newtonsoft.Json;
 using ProtoBuf;
 
 #endregion
@@ -42,14 +44,14 @@ namespace MapleSeed
             Database.Initialize();
             if (Client == null) {
                 Client = MapleClient.Create();
-                Client.OnMessageReceived += ClientOnOnMessageReceived;
+                Client.OnMessageReceived += ClientOnMessageReceived;
                 Client.OnConnected += ClientOnConnected;
                 Client.NetClient.Start();
             }
 
-            Text += $@" - Serial {Toolbelt.Settings.Serial}";
             MinimumSize = MaximumSize = Size;
             Text += Toolbelt.Version;
+            Text += $@" - Serial {Toolbelt.Settings.Serial}";
 
             Library = new List<string>(Directory.GetDirectories(Toolbelt.Settings.TitleDirectory));
             foreach (var item in Library) if (!string.IsNullOrEmpty(item)) ListBoxAddItem(new FileInfo(item).Name);
@@ -61,21 +63,55 @@ namespace MapleSeed
                 username.Text = Settings.Instance.Username = Toolkit.TempName();
             else
                 username.Text = Settings.Instance.Username;
-
+            
             Toolkit.GlobalTimer.Elapsed += GlobalTimer_Elapsed;
+            GlobalTimer_Elapsed(null, null);
         }
 
-        private void GlobalTimer_Elapsed(object sender, ElapsedEventArgs e) {}
+        private void GlobalTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            if (InvokeRequired) Invoke(new Action(UpdateUIModes));
+            else UpdateUIModes();
 
-        private static void ClientOnConnected(object sender, EventArgs e)
+            Client.Send("", MessageType.Userlist);
+        }
+
+        private void UpdateUIModes()
+        {
+            if (Client.NetClient.ConnectionStatus != NetConnectionStatus.Connected)
+            {
+                Client.Start(Toolbelt.Settings.Hub);
+                shareBtn.Enabled = false;
+                myUploads.Enabled = false;
+                sendChat.Enabled = false;
+                username.Enabled = false;
+                connectBtn.Text = @"Disconnect";
+            }
+            else
+            {
+                shareBtn.Enabled = true;
+                myUploads.Enabled = true;
+                sendChat.Enabled = true;
+                username.Enabled = true;
+                userList.Items.Clear();
+                connectBtn.Text = @"Connect";
+            }
+
+            connectBtn.Text = Client.NetClient.ConnectionStatus == NetConnectionStatus.Connected ? @"Disconnect" : @"Connect";
+        }
+
+        private void ClientOnConnected(object sender, EventArgs e)
         {
             Client.UserData = new UserData
             {
                 Username = Settings.Instance.Username,
                 Serial = Settings.Instance.Serial
             };
-            Client.Send(Client.UserData, MessageType.ModUsername);
-            Toolbelt.SetStatus($"You are now connected to Hub[{Toolbelt.Settings.Hub}]", Color.DarkGreen);
+            Client.Send(Client.UserData, MessageType.ModUserData);
+
+            GlobalTimer_Elapsed(null, null);
+            
+            Toolbelt.AppendLog($"Connected to Hub [{Toolbelt.Settings.Hub}]", Color.DarkGreen);
 
             Task.Run(() => {
                 while (Client.NetClient.ConnectionsCount > 0) {
@@ -88,20 +124,19 @@ namespace MapleSeed
             });
         }
 
-        private void ClientOnOnMessageReceived(object sender, OnMessageReceivedEventArgs e)
+        private void ClientOnMessageReceived(object sender, OnMessageReceivedEventArgs e)
         {
             var header = e.Header;
 
             switch (header.Type) {
                 case MessageType.Userlist:
-                    HandleUserList.Init(header.Data, userList);
+                    HandleUserList(header.Data);
                     break;
                 case MessageType.ChatMessage:
-                    var msg = Encoding.UTF8.GetString(header.Data);
-                    Toolbelt.AppendLog(msg);
+                    HandleChatMessage(header.Data);
                     break;
-                case MessageType.ModUsername:
-                    UpdateUsername(Encoding.UTF8.GetString(e.Header.Data));
+                case MessageType.ModUserData:
+                    UpdateUsername(e.Header.Data);
                     break;
                 case MessageType.StorageUpload:
                     ConfirmStorageUpload(e.Header);
@@ -120,6 +155,12 @@ namespace MapleSeed
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        private void HandleChatMessage(byte[] data)
+        {
+            var msg = Encoding.UTF8.GetString(data);
+            AppendChat(msg);
         }
 
         private void HandleRequestDownload(MessageHeader header)
@@ -150,7 +191,8 @@ namespace MapleSeed
             dataGrid1.Invoke(new Action(() => {
                 dataGrid1.DataSource = list;
                 dataGrid1.Columns.Remove("Data");
-                dataGrid1.Columns["Serial"].HeaderText = @"Owner";
+                var dataGridViewColumn = dataGrid1.Columns["Serial"];
+                if (dataGridViewColumn != null) dataGridViewColumn.HeaderText = @"Owner";
             }));
         }
 
@@ -162,13 +204,30 @@ namespace MapleSeed
                     dataGrid1.Invoke(new Action(() => {
                         dataGrid1.DataSource = list;
                         dataGrid1.Columns.Remove("Data");
-                        dataGrid1.Columns["Serial"].HeaderText = @"Owner";
+                        var dataGridViewColumn = dataGrid1.Columns["Serial"];
+                        if (dataGridViewColumn != null) dataGridViewColumn.HeaderText = @"Owner";
                     }));
                 }
             }
             catch (Exception e) {
                 Console.WriteLine(e);
             }
+        }
+
+        private void HandleUserList(byte[] data)
+        {
+            List<string> userlist;
+            using (var ms = new MemoryStream(data)) {
+                userlist = Serializer.Deserialize<List<string>>(ms);
+            }
+
+            userList.Invoke(new Action(() => {
+                userList.Items.Clear();
+
+                foreach (var name in userlist)
+                    if (!string.IsNullOrEmpty(name))
+                        userList.Items.Add(name);
+            }));
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -196,17 +255,32 @@ namespace MapleSeed
             SetStatus($"{percentage}% | {received} / {toReceive}");
         }
 
+        private void AppendChat(string msg, Color color = default(Color))
+        {
+            msg += '\n';
+            if (chatbox.InvokeRequired) {
+                chatbox.BeginInvoke(new Action(() => {
+                    chatbox.AppendText(msg, color);
+                    chatbox.ScrollToCaret();
+                }));
+            }
+            else {
+                chatbox.AppendText(msg, color);
+                chatbox.ScrollToCaret();
+            }
+        }
+
         public void AppendLog(string msg, Color color = default(Color))
         {
             msg += '\n';
             if (richTextBox1.InvokeRequired) {
                 richTextBox1.BeginInvoke(new Action(() => {
-                    richTextBox1.AppendText(msg);
+                    richTextBox1.AppendText(msg, color);
                     richTextBox1.ScrollToCaret();
                 }));
             }
             else {
-                richTextBox1.AppendText(msg);
+                richTextBox1.AppendText(msg, color);
                 richTextBox1.ScrollToCaret();
             }
         }
@@ -261,16 +335,26 @@ namespace MapleSeed
         {
             Toolbelt.Settings.FullScreenMode = fullScreen.Checked;
         }
-        
+
         private void username_TextChanged(object sender, EventArgs e)
         {
             Settings.Instance.Username = username.Text;
+
+            if (Client.UserData == null) return;
+            Client.UserData.Username = username.Text;
+            Client.Send(Client.UserData, MessageType.ModUserData);
+            Client.Send("", MessageType.Userlist);
         }
 
-        private void UpdateUsername(string name)
+        private void UpdateUsername(byte[] data)
         {
-            Settings.Instance.Username = name;
-            username.Invoke(new Action(() => { username.Text = name; }));
+            UserData ud;
+            using (var ms = new MemoryStream(data)) {
+                ud = Serializer.Deserialize<UserData>(ms);
+            }
+            Client.UserData.Username = ud.Username;
+            Settings.Instance.Username = ud.Username;
+            username.Invoke(new Action(() => { username.Text = ud.Username; }));
         }
 
         private void shareBtn_Click(object sender, EventArgs e)
@@ -345,7 +429,7 @@ namespace MapleSeed
 
         private void search_TextChanged(object sender, EventArgs e)
         {
-            if (search.Text.Length > 5)
+            if (search.Text.Length > 2)
                 Client.Send(search.Text, MessageType.RequestSearch);
         }
 
@@ -359,6 +443,7 @@ namespace MapleSeed
                 Client.Stop();
                 connectBtn.Text = @"Connect";
             }
+            GlobalTimer_Elapsed(null, null);
         }
 
         private void sendChat_Click(object sender, EventArgs e)

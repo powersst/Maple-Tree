@@ -111,6 +111,7 @@ namespace MapleSeed
                 Toolbelt.AppendLog("  - Deleting CDecrypt and libeay32...");
                 File.Delete(Path.Combine(outputDir, "CDecrypt.exe"));
                 File.Delete(Path.Combine(outputDir, "libeay32.dll"));
+                File.Delete(Path.Combine(outputDir, "msvcr120d.dll"));
             }
             catch {}
         }
@@ -233,9 +234,8 @@ namespace MapleSeed
             if (await ContentHandled(tmd, outputDir, titleUrl2) == 1) {
                 Toolbelt.AppendLog("  - Decrypting Content...");
                 Toolbelt.CDecrypt(outputDir);
+                CleanUpdate(outputDir, tmd);
             }
-
-            CleanUpdate(outputDir, tmd);
 
             Toolbelt.Form1?.titleList.Invoke(new Action(() => { Toolbelt.Form1.titleList.Enabled = true; }));
             Toolbelt.AppendLog($"Downloading Title '{wiiUTitle}' v{tmd.TitleVersion} Finished.");

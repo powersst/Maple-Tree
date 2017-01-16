@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Lidgren.Network;
+using MapleRoot.Common;
 using MapleRoot.Enums;
 using MapleRoot.Network.Events;
 using MapleRoot.Structs;
@@ -38,13 +39,6 @@ namespace MapleRoot.Network
             OnMessageReceived += m_OnMessageReceived;
 
             NetServer.Start();
-
-            Task.Run(() => {
-                while (NetServer.Status == NetPeerStatus.Running) {
-                    SendUserList();
-                    Toolkit.Sleep(1000);
-                }
-            });
         }
 
         private NetServer NetServer { get; }
@@ -53,38 +47,24 @@ namespace MapleRoot.Network
 
         private static List<NetConnection> Connections { get; set; }
 
-        private void SendUserList()
-        {
-            var names = (from c in NetServer.Connections select (UserData) c.Tag into mc select mc.Username).ToList();
-
-            if (names.Count <= 0) return;
-            var json = JsonConvert.SerializeObject(names);
-            var buf = Encoding.UTF8.GetBytes(json);
-
-            var msg = NetServer.CreateMessage();
-            msg.Write(buf.Length);
-            msg.Write((byte) MessageType.Userlist);
-            msg.Write(buf);
-
-            NetServer.SendToAll(msg, NetDeliveryMethod.ReliableOrdered);
-        }
-
         private void m_OnMessageReceived(object sender, OnMessageReceivedEventArgs e)
         {
             var from = (NetConnection) sender;
 
             switch (e.Header.Type) {
                 case MessageType.Userlist:
+                    HandleUserList(from);
                     break;
                 case MessageType.ChatMessage:
                     string msg = Encoding.UTF8.GetString(e.Header.Data);
                     SendToAll(msg, MessageType.ChatMessage);
                     Console.WriteLine(msg);
                     break;
-                case MessageType.ModUsername:
+                case MessageType.ModUserData:
                     using (var ms = new MemoryStream(e.Header.Data)) {
                         from.Tag = Serializer.Deserialize<UserData>(ms);
-                        Console.WriteLine($"[{((UserData)from.Tag).Username}] Name Updated.");
+                        HandleUserList(from);
+                        Console.WriteLine($"[{((UserData)from.Tag).Username}] User data updated.");
                     }
                     break;
                 case MessageType.StorageUpload:
@@ -102,6 +82,16 @@ namespace MapleRoot.Network
                     HandleRequestSearch(e.Header.Data, from);
                     break;
             }
+        }
+
+        private void HandleUserList(NetConnection from)
+        {
+            var names = (from c in NetServer.Connections select (UserData)c.Tag into mc select mc.Username).ToList();
+            names.RemoveAll(string.IsNullOrEmpty);
+
+            if (names.Count <= 0) return;
+
+            Send(names, from, MessageType.Userlist);
         }
 
         private void HandleRequestDownload(byte[] data, NetConnection @from)

@@ -47,7 +47,7 @@ namespace MapleRoot.Network
                 Username = username,
                 Serial = UserData.Serial
             };
-            Send(UserData, MessageType.ModUsername);
+            Send(UserData, MessageType.ModUserData);
         }
 
         public NetSendResult Send(string message, MessageType m_type)

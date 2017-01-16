@@ -61,10 +61,13 @@
       <HintPath>Resources\Cemu-UI.exe</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -74,6 +77,7 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="3rdParty\IniFileParser\Exceptions\ParsingException.cs" />
@@ -118,7 +122,6 @@
     <Content Include="3rdParty\CefSharp\CefSharp.dll" />
     <Content Include="3rdParty\CefSharp\CefSharp.WinForms.dll" />
     <Content Include="Resources\Seed.ico" />
-    <Content Include="TODO.txt" />
     <Compile Include="Toolbelt.cs" />
     <Content Include="version.txt" />
     <EmbeddedResource Include="1Form1.resx">

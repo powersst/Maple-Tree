@@ -10,6 +10,7 @@ using System.IO;
 using System.Windows.Forms;
 using IniParser;
 using MapleRoot;
+using MapleRoot.Common;
 using MapleSeed.Properties;
 
 #endregion
@@ -73,7 +74,7 @@ namespace MapleSeed
             get {
                 var value = GetKeyValue("Hub");
                 if (string.IsNullOrEmpty(value))
-                    WriteKeyValue("Hub", value = "72.219.12.183");
+                    WriteKeyValue("Hub", value = "mapletree.tsumes.com");
                 return value;
             }
         }

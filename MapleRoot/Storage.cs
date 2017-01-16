@@ -10,6 +10,7 @@ using System.Configuration;
 using System.IO;
 using System.Text;
 using Lidgren.Network;
+using MapleRoot.Common;
 using MapleRoot.Enums;
 using MapleRoot.Network;
 using MapleRoot.Structs;

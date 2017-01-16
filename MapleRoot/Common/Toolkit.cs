@@ -17,7 +17,7 @@ using Timer = System.Timers.Timer;
 
 #endregion
 
-namespace MapleRoot
+namespace MapleRoot.Common
 {
     public static class Toolkit
     {
