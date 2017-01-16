@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
-using MapleSeed;
 
-namespace MaryJane
+namespace MapleSeed
 {
     internal static class Program
     {
@@ -12,6 +11,7 @@ namespace MaryJane
         [STAThread]
         private static void Main()
         {
+            MapleRoot.Common.Helper.ResolveAssembly();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
