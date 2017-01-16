@@ -1,42 +1,42 @@
-﻿// Project: MaryJane
+﻿// Project: MapleSeed
 // File: Network.cs
-// Created By: Jared
-// Last Update: 01 10, 2017 6:01 AM
+// Updated By: Jared
+// 
+
+#region usings
 
 using System;
-using System.IO;
 using System.Net;
 using System.Threading.Tasks;
-using MapleSeed;
 
-namespace MaryJane
+#endregion
+
+namespace MapleSeed
 {
     public static class Network
     {
         private const string WII_USER_AGENT = "wii libnup/1.0";
 
-        public static async Task DownloadFile(string url, string saveTo)
+        public static async Task DownloadFileAsync(string url, string saveTo)
         {
-            using (var wc = new WebClient())
-            {
-                wc.Headers[HttpRequestHeader.UserAgent] = WII_USER_AGENT;
-                wc.DownloadProgressChanged += DownloadProgressChanged;
-                wc.DownloadDataCompleted += DownloadDataCompleted;
-                var stream = await wc.OpenReadTaskAsync(url);
-                var fs = File.Create(saveTo);
-                await stream.CopyToAsync(fs);
-                fs.Close();
-            }
+            var wc = new WebClient {Headers = {[HttpRequestHeader.UserAgent] = WII_USER_AGENT}};
+            wc.DownloadProgressChanged += DownloadProgressChanged;
+            wc.DownloadDataCompleted += DownloadDataCompleted;
+
+            await wc.DownloadFileTaskAsync(new Uri(url), saveTo);
+
+            while (wc.IsBusy) await Task.Delay(100);
+            wc.Dispose();
         }
 
-        public static async Task<byte[]> DownloadData(string url)
+        public static async void DownloadData(string url, DownloadDataCompletedEventHandler downloadDataCompleted)
         {
-            using (var wc = new WebClient())
-            {
+            using (var wc = new WebClient()) {
                 wc.Headers[HttpRequestHeader.UserAgent] = WII_USER_AGENT;
                 wc.DownloadProgressChanged += DownloadProgressChanged;
+                wc.DownloadDataCompleted += downloadDataCompleted;
                 wc.DownloadDataCompleted += DownloadDataCompleted;
-                return await wc.DownloadDataTaskAsync(url);
+                var data = await wc.DownloadDataTaskAsync(new Uri(url));
             }
         }
 
@@ -47,12 +47,7 @@ namespace MaryJane
 
         private static void DownloadDataCompleted(object sender, DownloadDataCompletedEventArgs e)
         {
-            if (Toolbelt.Form1 != null)
-            {
-                var pg = Toolbelt.Form1.progressBar;
-                pg.Invoke(new Action(() => pg.Value = 0));
-            }
-            Toolbelt.SetStatus(string.Empty);
+
         }
     }
 }

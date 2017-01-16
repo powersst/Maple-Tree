@@ -7,11 +7,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
 using libWiiSharp;
-using MaryJane;
 using MaryJane.Structs;
 using Newtonsoft.Json;
 
@@ -25,7 +25,7 @@ namespace MapleSeed
         private static string DatabaseFile => "database.json";
         private static List<WiiUTitle> DbObject { get; set; } = new List<WiiUTitle>();
 
-        public static async void Initialize()
+        public static async Task Initialize()
         {
             try {
                 if (Toolbelt.Database == null)
@@ -34,13 +34,8 @@ namespace MapleSeed
                 if (Toolbelt.Settings == null)
                     Toolbelt.Settings = new Settings();
 
-                if (DateTime.Now > new FileInfo(DatabaseFile).LastWriteTime.AddDays(1)) {
-                    var data = await Network.DownloadData(TitleKeys + "/json");
-
-                    if (File.Exists(DatabaseFile))
-                        File.Delete(DatabaseFile);
-                    File.WriteAllBytes(DatabaseFile, data);
-                }
+                if (DateTime.Now > new FileInfo(DatabaseFile).LastWriteTime.AddDays(1))
+                    await Network.DownloadFileAsync(TitleKeys + "/json", DatabaseFile);
             }
             catch (Exception e) {
                 Toolbelt.AppendLog($"{e.Message}\n{e.StackTrace}");
@@ -58,7 +53,7 @@ namespace MapleSeed
             UpdateGame(titleId, fullPath);
         }
 
-        public void UpdateGame(string titleId, string fullPath)
+        public async Task UpdateGame(string titleId, string fullPath)
         {
             var game = FindByTitleId(titleId);
 
@@ -68,8 +63,7 @@ namespace MapleSeed
 
             Toolbelt.SetStatus($"Updating {titleId}");
 
-            DownloadTitle(game, fullPath);
-            Toolbelt.SetStatus(string.Empty);
+            await DownloadTitle(game, fullPath);
         }
 
         public static WiiUTitle Find(string game_name)
@@ -95,12 +89,12 @@ namespace MapleSeed
             return new WiiUTitle {Name = "NULL"};
         }
 
-        private static WiiUTitle FindByTitleId(string titleId)
+        private WiiUTitle FindByTitleId(string titleId)
         {
             return titleId == null ? new WiiUTitle() : DbObject.Find(t => t.TitleID.ToLower() == titleId.ToLower());
         }
 
-        private static void CleanUpdate(string outputDir, TMD tmd)
+        private void CleanUpdate(string outputDir, TMD tmd)
         {
             try {
                 Toolbelt.AppendLog("  - Deleting Encrypted Contents...");
@@ -113,59 +107,21 @@ namespace MapleSeed
                 File.Delete(Path.Combine(outputDir, "libeay32.dll"));
                 File.Delete(Path.Combine(outputDir, "msvcr120d.dll"));
             }
-            catch {}
+            catch {
+                // ignored
+            }
         }
 
-        private static async Task<int> TicketHandled(WiiUTitle wiiUTitle, string outputDir, string titleUrl)
-        {
-            var buffer = new byte[0];
-            try {
-                Toolbelt.AppendLog("  - Downloading Ticket...");
-                buffer = await Network.DownloadData(Path.Combine(titleUrl, "cetk"));
-            }
-            catch (Exception ex) {
-                try {
-                    if (wiiUTitle.Ticket == "1") {
-                        var WII_TIK_URL = "https://wiiu.titlekeys.com/ticket/";
-                        var cetkUrl = $"{WII_TIK_URL}{wiiUTitle.TitleID.ToLower()}.tik";
-                        buffer = await Network.DownloadData(cetkUrl);
-                    }
-                }
-                catch {
-                    Toolbelt.AppendLog($"   + Downloading Ticket Failed...\n{ex.Message}");
-                    return 0;
-                }
-            }
-            File.WriteAllBytes(Path.Combine(outputDir, "cetk"), buffer);
-
-            // Parse Ticket
-            if (buffer.Length > 0) {
-                Toolbelt.AppendLog("   + Parsing Ticket...");
-                Ticket.Load(buffer);
-            }
-            else {
-                Toolbelt.AppendLog("   + Ticket Unavailable...");
-                return 0;
-            }
-
-            return 1;
-        }
-
-        private static async Task<TMD> HandleTmd(string outputDir, string titleUrl)
+        private async Task<TMD> LoadTmd(string outputDir, string titleUrl)
         {
             try {
                 var tmdFile = Path.Combine(outputDir, "tmd");
 
-                if (!File.Exists(tmdFile)) {
-                    Toolbelt.AppendLog("  - Downloading TMD...");
-                    var buffer = await Network.DownloadData(titleUrl + "tmd");
-
-                    Toolbelt.AppendLog("  - Saving TMD...");
-                    File.WriteAllBytes(Path.Combine(outputDir, "tmd"), buffer);
-                }
+                Toolbelt.AppendLog("  - Downloading TMD...");
+                await Network.DownloadFileAsync(Path.Combine(titleUrl, "tmd"), tmdFile);
 
                 Toolbelt.AppendLog("  - Loading TMD...");
-                var tmd = TMD.Load(tmdFile);
+                var tmd = TMD.Load(File.ReadAllBytes(tmdFile));
 
                 Toolbelt.AppendLog("  - Parsing TMD...");
                 Toolbelt.AppendLog($"    + Title Version: {tmd.TitleVersion}");
@@ -180,11 +136,43 @@ namespace MapleSeed
             return null;
         }
 
-        private static async Task<int> ContentHandled(TMD tmd, string outputDir, string titleUrl)
+        private async Task<int> LoadTicket(WiiUTitle wiiUTitle, string outputDir, string titleUrl)
+        {
+            var cetk = Path.Combine(outputDir, "cetk");
+
+            try {
+                Toolbelt.AppendLog("  - Downloading Ticket...");
+
+                var cetkUrl = Path.Combine(titleUrl, "cetk");
+                await Network.DownloadFileAsync(cetkUrl, cetk);
+            }
+            catch (Exception ex) {
+                try {
+                    if (wiiUTitle.Ticket == "1") {
+                        var WII_TIK_URL = "https://wiiu.titlekeys.com/ticket/";
+                        var cetkUrl = $"{WII_TIK_URL}{wiiUTitle.TitleID.ToLower()}.tik";
+                        await Network.DownloadFileAsync(cetkUrl, cetk);
+                    }
+                }
+                catch {
+                    Toolbelt.AppendLog($"   + Downloading Ticket Failed...\n{ex.Message}");
+                    return 0;
+                }
+            }
+
+            // Parse Ticket
+            Toolbelt.AppendLog("   + Loading Ticket...");
+            Ticket.Load(File.ReadAllBytes(cetk));
+            return 1;
+        }
+
+        private async Task<int> DownloadContent(TMD tmd, string outputDir, string titleUrl, string name)
         {
             for (var i = 0; i < tmd.NumOfContents; i++) {
+                var numc = tmd.NumOfContents;
                 var size = Toolbelt.SizeSuffix((long) tmd.Contents[i].Size);
-                Toolbelt.AppendLog($"  - Downloading Content #{i + 1} of {tmd.NumOfContents}... ({size} bytes)");
+                Toolbelt.AppendLog($"  - Downloading Content #{i + 1} of {numc}... ({size} bytes)");
+                Toolbelt.SetStatus($"Downloading '{name}' Content #{i + 1} of {numc}... ({size} bytes)", Color.OrangeRed);
 
                 var contentPath = Path.Combine(outputDir, tmd.Contents[i].ContentID.ToString("x8"));
                 if (Toolbelt.IsValid(tmd.Contents[i], contentPath))
@@ -193,19 +181,18 @@ namespace MapleSeed
                     try {
                         var downloadUrl = titleUrl + tmd.Contents[i].ContentID.ToString("x8");
                         var outputdir = Path.Combine(outputDir, tmd.Contents[i].ContentID.ToString("x8"));
-                        await Network.DownloadFile(downloadUrl, outputdir);
+                        await Network.DownloadFileAsync(downloadUrl, outputdir);
                     }
                     catch (Exception ex) {
-                        Toolbelt.AppendLog(
-                            $"  - Downloading Content #{i + 1} of {tmd.NumOfContents} failed...\n{ex.Message}");
+                        Toolbelt.AppendLog($"  - Downloading Content #{i + 1} of {numc} failed...\n{ex.Message}");
+                        Toolbelt.SetStatus($"Downloading '{name}' Content #{i + 1} of {numc} failed... Check Console for Error!");
                         return 0;
                     }
             }
-
             return 1;
         }
 
-        private async void DownloadTitle(WiiUTitle wiiUTitle, string fullPath)
+        private async Task DownloadTitle(WiiUTitle wiiUTitle, string fullPath)
         {
             var outputDir = Path.GetFullPath(fullPath);
 
@@ -224,21 +211,23 @@ namespace MapleSeed
             string titleUrl = $"{wiiWupUrl}{wiiUTitle.TitleID}/";
             string titleUrl2 = $"{wiiNusUrl}{wiiUTitle.TitleID}/";
 
-            //Download Ticket
-            if (await TicketHandled(wiiUTitle, outputDir, titleUrl) == 0) return;
-
-            //Download TMD
-            var tmd = await HandleTmd(outputDir, titleUrl);
-
-            //Download Content
-            if (await ContentHandled(tmd, outputDir, titleUrl2) == 1) {
-                Toolbelt.AppendLog("  - Decrypting Content...");
-                Toolbelt.CDecrypt(outputDir);
-                CleanUpdate(outputDir, tmd);
+            TMD tmd;
+            if ((tmd = await LoadTmd(outputDir, titleUrl)) != null) {
+                if (await LoadTicket(wiiUTitle, outputDir, titleUrl) == 1) {
+                    if (await DownloadContent(tmd, outputDir, titleUrl2, wiiUTitle.ToString()) == 1) {
+                        Toolbelt.AppendLog("  - Decrypting Content...");
+                        Toolbelt.CDecrypt(outputDir);
+                        CleanUpdate(outputDir, tmd);
+                    }
+                    Toolbelt.AppendLog($"Downloading Title '{wiiUTitle}' v{tmd.TitleVersion} Finished.");
+                    Toolbelt.SetStatus($"Downloading Title '{wiiUTitle}' v{tmd.TitleVersion} Finished.", Color.Green);
+                }
             }
-
-            Toolbelt.Form1?.titleList.Invoke(new Action(() => { Toolbelt.Form1.titleList.Enabled = true; }));
-            Toolbelt.AppendLog($"Downloading Title '{wiiUTitle}' v{tmd.TitleVersion} Finished.");
+            else {
+                Toolbelt.SetStatus($"Downloading Title '{wiiUTitle}'Failed.", Color.DarkRed);
+            }
+            
+            Toolbelt.Form1.UpdateProgress(0, 0, 0);
         }
     }
 }

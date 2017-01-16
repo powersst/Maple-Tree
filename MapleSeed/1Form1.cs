@@ -9,10 +9,12 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Forms;
+using libWiiSharp;
 using Lidgren.Network;
 using MapleRoot;
 using MapleRoot.Common;
@@ -39,9 +41,9 @@ namespace MapleSeed
 
         private static MapleClient Client { get; set; }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private async void Form1_Load(object sender, EventArgs e)
         {
-            Database.Initialize();
+            await Database.Initialize();
             if (Client == null) {
                 Client = MapleClient.Create();
                 Client.OnMessageReceived += ClientOnMessageReceived;
@@ -54,7 +56,7 @@ namespace MapleSeed
             Text += $@" - Serial {Toolbelt.Settings.Serial}";
 
             Library = new List<string>(Directory.GetDirectories(Toolbelt.Settings.TitleDirectory));
-            foreach (var item in Library) if (!string.IsNullOrEmpty(item)) ListBoxAddItem(new FileInfo(item).Name);
+            foreach (var item in Library) ListBoxAddItem(new FileInfo(item).Name);
 
             status.Text = Settings.Instance.TitleDirectory;
             fullScreen.Checked = Settings.Instance.FullScreenMode;
@@ -70,7 +72,8 @@ namespace MapleSeed
 
         private void GlobalTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (InvokeRequired) Invoke(new Action(UpdateUIModes));
+            if (InvokeRequired)
+                Invoke(new Action(UpdateUIModes));
             else UpdateUIModes();
 
             Client.Send("", MessageType.Userlist);
@@ -78,8 +81,7 @@ namespace MapleSeed
 
         private void UpdateUIModes()
         {
-            if (Client.NetClient.ConnectionStatus != NetConnectionStatus.Connected)
-            {
+            if (Client.NetClient.ConnectionStatus != NetConnectionStatus.Connected) {
                 Client.Start(Toolbelt.Settings.Hub);
                 shareBtn.Enabled = false;
                 myUploads.Enabled = false;
@@ -87,8 +89,7 @@ namespace MapleSeed
                 username.Enabled = false;
                 connectBtn.Text = @"Disconnect";
             }
-            else
-            {
+            else {
                 shareBtn.Enabled = true;
                 myUploads.Enabled = true;
                 sendChat.Enabled = true;
@@ -96,7 +97,7 @@ namespace MapleSeed
                 userList.Items.Clear();
                 connectBtn.Text = @"Connect";
             }
-
+            
             connectBtn.Text = Client.NetClient.ConnectionStatus == NetConnectionStatus.Connected ? @"Disconnect" : @"Connect";
         }
 
@@ -112,16 +113,6 @@ namespace MapleSeed
             GlobalTimer_Elapsed(null, null);
             
             Toolbelt.AppendLog($"Connected to Hub [{Toolbelt.Settings.Hub}]", Color.DarkGreen);
-
-            Task.Run(() => {
-                while (Client.NetClient.ConnectionsCount > 0) {
-                    Toolbelt.SetStatus(
-                        $@"Total In {Client.Stats.ReceivedBytes} bytes, Total Out {Client.Stats.SentBytes} bytes",
-                        Color.Gray);
-                    Toolkit.Sleep(100);
-                }
-                Toolbelt.SetStatus("Disconnected from server!!");
-            });
         }
 
         private void ClientOnMessageReceived(object sender, OnMessageReceivedEventArgs e)
@@ -245,14 +236,12 @@ namespace MapleSeed
 
         public void UpdateProgress(int percentage, long recvd, long toRecv)
         {
-            if (Toolbelt.Form1 != null) {
-                var pg = Toolbelt.Form1.progressBar;
-                pg.Invoke(new Action(() => pg.Value = percentage));
-            }
+            Invoke(new Action(() => { progressBar.Value = percentage; }));
 
             var received = Toolbelt.SizeSuffix(recvd);
             var toReceive = Toolbelt.SizeSuffix(toRecv);
-            SetStatus($"{percentage}% | {received} / {toReceive}");
+            
+            progressOverlay.Invoke(new Action(() => { progressOverlay.Text = $@"{received} / {toReceive}"; }));
         }
 
         private void AppendChat(string msg, Color color = default(Color))
@@ -300,30 +289,35 @@ namespace MapleSeed
             }
         }
 
-        private void updateBtn_Click(object sender, EventArgs e)
+        private async void updateBtn_Click(object sender, EventArgs e)
         {
             try {
-                string fullPath = null, item = titleList.SelectedItem as string;
+                if (MessageBox.Show(@"This action will overwrite pre-existing files!", @"Confirm Update", MessageBoxButtons.OKCancel) == DialogResult.OK) {
+                    updateBtn.Enabled = false;
+                    foreach (var item in titleList.SelectedItems) {
+                        var fullPath = item as string;
+                        if (fullPath.IsNullOrEmpty()) continue;
 
-                if (item != null)
-                    fullPath = Path.Combine(Toolbelt.Settings.TitleDirectory, item);
+                        // ReSharper disable once AssignNullToNotNullAttribute
+                        fullPath = Path.Combine(Toolbelt.Settings.TitleDirectory, fullPath);
 
-                if (Toolbelt.Database != null) {
-                    var title = Database.Find(item);
-                    Toolbelt.Database.UpdateGame(title.TitleID, fullPath);
+                        if (Toolbelt.Database == null) continue;
+                        var title = Database.Find(new FileInfo(fullPath).Name);
+                        await Toolbelt.Database.UpdateGame(title.TitleID, fullPath);
+                    }
                 }
             }
             catch (Exception ex) {
-                Console.WriteLine(ex);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace);
             }
 
-            titleList.Enabled = false;
+            updateBtn.Enabled = true;
+            titleList.Enabled = true;
         }
 
         private void listBox1_DoubleClick(object sender, EventArgs e)
         {
-            var item = titleList.SelectedItem as string;
-            if (string.IsNullOrEmpty(item)) return;
+            updateBtn_Click(null, null);
         }
 
         private void fullTitle_CheckedChanged(object sender, EventArgs e)

@@ -476,5 +476,8 @@
     <Content Include="ThirdParty\Lidgren.Network\Documentation\Tutorial.html" />
     <Content Include="ThirdParty\protobuf-net\Web\TODO.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Network\Web\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

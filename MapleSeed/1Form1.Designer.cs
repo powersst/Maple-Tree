@@ -54,6 +54,7 @@
             this.myUploads = new System.Windows.Forms.Button();
             this.connectBtn = new System.Windows.Forms.Button();
             this.sendChat = new System.Windows.Forms.Button();
+            this.progressOverlay = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -93,9 +94,11 @@
             this.titleList.FormattingEnabled = true;
             this.titleList.Location = new System.Drawing.Point(12, 36);
             this.titleList.Name = "titleList";
+            this.titleList.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.titleList.Size = new System.Drawing.Size(250, 550);
             this.titleList.Sorted = true;
             this.titleList.TabIndex = 10;
+            this.titleList.TabStop = false;
             this.titleList.DoubleClick += new System.EventHandler(this.listBox1_DoubleClick);
             // 
             // richTextBox1
@@ -316,12 +319,24 @@
             this.sendChat.UseVisualStyleBackColor = true;
             this.sendChat.Click += new System.EventHandler(this.sendChat_Click);
             // 
+            // progressOverlay
+            // 
+            this.progressOverlay.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressOverlay.AutoSize = true;
+            this.progressOverlay.BackColor = System.Drawing.Color.Transparent;
+            this.progressOverlay.Location = new System.Drawing.Point(12, 622);
+            this.progressOverlay.Name = "progressOverlay";
+            this.progressOverlay.Size = new System.Drawing.Size(73, 13);
+            this.progressOverlay.TabIndex = 23;
+            this.progressOverlay.Text = "Progress Text";
+            // 
             // Form1
             // 
             this.AcceptButton = this.sendChat;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1264, 681);
+            this.Controls.Add(this.progressOverlay);
             this.Controls.Add(this.sendChat);
             this.Controls.Add(this.myUploads);
             this.Controls.Add(this.connectBtn);
@@ -382,6 +397,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.RichTextBox chatbox;
+        private System.Windows.Forms.Label progressOverlay;
     }
 }
 

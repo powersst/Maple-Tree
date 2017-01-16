@@ -19,5 +19,10 @@ namespace MapleRoot.Common
             box.AppendText(text);
             box.SelectionColor = box.ForeColor;
         }
+
+        public static bool IsNullOrEmpty(this string str)
+        {
+            return string.IsNullOrEmpty(str);
+        }
     }
 }
