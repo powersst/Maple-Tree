@@ -27,7 +27,7 @@ namespace MapleRoot.Common
                 GlobalTimer = new Timer();
 
             GlobalTimer.AutoReset = true;
-            GlobalTimer.Interval = 1000;
+            GlobalTimer.Interval = 500;
             GlobalTimer.Start();
         }
 

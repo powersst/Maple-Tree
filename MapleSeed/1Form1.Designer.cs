@@ -121,12 +121,13 @@
             // fullTitle
             // 
             this.fullTitle.AutoSize = true;
-            this.fullTitle.Location = new System.Drawing.Point(12, 599);
+            this.fullTitle.Location = new System.Drawing.Point(133, 592);
             this.fullTitle.Name = "fullTitle";
             this.fullTitle.Size = new System.Drawing.Size(126, 17);
             this.fullTitle.TabIndex = 11;
             this.fullTitle.Text = "Download Full Title";
             this.fullTitle.UseVisualStyleBackColor = true;
+            this.fullTitle.Visible = false;
             this.fullTitle.CheckedChanged += new System.EventHandler(this.fullTitle_CheckedChanged);
             // 
             // updateBtn
@@ -142,7 +143,7 @@
             // fullScreen
             // 
             this.fullScreen.AutoSize = true;
-            this.fullScreen.Location = new System.Drawing.Point(145, 599);
+            this.fullScreen.Location = new System.Drawing.Point(12, 592);
             this.fullScreen.Name = "fullScreen";
             this.fullScreen.Size = new System.Drawing.Size(115, 17);
             this.fullScreen.TabIndex = 13;
@@ -155,7 +156,9 @@
             this.userList.FormattingEnabled = true;
             this.userList.Location = new System.Drawing.Point(1143, 86);
             this.userList.Name = "userList";
+            this.userList.SelectionMode = System.Windows.Forms.SelectionMode.None;
             this.userList.Size = new System.Drawing.Size(109, 472);
+            this.userList.Sorted = true;
             this.userList.TabIndex = 14;
             // 
             // chatInput
@@ -301,11 +304,15 @@
             // 
             // connectBtn
             // 
-            this.connectBtn.Location = new System.Drawing.Point(1143, 29);
+            this.connectBtn.BackColor = System.Drawing.Color.Transparent;
+            this.connectBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("connectBtn.BackgroundImage")));
+            this.connectBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.connectBtn.FlatAppearance.BorderSize = 0;
+            this.connectBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.connectBtn.Location = new System.Drawing.Point(1222, 7);
             this.connectBtn.Name = "connectBtn";
-            this.connectBtn.Size = new System.Drawing.Size(108, 23);
+            this.connectBtn.Size = new System.Drawing.Size(30, 29);
             this.connectBtn.TabIndex = 20;
-            this.connectBtn.Text = "Connect";
             this.connectBtn.UseVisualStyleBackColor = true;
             this.connectBtn.Click += new System.EventHandler(this.connectBtn_Click);
             // 
@@ -324,11 +331,11 @@
             this.progressOverlay.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.progressOverlay.AutoSize = true;
             this.progressOverlay.BackColor = System.Drawing.Color.Transparent;
-            this.progressOverlay.Location = new System.Drawing.Point(12, 622);
+            this.progressOverlay.Location = new System.Drawing.Point(12, 621);
             this.progressOverlay.Name = "progressOverlay";
-            this.progressOverlay.Size = new System.Drawing.Size(73, 13);
+            this.progressOverlay.Size = new System.Drawing.Size(89, 13);
             this.progressOverlay.TabIndex = 23;
-            this.progressOverlay.Text = "Progress Text";
+            this.progressOverlay.Text = "0 bytes / 0 bytes";
             // 
             // Form1
             // 

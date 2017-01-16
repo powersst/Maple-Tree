@@ -6,6 +6,7 @@
 #region usings
 
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Windows.Forms;
 using IniParser;
@@ -33,10 +34,10 @@ namespace MapleSeed
                 var fbd = new FolderBrowserDialog {Description = @"Please select your Cemu Game Directory"};
                 var result = fbd.ShowDialog();
 
-                if (string.IsNullOrWhiteSpace(fbd.SelectedPath) && result == DialogResult.OK)
-                    return value;
-                value = fbd.SelectedPath;
+                if (string.IsNullOrWhiteSpace(fbd.SelectedPath) || result != DialogResult.OK)
+                    Application.Exit();
 
+                value = fbd.SelectedPath;
                 WriteKeyValue("TitleDirectory", value);
                 return value;
             }
@@ -55,8 +56,9 @@ namespace MapleSeed
                 DialogResult result = DialogResult.Cancel;
                 Toolbelt.Form1.Invoke(new Action(()=> result = ofd.ShowDialog()));
 
-                if (string.IsNullOrWhiteSpace(ofd.FileName) && result == DialogResult.OK) return value;
-
+                if (string.IsNullOrWhiteSpace(ofd.FileName) || result != DialogResult.OK)
+                    Application.Exit();
+                
                 value = Path.GetDirectoryName(ofd.FileName);
                 WriteKeyValue("CemuDirectory", value);
                 return value;

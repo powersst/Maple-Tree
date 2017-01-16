@@ -89,7 +89,7 @@ namespace MapleSeed
             return new WiiUTitle {Name = "NULL"};
         }
 
-        private WiiUTitle FindByTitleId(string titleId)
+        public static WiiUTitle FindByTitleId(string titleId)
         {
             return titleId == null ? new WiiUTitle() : DbObject.Find(t => t.TitleID.ToLower() == titleId.ToLower());
         }

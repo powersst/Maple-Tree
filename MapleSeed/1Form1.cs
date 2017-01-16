@@ -9,20 +9,17 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Forms;
-using libWiiSharp;
 using Lidgren.Network;
 using MapleRoot;
 using MapleRoot.Common;
 using MapleRoot.Enums;
 using MapleRoot.Network;
 using MapleRoot.Network.Events;
+using MapleRoot.Properties;
 using MapleRoot.Structs;
-using Newtonsoft.Json;
 using ProtoBuf;
 
 #endregion
@@ -37,6 +34,8 @@ namespace MapleSeed
             Toolbelt.Form1 = this;
         }
 
+        private static bool IsLive { get; set; } = true;
+
         private static List<string> Library { get; set; }
 
         private static MapleClient Client { get; set; }
@@ -44,6 +43,7 @@ namespace MapleSeed
         private async void Form1_Load(object sender, EventArgs e)
         {
             await Database.Initialize();
+
             if (Client == null) {
                 Client = MapleClient.Create();
                 Client.OnMessageReceived += ClientOnMessageReceived;
@@ -55,19 +55,42 @@ namespace MapleSeed
             Text += Toolbelt.Version;
             Text += $@" - Serial {Toolbelt.Settings.Serial}";
 
-            Library = new List<string>(Directory.GetDirectories(Toolbelt.Settings.TitleDirectory));
-            foreach (var item in Library) ListBoxAddItem(new FileInfo(item).Name);
+            if (!Toolbelt.Settings.TitleDirectory.IsNullOrEmpty()) {
+                Library = new List<string>(Directory.GetDirectories(Toolbelt.Settings.TitleDirectory));
+                foreach (var item in Library) ListBoxAddItem(new FileInfo(item).Name);
+                AppendLog($"Game Directory [{Settings.Instance.TitleDirectory}]");
+            }
 
-            status.Text = Settings.Instance.TitleDirectory;
             fullScreen.Checked = Settings.Instance.FullScreenMode;
 
-            if (string.IsNullOrEmpty(Settings.Instance.Username))
+            username.Text = Settings.Instance.Username;
+            if (Settings.Instance.Username.IsNullOrEmpty())
                 username.Text = Settings.Instance.Username = Toolkit.TempName();
-            else
-                username.Text = Settings.Instance.Username;
-            
+                
             Toolkit.GlobalTimer.Elapsed += GlobalTimer_Elapsed;
             GlobalTimer_Elapsed(null, null);
+        }
+
+        private void UpdateUIModes()
+        {
+            if (Client.NetClient.ConnectionsCount <= 0 && IsLive) {
+                Client.Start(Toolbelt.Settings.Hub);
+                shareBtn.Enabled = false;
+                myUploads.Enabled = false;
+                sendChat.Enabled = false;
+                username.Enabled = false;
+            }
+            else {
+                shareBtn.Enabled = true;
+                myUploads.Enabled = true;
+                sendChat.Enabled = true;
+                username.Enabled = true;
+                userList.Items.Clear();
+            }
+
+            connectBtn.BackgroundImage = Client.NetClient.ConnectionStatus == NetConnectionStatus.Connected
+                ? Resources.Green_Light.ToBitmap()
+                : Resources.Red_Light.ToBitmap();
         }
 
         private void GlobalTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -77,28 +100,6 @@ namespace MapleSeed
             else UpdateUIModes();
 
             Client.Send("", MessageType.Userlist);
-        }
-
-        private void UpdateUIModes()
-        {
-            if (Client.NetClient.ConnectionStatus != NetConnectionStatus.Connected) {
-                Client.Start(Toolbelt.Settings.Hub);
-                shareBtn.Enabled = false;
-                myUploads.Enabled = false;
-                sendChat.Enabled = false;
-                username.Enabled = false;
-                connectBtn.Text = @"Disconnect";
-            }
-            else {
-                shareBtn.Enabled = true;
-                myUploads.Enabled = true;
-                sendChat.Enabled = true;
-                username.Enabled = true;
-                userList.Items.Clear();
-                connectBtn.Text = @"Connect";
-            }
-            
-            connectBtn.Text = Client.NetClient.ConnectionStatus == NetConnectionStatus.Connected ? @"Disconnect" : @"Connect";
         }
 
         private void ClientOnConnected(object sender, EventArgs e)
@@ -111,7 +112,7 @@ namespace MapleSeed
             Client.Send(Client.UserData, MessageType.ModUserData);
 
             GlobalTimer_Elapsed(null, null);
-            
+
             Toolbelt.AppendLog($"Connected to Hub [{Toolbelt.Settings.Hub}]", Color.DarkGreen);
         }
 
@@ -221,11 +222,6 @@ namespace MapleSeed
             }));
         }
 
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (Client.IsRunning) Client.Stop();
-        }
-
         private void ListBoxAddItem(object obj)
         {
             if (titleList.InvokeRequired)
@@ -234,14 +230,26 @@ namespace MapleSeed
                 titleList.Items.Add(obj);
         }
 
+        private void connectBtn_Click(object sender, EventArgs e)
+        {
+            if (!IsLive) Client.Start(Toolbelt.Settings.Hub);
+            else Client.Stop();
+            IsLive = !IsLive;
+        }
+
         public void UpdateProgress(int percentage, long recvd, long toRecv)
         {
             Invoke(new Action(() => { progressBar.Value = percentage; }));
 
             var received = Toolbelt.SizeSuffix(recvd);
             var toReceive = Toolbelt.SizeSuffix(toRecv);
-            
+
             progressOverlay.Invoke(new Action(() => { progressOverlay.Text = $@"{received} / {toReceive}"; }));
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (Client.IsRunning) Client.Stop();
         }
 
         private void AppendChat(string msg, Color color = default(Color))
@@ -292,7 +300,9 @@ namespace MapleSeed
         private async void updateBtn_Click(object sender, EventArgs e)
         {
             try {
-                if (MessageBox.Show(@"This action will overwrite pre-existing files!", @"Confirm Update", MessageBoxButtons.OKCancel) == DialogResult.OK) {
+                if (
+                    MessageBox.Show(@"This action will overwrite pre-existing files!", @"Confirm Update",
+                        MessageBoxButtons.OKCancel) == DialogResult.OK) {
                     updateBtn.Enabled = false;
                     foreach (var item in titleList.SelectedItems) {
                         var fullPath = item as string;
@@ -427,25 +437,26 @@ namespace MapleSeed
                 Client.Send(search.Text, MessageType.RequestSearch);
         }
 
-        private void connectBtn_Click(object sender, EventArgs e)
-        {
-            if (Client.NetClient.ConnectionsCount <= 0) {
-                Client.Start(Toolbelt.Settings.Hub);
-                connectBtn.Text = @"Disconnect";
-            }
-            else {
-                Client.Stop();
-                connectBtn.Text = @"Connect";
-            }
-            GlobalTimer_Elapsed(null, null);
-        }
-
         private void sendChat_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(chatInput.Text)) return;
+            if (chatInput.Text.IsNullOrEmpty()) return;
+            CheckForCommandInput(chatInput.Text);
             if (Client.NetClient.ServerConnection == null) return;
             Client.Send($"[{username.Text}]: {chatInput.Text}", MessageType.ChatMessage);
             chatInput.Text = string.Empty;
+        }
+
+        private async void CheckForCommandInput(string s)
+        {
+            if (s.StartsWith("/dl")) {
+                var titleId = s.Substring(3);
+                var title = Database.FindByTitleId(titleId);
+                var fullPath = Path.Combine(Settings.Instance.TitleDirectory, title.ToString());
+                await Toolbelt.Database.UpdateGame(titleId, fullPath);
+            }
+            else if (s.StartsWith("/help")) {
+                AppendChat("This function is still a work in progress.");
+            }
         }
     }
 }
