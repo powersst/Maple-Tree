@@ -121,7 +121,6 @@
     <Content Include="3rdParty\CefSharp\CefSharp.Core.dll" />
     <Content Include="3rdParty\CefSharp\CefSharp.dll" />
     <Content Include="3rdParty\CefSharp\CefSharp.WinForms.dll" />
-    <Content Include="Updates.txt" />
     <Content Include="Resources\Seed.ico" />
     <Compile Include="Toolbelt.cs" />
     <Content Include="version.txt" />

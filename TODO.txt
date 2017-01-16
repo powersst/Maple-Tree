@@ -1,0 +1,14 @@
+﻿**New Features**
+- Confirmation for file editing tasks
+- Multi Selection title updates
+- Download progress bar
+
+
+**TODO - Bugs & Improvements**
+can't type while uploading
+Add confirmation to file editing functions
+word cemu folder selection better.(people selecting main cemu folder)
+Add & remove games from library
+delete, rename, and transfer(to another user) uploaded files.
+A sync repository like Dropbox / Google Drive shared folders.
+Cheats section
