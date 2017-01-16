@@ -12,6 +12,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
 using libWiiSharp;
+using MapleRoot.Common;
 using MaryJane.Structs;
 using Newtonsoft.Json;
 
@@ -57,13 +58,18 @@ namespace MapleSeed
         {
             var game = FindByTitleId(titleId);
 
-            if (Toolbelt.Form1 != null)
-                if (!Toolbelt.Form1.fullTitle.Checked)
-                    game.TitleID = game.TitleID.Replace("00050000", "0005000e");
+            if (game.TitleID.IsNullOrEmpty()) {
+                Toolbelt.AppendLog($"Unable to locate title using ID {titleId}");
+            }
+            else {
+                if (Toolbelt.Form1 != null)
+                    if (!Toolbelt.Form1.fullTitle.Checked)
+                        game.TitleID = game.TitleID.Replace("00050000", "0005000e");
 
-            Toolbelt.SetStatus($"Updating {titleId}");
+                Toolbelt.SetStatus($"Updating {titleId}");
 
-            await DownloadTitle(game, fullPath);
+                await DownloadTitle(game, fullPath);
+            }
         }
 
         public static WiiUTitle Find(string game_name)
@@ -224,7 +230,7 @@ namespace MapleSeed
                 }
             }
             else {
-                Toolbelt.SetStatus($"Downloading Title '{wiiUTitle}'Failed.", Color.DarkRed);
+                Toolbelt.SetStatus($"Downloading Title '{wiiUTitle}' Failed.", Color.DarkRed);
             }
             
             Toolbelt.Form1.UpdateProgress(0, 0, 0);

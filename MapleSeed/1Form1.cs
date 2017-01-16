@@ -449,9 +449,10 @@ namespace MapleSeed
         private async void CheckForCommandInput(string s)
         {
             if (s.StartsWith("/dl")) {
-                var titleId = s.Substring(3);
+                var titleId = s.Substring(3).Trim();
                 var title = Database.FindByTitleId(titleId);
                 var fullPath = Path.Combine(Settings.Instance.TitleDirectory, title.ToString());
+                if (title.TitleID.IsNullOrEmpty()) return;
                 await Toolbelt.Database.UpdateGame(titleId, fullPath);
             }
             else if (s.StartsWith("/help")) {

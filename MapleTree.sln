@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26014.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapleRoot", "MapleRoot\MapleRoot.csproj", "{4375D4C0-FEF9-46F5-942D-36C2EBE15672}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapleSeed", "MapleSeed\MapleSeed.csproj", "{07945F9B-70DC-4360-8D8B-D1991D6D722F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapleSeedU", "MapleSeedU\MapleSeedU.csproj", "{6D7C0F83-5C98-492F-B683-32335BD45065}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{07945F9B-70DC-4360-8D8B-D1991D6D722F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07945F9B-70DC-4360-8D8B-D1991D6D722F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{07945F9B-70DC-4360-8D8B-D1991D6D722F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D7C0F83-5C98-492F-B683-32335BD45065}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D7C0F83-5C98-492F-B683-32335BD45065}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D7C0F83-5C98-492F-B683-32335BD45065}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D7C0F83-5C98-492F-B683-32335BD45065}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
