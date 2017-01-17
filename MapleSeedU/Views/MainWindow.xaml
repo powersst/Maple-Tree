@@ -1,12 +1,32 @@
-﻿<Window x:Class="MapleSeedU.Views.MainWindow"
+﻿<Controls:MetroWindow x:Class="MapleSeedU.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MapleSeedU"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="Maple Seed U" Height="720" Width="1280" ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen">
     <Grid>
-        
+        <TabControl x:Name="tabControl" Width="1117" Margin="5,0,145,75" HorizontalAlignment="Left" BorderBrush="#FFF75A00">
+            <TabItem Header="Dashboard">
+                
+            </TabItem>
+            <TabItem Header="Console">
+                <RichTextBox x:Name="richTextBox" Foreground="#FFCCCCCC" Background="{x:Null}" CaretBrush="{x:Null}" Margin="0,0,0,35" IsReadOnly="True" ClipToBounds="True" BorderThickness="0" BorderBrush="#FFF75A00">
+                    <FlowDocument>
+                        <Paragraph>
+                            <Run Text="RichTextBox"/>
+                        </Paragraph>
+                    </FlowDocument>
+                </RichTextBox>
+            </TabItem>
+            <Image x:Name="image" Height="100" Width="100"/>
+        </TabControl>
+
+        <Label x:Name="statusLabel" Content="Github.com/Tsume/Maple-Tree" Foreground="Gray" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Bottom"/>
+        <ProgressBar Margin="10,635,10,25" Height="28" VerticalAlignment="Bottom" Value="50" Background="{x:Null}" BorderBrush="{x:Null}"/>
+        <Separator Height="16" Margin="5,0,10,58" VerticalAlignment="Bottom" Background="#FFFF6800"/>
+
     </Grid>
-</Window>
+</Controls:MetroWindow>
