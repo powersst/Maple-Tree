@@ -2,6 +2,8 @@
 - Confirmation for file editing tasks
 - Multi Selection title updates
 - Download progress bar
+- /dl command
+- Bug Fixes
 
 
 **TODO - Bugs & Improvements**

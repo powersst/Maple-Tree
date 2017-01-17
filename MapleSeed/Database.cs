@@ -97,7 +97,9 @@ namespace MapleSeed
 
         public static WiiUTitle FindByTitleId(string titleId)
         {
-            return titleId == null ? new WiiUTitle() : DbObject.Find(t => t.TitleID.ToLower() == titleId.ToLower());
+            var title = DbObject.Find(t => string.Equals(t.TitleID, titleId, StringComparison.CurrentCultureIgnoreCase));;
+
+            return titleId.IsNullOrEmpty() || title.ToString().IsNullOrEmpty() ? new WiiUTitle() : title;
         }
 
         private void CleanUpdate(string outputDir, TMD tmd)
@@ -191,7 +193,8 @@ namespace MapleSeed
                     }
                     catch (Exception ex) {
                         Toolbelt.AppendLog($"  - Downloading Content #{i + 1} of {numc} failed...\n{ex.Message}");
-                        Toolbelt.SetStatus($"Downloading '{name}' Content #{i + 1} of {numc} failed... Check Console for Error!");
+                        Toolbelt.SetStatus(
+                            $"Downloading '{name}' Content #{i + 1} of {numc} failed... Check Console for Error!");
                         return 0;
                     }
             }
@@ -207,6 +210,9 @@ namespace MapleSeed
                 if (folder.EndsWith("code"))
                     outputDir = Path.GetDirectoryName(folder);
             }
+
+            if (!Directory.Exists(outputDir))
+                Directory.CreateDirectory(outputDir);
 
             Toolbelt.AppendLog($"Output Directory '{outputDir}'");
 
@@ -232,7 +238,7 @@ namespace MapleSeed
             else {
                 Toolbelt.SetStatus($"Downloading Title '{wiiUTitle}' Failed.", Color.DarkRed);
             }
-            
+
             Toolbelt.Form1.UpdateProgress(0, 0, 0);
         }
     }

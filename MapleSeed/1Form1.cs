@@ -55,20 +55,26 @@ namespace MapleSeed
             Text += Toolbelt.Version;
             Text += $@" - Serial {Toolbelt.Settings.Serial}";
 
-            if (!Toolbelt.Settings.TitleDirectory.IsNullOrEmpty()) {
-                Library = new List<string>(Directory.GetDirectories(Toolbelt.Settings.TitleDirectory));
-                foreach (var item in Library) ListBoxAddItem(new FileInfo(item).Name);
-                AppendLog($"Game Directory [{Settings.Instance.TitleDirectory}]");
-            }
+            ReadLibrary();
 
             fullScreen.Checked = Settings.Instance.FullScreenMode;
 
             username.Text = Settings.Instance.Username;
             if (Settings.Instance.Username.IsNullOrEmpty())
                 username.Text = Settings.Instance.Username = Toolkit.TempName();
-                
+
             Toolkit.GlobalTimer.Elapsed += GlobalTimer_Elapsed;
             GlobalTimer_Elapsed(null, null);
+        }
+
+        private void ReadLibrary()
+        {
+            if (Toolbelt.Settings.TitleDirectory.IsNullOrEmpty()) return;
+
+            Library = new List<string>(Directory.GetDirectories(Toolbelt.Settings.TitleDirectory));
+            foreach (var item in Library) if (!Library.Contains(item)) ListBoxAddItem(new FileInfo(item).Name);
+
+            AppendLog($"Game Directory [{Settings.Instance.TitleDirectory}]");
         }
 
         private void UpdateUIModes()
@@ -85,7 +91,6 @@ namespace MapleSeed
                 myUploads.Enabled = true;
                 sendChat.Enabled = true;
                 username.Enabled = true;
-                userList.Items.Clear();
             }
 
             connectBtn.BackgroundImage = Client.NetClient.ConnectionStatus == NetConnectionStatus.Connected

@@ -60,7 +60,7 @@ namespace MapleSeed
         {
             return
                 Path.GetInvalidPathChars()
-                    .Aggregate(str, (current, c) => current.Replace(c.ToString(), ""))
+                    .Aggregate(str, (current, c) => current.Replace(c.ToString(), "-"))
                     .Replace(':', ' ');
         }
 
