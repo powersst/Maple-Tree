@@ -33,16 +33,14 @@ namespace MapleSeed
         {
             string rpx = null, gamePath = null;
 
-            string[] files = {};
+            if (game != null) gamePath = Path.Combine(Settings.TitleDirectory, game);
+            else {
+                RunCemu(Path.Combine(Settings.Instance.CemuDirectory, "cemu.exe"), "");
+                return;
+            }
 
-            if (game != null)
-                gamePath = Path.Combine(Settings.TitleDirectory, game);
-
-            if (gamePath != null)
-                files = Directory.GetFiles(gamePath, "*.rpx", SearchOption.AllDirectories);
-
-            if (files.Length > 0)
-                rpx = files[0];
+            var files = Directory.GetFiles(gamePath, "*.rpx", SearchOption.AllDirectories);
+            if (files.Length > 0) rpx = files[0];
 
             var cemuPath = Path.Combine(Settings.Instance.CemuDirectory, "cemu.exe");
             if (File.Exists(cemuPath) && File.Exists(rpx))

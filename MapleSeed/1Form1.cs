@@ -65,16 +65,32 @@ namespace MapleSeed
 
             Toolkit.GlobalTimer.Elapsed += GlobalTimer_Elapsed;
             GlobalTimer_Elapsed(null, null);
+
+            
+            AppendLog($"Game Directory [{Toolbelt.Settings.TitleDirectory}]");
         }
 
         private void ReadLibrary()
         {
-            if (Toolbelt.Settings.TitleDirectory.IsNullOrEmpty()) return;
+            var dir = Toolbelt.Settings.TitleDirectory;
+            if (dir.IsNullOrEmpty()) return;
 
-            Library = new List<string>(Directory.GetDirectories(Toolbelt.Settings.TitleDirectory));
-            foreach (var item in Library) if (!Library.Contains(item)) ListBoxAddItem(new FileInfo(item).Name);
+            Library = new List<string>(Directory.GetDirectories(dir));
+            foreach (var item in Library) {
+                var name = new FileInfo(item).Name;
+                if (!titleList.Items.Contains(name)) {
+                    ListBoxAddItem(name);
+                }
+            }
 
-            AppendLog($"Game Directory [{Settings.Instance.TitleDirectory}]");
+            var cache = new object[titleList.Items.Count];
+            titleList.Items.CopyTo(cache, 0);
+
+            foreach (var item in cache) {
+                var path = Path.Combine(dir, item.ToString());
+                if (!Directory.Exists(path))
+                    titleList.Invoke(new Action(()=> titleList.Items.Remove(item)));
+            }
         }
 
         private void UpdateUIModes()
@@ -100,11 +116,17 @@ namespace MapleSeed
 
         private void GlobalTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (InvokeRequired)
-                Invoke(new Action(UpdateUIModes));
-            else UpdateUIModes();
+            try {
+                if (InvokeRequired)
+                    Invoke(new Action(UpdateUIModes));
+                else UpdateUIModes();
 
-            Client.Send("", MessageType.Userlist);
+                ReadLibrary();
+                Client.Send("", MessageType.Userlist);
+            }
+            catch (Exception ex) {
+                AppendLog(ex.StackTrace);
+            }
         }
 
         private void ClientOnConnected(object sender, EventArgs e)
@@ -415,7 +437,7 @@ namespace MapleSeed
         private void playBtn_Click(object sender, EventArgs e)
         {
             var title = titleList.SelectedItem as string;
-            if (title == null) return;
+            //if (title == null) return;
 
             Toolbelt.LaunchCemu(title);
             var msg = $"[{Client.UserData.Username}] Has started playing {title}!";
