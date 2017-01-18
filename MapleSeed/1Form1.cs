@@ -437,8 +437,6 @@ namespace MapleSeed
         private void playBtn_Click(object sender, EventArgs e)
         {
             var title = titleList.SelectedItem as string;
-            //if (title == null) return;
-
             Toolbelt.LaunchCemu(title);
             var msg = $"[{Client.UserData.Username}] Has started playing {title}!";
             Client.Send(msg, MessageType.ChatMessage);
@@ -480,7 +478,7 @@ namespace MapleSeed
                 var title = Database.FindByTitleId(titleId);
                 var fullPath = Path.Combine(Settings.Instance.TitleDirectory, title.ToString());
                 if (title.TitleID.IsNullOrEmpty()) return;
-                await Toolbelt.Database.UpdateGame(titleId, fullPath);
+                await Toolbelt.Database.UpdateGame(titleId, fullPath, false);
             }
             else if (s.StartsWith("/help")) {
                 AppendChat("This function is still a work in progress.");

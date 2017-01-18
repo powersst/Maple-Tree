@@ -54,7 +54,7 @@ namespace MapleSeed
             UpdateGame(titleId, fullPath);
         }
 
-        public async Task UpdateGame(string titleId, string fullPath)
+        public async Task UpdateGame(string titleId, string fullPath, bool modtid = true)
         {
             var game = FindByTitleId(titleId);
 
@@ -62,7 +62,7 @@ namespace MapleSeed
                 Toolbelt.AppendLog($"Unable to locate title using ID {titleId}");
             }
             else {
-                if (Toolbelt.Form1 != null)
+                if (Toolbelt.Form1 != null && modtid)
                     if (!Toolbelt.Form1.fullTitle.Checked)
                         game.TitleID = game.TitleID.Replace("00050000", "0005000e");
 
