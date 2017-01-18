@@ -1,5 +1,14 @@
-﻿using System;
+﻿// Project: MapleSeed
+// File: Program.cs
+// Updated By: Jared
+// 
+
+#region usings
+
+using System;
 using System.Windows.Forms;
+
+#endregion
 
 namespace MapleSeed
 {
@@ -11,7 +20,6 @@ namespace MapleSeed
         [STAThread]
         private static void Main()
         {
-            MapleRoot.Common.Helper.ResolveAssembly();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());

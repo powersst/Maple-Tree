@@ -12,9 +12,9 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
 using libWiiSharp;
-using MapleRoot.Common;
 using MaryJane.Structs;
 using Newtonsoft.Json;
+using MapleLib.Common;
 
 #endregion
 
@@ -23,7 +23,7 @@ namespace MapleSeed
     public class Database
     {
         private static string TitleKeys => "https://wiiu.titlekeys.com";
-        private static string DatabaseFile => "database.json";
+        private static string DatabaseFile => Path.Combine(Path.GetTempPath(), "MapleSeed_DB.json");
         private static List<WiiUTitle> DbObject { get; set; } = new List<WiiUTitle>();
 
         public static async Task Initialize()
@@ -51,7 +51,9 @@ namespace MapleSeed
         public void updateGame(string titleId, string fullPath)
         {
             titleId = titleId.Replace("00050000", "0005000e");
+#pragma warning disable 4014
             UpdateGame(titleId, fullPath);
+#pragma warning restore 4014
         }
 
         public async Task UpdateGame(string titleId, string fullPath, bool modtid = true)
@@ -97,7 +99,8 @@ namespace MapleSeed
 
         public static WiiUTitle FindByTitleId(string titleId)
         {
-            var title = DbObject.Find(t => string.Equals(t.TitleID, titleId, StringComparison.CurrentCultureIgnoreCase));;
+            var title = DbObject.Find(t => string.Equals(t.TitleID, titleId, StringComparison.CurrentCultureIgnoreCase));
+            ;
 
             return titleId.IsNullOrEmpty() || title.ToString().IsNullOrEmpty() ? new WiiUTitle() : title;
         }

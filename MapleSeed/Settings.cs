@@ -6,12 +6,10 @@
 #region usings
 
 using System;
-using System.ComponentModel;
 using System.IO;
 using System.Windows.Forms;
 using IniParser;
-using MapleRoot;
-using MapleRoot.Common;
+using MapleLib.Common;
 using MapleSeed.Properties;
 
 #endregion
@@ -53,12 +51,12 @@ namespace MapleSeed
                     CheckFileExists = true,
                     Filter = @"Cemu Excutable |cemu.exe"
                 };
-                DialogResult result = DialogResult.Cancel;
-                Toolbelt.Form1.Invoke(new Action(()=> result = ofd.ShowDialog()));
+                var result = DialogResult.Cancel;
+                Toolbelt.Form1.Invoke(new Action(() => result = ofd.ShowDialog()));
 
                 if (string.IsNullOrWhiteSpace(ofd.FileName) || result != DialogResult.OK)
                     Application.Exit();
-                
+
                 value = Path.GetDirectoryName(ofd.FileName);
                 WriteKeyValue("CemuDirectory", value);
                 return value;
@@ -71,8 +69,7 @@ namespace MapleSeed
             set { WriteKeyValue("Username", value); }
         }
 
-        public string Hub
-        {
+        public string Hub {
             get {
                 var value = GetKeyValue("Hub");
                 if (string.IsNullOrEmpty(value))

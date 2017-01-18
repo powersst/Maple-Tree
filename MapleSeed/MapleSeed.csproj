@@ -49,17 +49,12 @@
     <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CefSharp">
-      <HintPath>3rdParty\CefSharp\CefSharp.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="CefSharp.WinForms">
-      <HintPath>3rdParty\CefSharp\CefSharp.WinForms.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Cemu-UI">
       <HintPath>Resources\Cemu-UI.exe</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="ILMerge">
+      <HintPath>..\packages\ILMerge.2.14.1208\tools\ILMerge.exe</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -80,30 +75,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="3rdParty\IniFileParser\Exceptions\ParsingException.cs" />
-    <Compile Include="3rdParty\IniFileParser\FileIniParser.cs" />
-    <Compile Include="3rdParty\IniFileParser\Helpers\Assert.cs" />
-    <Compile Include="3rdParty\IniFileParser\Model\Configuration\ConcatenateDuplicatedKeysIniParserConfiguration.cs" />
-    <Compile Include="3rdParty\IniFileParser\Model\Configuration\IniParserConfiguration.cs" />
-    <Compile Include="3rdParty\IniFileParser\Model\Formatting\DefaultIniDataFormatter.cs" />
-    <Compile Include="3rdParty\IniFileParser\Model\Formatting\IIniDataFormatter.cs" />
-    <Compile Include="3rdParty\IniFileParser\Model\IniData.cs" />
-    <Compile Include="3rdParty\IniFileParser\Model\IniDataCaseInsensitive.cs" />
-    <Compile Include="3rdParty\IniFileParser\Model\KeyData.cs" />
-    <Compile Include="3rdParty\IniFileParser\Model\KeyDataCollection.cs" />
-    <Compile Include="3rdParty\IniFileParser\Model\SectionData.cs" />
-    <Compile Include="3rdParty\IniFileParser\Model\SectionDataCollection.cs" />
-    <Compile Include="3rdParty\IniFileParser\Parser\ConcatenateDuplicatedKeysIniDataParser.cs" />
-    <Compile Include="3rdParty\IniFileParser\Parser\IniDataParser.cs" />
-    <Compile Include="3rdParty\IniFileParser\StreamIniDataParser.cs" />
-    <Compile Include="3rdParty\IniFileParser\StringIniParser.cs" />
-    <Compile Include="3rdParty\libWiiUSharp\CommonKey.cs" />
-    <Compile Include="3rdParty\libWiiUSharp\ContentIndices.cs" />
-    <Compile Include="3rdParty\libWiiUSharp\GZip.cs" />
-    <Compile Include="3rdParty\libWiiUSharp\MessageEventArgs.cs" />
-    <Compile Include="3rdParty\libWiiUSharp\Shared.cs" />
-    <Compile Include="3rdParty\libWiiUSharp\Ticket.cs" />
-    <Compile Include="3rdParty\libWiiUSharp\TMD.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="1Form1.cs">
       <SubType>Form</SubType>
@@ -111,16 +82,12 @@
     <Compile Include="1Form1.Designer.cs">
       <DependentUpon>1Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="UpdaterPlugin.cs" />
     <Compile Include="Network.cs" />
     <Compile Include="Resources\GlobalSuppressions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Structs\WiiUTitle.cs" />
-    <Content Include="3rdParty\CefSharp\CefSharp.Core.dll" />
-    <Content Include="3rdParty\CefSharp\CefSharp.dll" />
-    <Content Include="3rdParty\CefSharp\CefSharp.WinForms.dll" />
     <Content Include="Resources\Seed.ico" />
     <Compile Include="Toolbelt.cs" />
     <Content Include="version.txt" />
@@ -137,7 +104,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="3rdParty\IniFileParser\Model\IniData.cs.rej" />
     <None Include="Properties\DataSources\Form1.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -156,14 +122,18 @@
     <None Include="Resources\CDecrypt.exe" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MapleRoot\MapleRoot.csproj">
+    <ProjectReference Include="..\Common\MapleLib.csproj">
       <Project>{4375d4c0-fef9-46f5-942d-36c2ebe15672}</Project>
-      <Name>MapleRoot</Name>
+      <Name>MapleLib</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>"C:\Program Files\Git\bin\git.exe" rev-parse --short HEAD &gt; "$(ProjectDir)\version.txt"
 </PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -13,13 +13,13 @@ using System.Text;
 using System.Timers;
 using System.Windows.Forms;
 using Lidgren.Network;
-using MapleRoot;
-using MapleRoot.Common;
-using MapleRoot.Enums;
-using MapleRoot.Network;
-using MapleRoot.Network.Events;
-using MapleRoot.Properties;
-using MapleRoot.Structs;
+using MapleLib;
+using MapleLib.Common;
+using MapleLib.Enums;
+using MapleLib.Network;
+using MapleLib.Network.Events;
+using MapleLib.Properties;
+using MapleLib.Structs;
 using ProtoBuf;
 
 #endregion
@@ -66,7 +66,7 @@ namespace MapleSeed
             Toolkit.GlobalTimer.Elapsed += GlobalTimer_Elapsed;
             GlobalTimer_Elapsed(null, null);
 
-            
+
             AppendLog($"Game Directory [{Toolbelt.Settings.TitleDirectory}]");
         }
 
@@ -78,9 +78,7 @@ namespace MapleSeed
             Library = new List<string>(Directory.GetDirectories(dir));
             foreach (var item in Library) {
                 var name = new FileInfo(item).Name;
-                if (!titleList.Items.Contains(name)) {
-                    ListBoxAddItem(name);
-                }
+                if (!titleList.Items.Contains(name)) ListBoxAddItem(name);
             }
 
             var cache = new object[titleList.Items.Count];
@@ -89,7 +87,7 @@ namespace MapleSeed
             foreach (var item in cache) {
                 var path = Path.Combine(dir, item.ToString());
                 if (!Directory.Exists(path))
-                    titleList.Invoke(new Action(()=> titleList.Items.Remove(item)));
+                    titleList.Invoke(new Action(() => titleList.Items.Remove(item)));
             }
         }
 
