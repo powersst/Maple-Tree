@@ -1,5 +1,6 @@
 # Maple-Tree
-A small application with a set of features based around the wants/needs of the cemu community.
+
+A small application with a feature set aimed to make Wii U title management easier.
 
 ***Working Features***
 - Game Launching
@@ -10,8 +11,21 @@ A small application with a set of features based around the wants/needs of the c
 - Chat feature
 - Search by file name
 - Multi Selection title updates
+- Confirmation for file editing tasks
+- Multi Selection title updates
+- Download progress bar
+- /dl <titleID> command
+- Library Auto Updates
 
 ***Work In Progress***
-- Transferable Cache Sharing
-- Graphic Pack Sharing
-- Private Sharing
+- Add /help command
+- Add /repair command to fix broken titles
+- Add /search command to find title ids by game name
+- Add title checking to the Play! button
+- Add launching support for wud/wux files.
+- Typing while uploading
+- word cemu folder selection better.(people selecting main cemu folder)
+- Add & remove games from library
+- delete, rename, and transfer(to another user) uploaded files.
+- A sync repository like Dropbox / Google Drive shared folders.
+- Cheats section
