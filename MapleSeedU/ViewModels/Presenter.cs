@@ -5,11 +5,6 @@
 
 #region usings
 
-#endregion
-
-#region usings
-
-using System.Collections.Generic;
 using MapleSeedU.Models;
 
 #endregion
@@ -18,22 +13,17 @@ namespace MapleSeedU.ViewModels
 {
     public class Presenter : ObservableObject
     {
-        public Presenter()
-        {
-
-        }
-
         private string _status = "Github.com/Tsume/Maple-Tree";
-        private List<TitleInfo> _titleInfoLife = new List<TitleInfo> {new TitleInfo {Name = "No Titles Present"}};
         private string _titleName = "No Game Selected";
 
-        public List<TitleInfo> TitleInfoList {
-            get { return _titleInfoLife; }
-            set {
-                _titleInfoLife = value;
-                RaisePropertyChangedEvent("TitleInfoList");
-            }
+        public Presenter()
+        {
+            Status = LibraryPath.GetPath();
         }
+
+        private LibraryPath LibraryPath { get; set; } = new LibraryPath();
+
+        public TitleInfoViewModel TitleInfoViewModel { get; set; } = new TitleInfoViewModel();
 
         public string Status {
             get { return _status; }
