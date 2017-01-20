@@ -5,9 +5,11 @@
 
 #region usings
 
+#endregion
+
+#region usings
+
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Windows.Input;
 using MapleSeedU.Models;
 
 #endregion
@@ -16,33 +18,37 @@ namespace MapleSeedU.ViewModels
 {
     public class Presenter : ObservableObject
     {
-        private readonly ObservableCollection<string> _history = new ObservableCollection<string>();
-        private readonly TextConverter _textConverter = new TextConverter(s => s.ToUpper());
-        private string _someText;
+        public Presenter()
+        {
 
-        public string SomeText {
-            get { return _someText; }
+        }
+
+        private string _status = "Github.com/Tsume/Maple-Tree";
+        private List<TitleInfo> _titleInfoLife = new List<TitleInfo> {new TitleInfo {Name = "No Titles Present"}};
+        private string _titleName = "No Game Selected";
+
+        public List<TitleInfo> TitleInfoList {
+            get { return _titleInfoLife; }
             set {
-                _someText = value;
-                RaisePropertyChangedEvent("SomeText");
+                _titleInfoLife = value;
+                RaisePropertyChangedEvent("TitleInfoList");
             }
         }
 
-        public IEnumerable<string> History => _history;
-
-        public ICommand ConvertTextCommand => new DelegateCommand(ConvertText);
-
-        private void ConvertText()
-        {
-            if (string.IsNullOrWhiteSpace(SomeText)) return;
-            AddToHistory(_textConverter.ConvertText(SomeText));
-            SomeText = string.Empty;
+        public string Status {
+            get { return _status; }
+            set {
+                _status = value;
+                RaisePropertyChangedEvent("Status");
+            }
         }
 
-        private void AddToHistory(string item)
-        {
-            if (!_history.Contains(item))
-                _history.Add(item);
+        public string TitleName {
+            get { return _titleName; }
+            set {
+                _titleName = value;
+                RaisePropertyChangedEvent("TitleName");
+            }
         }
     }
 }

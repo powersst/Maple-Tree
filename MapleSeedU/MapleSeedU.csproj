@@ -87,6 +87,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Models\TextConverter.cs" />
+    <Compile Include="Helper.cs" />
+    <Compile Include="Models\TitleInfo.cs" />
     <Compile Include="ViewModels\DelegateCommand.cs" />
     <Compile Include="ViewModels\ObservableObject.cs" />
     <Compile Include="ViewModels\Presenter.cs" />
@@ -130,6 +132,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="bootTvTex.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
