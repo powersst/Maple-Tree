@@ -21,7 +21,7 @@ namespace MapleSeedU.ViewModels
             Status = LibraryPath.GetPath();
         }
 
-        private LibraryPath LibraryPath { get; set; } = new LibraryPath();
+        public static LibraryPath LibraryPath { get; } = new LibraryPath();
 
         public TitleInfoViewModel TitleInfoViewModel { get; set; } = new TitleInfoViewModel();
 

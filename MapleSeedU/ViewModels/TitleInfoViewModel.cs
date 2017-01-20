@@ -23,6 +23,12 @@ namespace MapleSeedU.ViewModels
         {
             IList<TitleInfoEntry> list = new List<TitleInfoEntry>();
 
+            var path = Presenter.LibraryPath.GetPath();
+            var files = Directory.GetFiles(path, "*.rpx", SearchOption.AllDirectories);
+            foreach (var file in files) {
+                
+            }
+
             list.Add(new TitleInfoEntry("test"));
             list.Add(new TitleInfoEntry("test2"));
 
