@@ -17,31 +17,27 @@ namespace MapleSeedU.ViewModels
 {
     public class TitleInfoViewModel : INotifyPropertyChanged
     {
-        private string _titleInfoEntry;
-
         public TitleInfoViewModel()
         {
             IList<TitleInfoEntry> list = new List<TitleInfoEntry>();
 
             var path = Presenter.LibraryPath.GetPath();
-            var files = Directory.GetFiles(path, "*.rpx", SearchOption.AllDirectories);
-            foreach (var file in files) {
-                
-            }
-
-            list.Add(new TitleInfoEntry("test"));
-            list.Add(new TitleInfoEntry("test2"));
+            var files = Directory.GetDirectories(path, "code", SearchOption.AllDirectories);
+            foreach (var file in files) list.Add(new TitleInfoEntry(file));
 
             TitleInfoEntries = new CollectionView(list);
         }
 
         public CollectionView TitleInfoEntries { get; }
 
-        public string TitleInfoEntry {
+        private TitleInfoEntry _titleInfoEntry;
+        public TitleInfoEntry TitleInfoEntry {
             get { return _titleInfoEntry; }
             set {
                 if (_titleInfoEntry == value) return;
                 _titleInfoEntry = value;
+                _titleInfoEntry.SetBootTex();
+                Presenter.Instance.Status = _titleInfoEntry.Root;
                 OnPropertyChanged("TitleInfoEntry");
             }
         }

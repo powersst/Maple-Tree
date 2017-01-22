@@ -1,22 +1,18 @@
 ﻿// Project: MapleSeedU
-// File: LibraryPath.cs
+// File: CemuPath.cs
 // Updated By: Jared
 // 
-
-#region usings
 
 using System.IO;
 using System.Windows.Forms;
 
-#endregion
-
 namespace MapleSeedU.Models
 {
-    public class LibraryPath
+    public class CemuPath
     {
-        public LibraryPath()
+        public CemuPath()
         {
-            _libraryPath = new ConfigurationEntry("LibraryPath");
+            _libraryPath = new ConfigurationEntry("CemuPath");
         }
 
         private ConfigurationEntry _libraryPath { get; }
@@ -28,18 +24,23 @@ namespace MapleSeedU.Models
 
         private string SetPath()
         {
-            var diaglog = new FolderBrowserDialog {Description = @"Cemu Library Path (Root folder of Wii U Games)"};
+            var diaglog = new OpenFileDialog
+            {
+                Title = @"Cemu Executable",
+                Filter = @"Cemu Executable (cemu.exe) | cemu.exe"
+            };
+
             var result = diaglog.ShowDialog();
 
             if (result == DialogResult.OK)
-                _libraryPath.Value = Path.GetFullPath(diaglog.SelectedPath);
+                _libraryPath.Value = Path.GetFullPath(diaglog.FileName);
 
             return _libraryPath.Value;
         }
 
         private void ResetPath()
         {
-            _libraryPath.DeleteKey("LibraryPath");
+            _libraryPath.DeleteKey("CemuPath");
         }
     }
 }
