@@ -17,9 +17,9 @@ namespace MapleSeedU.Models
     {
         private readonly RegistryKey _baseRegistryKey = Registry.CurrentUser;
         private readonly string _subKey = "SOFTWARE\\MapleSeed";
-        private bool showError = true;
+        private readonly bool showError = true;
 
-        public string Read(string keyName)
+        protected string Read(string keyName)
         {
             var rk = _baseRegistryKey;
             var sk1 = rk.OpenSubKey(_subKey);
@@ -33,7 +33,7 @@ namespace MapleSeedU.Models
             }
         }
 
-        public bool Write(string keyName, object value)
+        protected bool Write(string keyName, object value)
         {
             try {
                 var rk = _baseRegistryKey;

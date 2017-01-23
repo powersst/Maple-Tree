@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapleSeed", "MapleSeed\MapleSeed.csproj", "{07945F9B-70DC-4360-8D8B-D1991D6D722F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapleSeedU", "MapleSeedU\MapleSeedU.csproj", "{6D7C0F83-5C98-492F-B683-32335BD45065}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapleSeed-Lite", "MapleSeedU\MapleSeed-Lite.csproj", "{6D7C0F83-5C98-492F-B683-32335BD45065}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapleLib", "Common\MapleLib.csproj", "{4375D4C0-FEF9-46F5-942D-36C2EBE15672}"
 EndProject

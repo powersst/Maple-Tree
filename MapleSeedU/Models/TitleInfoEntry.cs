@@ -9,6 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Xml;
 using MapleSeedU.ViewModels;
 using Newtonsoft.Json;
@@ -22,10 +26,11 @@ namespace MapleSeedU.Models
     {
         public TitleInfoEntry(string fullPath)
         {
-            try {
-                fullPath = Path.GetDirectoryName(fullPath); //get parent
+            Task.Run(() => {
+                try {
+                    fullPath = Path.GetDirectoryName(fullPath); //get parent
 
-                if (fullPath != null) {
+                    if (fullPath == null) return;
                     var dir = new DirectoryInfo(fullPath);
                     Root = dir.FullName;
                     Name = dir.Name;
@@ -34,25 +39,24 @@ namespace MapleSeedU.Models
                     SetTitleID();
                     SetTitleKey();
                 }
-            }
-            catch (Exception) {
-                //MessageBox.Show(e.StackTrace);
-            }
+                catch (Exception e) {
+                    MessageBox.Show(e.StackTrace);
+                }
+            });
         }
 
         public string Name { get; set; }
-        public string Root { get; }
-        public object BootTex { get; set; }
+        public string Root { get; private set; }
         private object BootFile { get; set; }
         private string TitleID { get; set; }
         private string TitleKey { get; set; }
         private string Region { get; set; }
         private string Version { get; set; }
+        public BitmapSource BootTex { get; set; }
 
-        public void PlayTitle()
+        public async void PlayTitle()
         {
-            try
-            {
+            try {
                 var cemuPath = Presenter.CemuPath.GetPath();
                 var workingDir = Path.GetDirectoryName(cemuPath);
 
@@ -76,11 +80,12 @@ namespace MapleSeedU.Models
 
                 process.Start();
                 Presenter.WriteLine($"Started playing {Name}!");
-                process.WaitForExit();
-                Presenter.WriteLine($"Stopped playing {Name}!");
+                await Task.Run(() => {
+                    process.WaitForExit();
+                    Presenter.WriteLine($"Stopped playing {Name}!");
+                });
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Presenter.WriteLine("Error!\r\n" + ex.Message);
             }
         }
@@ -91,17 +96,15 @@ namespace MapleSeedU.Models
             using (var fs = new FileStream(bootTvTexTGA, FileMode.Open, FileAccess.Read, FileShare.Read))
             using (var reader = new BinaryReader(fs)) {
                 var tga = new TgaImage(reader);
-                var source = tga.GetBitmap();
-                BootTex = source;
+                var color = ImageAnalysis.GetRandomColour(BootTex = tga.GetBitmap());
+                ThemeManagerHelper.CreateAppStyleBy(Color.FromArgb(color.A, color.R, color.G, color.B));
             }
         }
 
         private void SetBootFile()
         {
             var files = Directory.GetFiles(Root, "*.rpx", SearchOption.AllDirectories);
-            if (files.Length > 0) {
-                BootFile = files[0];
-            }
+            if (files.Length > 0) BootFile = files[0];
         }
 
         private void SetTitleID()

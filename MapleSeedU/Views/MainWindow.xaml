@@ -6,22 +6,24 @@
         xmlns:local="clr-namespace:MapleSeedU"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:ViewModels="clr-namespace:MapleSeedU.ViewModels" x:Class="MapleSeedU.Views.MainWindow"
-        mc:Ignorable="d"
-        Title="Maple Seed U" Width="823" Height="552" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Icon="/MapleSeedU;component/Seed.ico" >
+        mc:Ignorable="d" Width="823" Height="552" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Icon="/MapleSeedU;component/Seed.ico" Title="Maple Seed Lite" IsMaxRestoreButtonEnabled="False" SaveWindowPosition="True" ShowMaxRestoreButton="False" BorderBrush="Black">
     <Controls:MetroWindow.DataContext>
         <ViewModels:Presenter/>
     </Controls:MetroWindow.DataContext>
     <Grid>
-        <Image x:Name="image" Source="{Binding TitleInfoViewModel.TitleInfoEntry.BootTex}" Height="auto" Width="auto" Margin="0,0,0,58"/>
-        <Rectangle Margin="0,0,0,58">
-            <Rectangle.Fill>
-                <SolidColorBrush Color="Black" Opacity="0.5"/>
-            </Rectangle.Fill>
-        </Rectangle>
+        <Image x:Name="image" Source="{Binding TitleInfoViewModel.TitleInfoEntry.BootTex}" Height="auto" Width="auto" Margin="0,0,0,58">
+            <Image.OpacityMask>
+                <SolidColorBrush Color="Black" Opacity="1"/>
+            </Image.OpacityMask>
+        </Image>
 
         <Label x:Name="label" Content="{Binding Status, UpdateSourceTrigger=PropertyChanged}" Foreground="Gray" HorizontalAlignment="Left" Margin="0,0,0,4" VerticalAlignment="Bottom"/>
         <ProgressBar Margin="0,0,0,30" Height="28" VerticalAlignment="Bottom" Value="100" Background="{x:Null}" BorderBrush="{x:Null}"/>
-        <ComboBox x:Name="comboBox" ItemsSource="{Binding TitleInfoViewModel.TitleInfoEntries, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding TitleInfoViewModel.TitleInfoEntry}" DisplayMemberPath="Name"  SelectedValuePath="Name" SelectedIndex="0" HorizontalAlignment="Left" Margin="10,0,0,63" VerticalAlignment="Bottom" Background="{x:Null}" IsEditable="True"/>
+        <ComboBox x:Name="comboBox" ItemsSource="{Binding TitleInfoViewModel.TitleInfoEntries, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding TitleInfoViewModel.TitleInfoEntry}" DisplayMemberPath="Name"  SelectedValuePath="Name" SelectedIndex="0" HorizontalAlignment="Left" Margin="10,0,0,63" VerticalAlignment="Bottom" IsEditable="True" Width="300" Foreground="#FFECECEC">
+            <ComboBox.Background>
+                <SolidColorBrush Color="Black" Opacity="0.5"/>
+            </ComboBox.Background>
+        </ComboBox>
         <Button x:Name="button" Command="{Binding ClickCommand}" Content="Play!" HorizontalAlignment="Right" Margin="0,0,10,63" VerticalAlignment="Bottom" Width="67" Height="26"/>
         <Button x:Name="button1" Content="Update" Margin="0,0,82,63" VerticalAlignment="Bottom" Width="64" Height="26" HorizontalAlignment="Right" IsEnabled="False"/>
         <TextBlock x:Name="textBlock" TextWrapping="Wrap" Text="{Binding TitleInfoViewModel.TitleInfoEntry.Name, UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" Foreground="Gray" TextAlignment="Right" VerticalAlignment="Bottom" Height="25" HorizontalAlignment="Right" Margin="0,0,10,0"/>

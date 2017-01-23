@@ -64,6 +64,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.1.4.1\lib\net45\System.Windows.Interactivity.dll</HintPath>
@@ -103,7 +104,9 @@
     <Compile Include="Models\CemuPath.cs" />
     <Compile Include="Models\ConfigurationEntry.cs" />
     <Compile Include="Models\LibraryPath.cs" />
+    <Compile Include="Models\ImageAnalysis.cs" />
     <Compile Include="Models\RegistryKeyEntry.cs" />
+    <Compile Include="Models\ThemeManagerHelper.cs" />
     <Compile Include="Models\TitleInfoEntry.cs" />
     <Compile Include="Models\WiiUTitle.cs" />
     <Compile Include="ViewModels\DelegateCommand.cs" />
