@@ -2,6 +2,13 @@
 
 A small application with a feature set aimed to make Wii U title management easier.
 
+***Maple Seed Lite***
+
+![Screenshot](https://pixxy.in/aU41176.png)
+
+
+***Maple Seed***
+
 ***Working Features***
 - Game Launching
 - Game Title Updating
