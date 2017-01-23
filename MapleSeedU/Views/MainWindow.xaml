@@ -3,10 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:MapleSeedU"
-        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+    xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:ViewModels="clr-namespace:MapleSeedU.ViewModels" x:Class="MapleSeedU.Views.MainWindow"
-        mc:Ignorable="d" Width="823" Height="552" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Icon="/MapleSeedU;component/Seed.ico" Title="Maple Seed Lite" IsMaxRestoreButtonEnabled="False" SaveWindowPosition="True" ShowMaxRestoreButton="False" BorderBrush="Black">
+        mc:Ignorable="d" Width="823" Height="552" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Icon="/MapleSeedU-Lite;component/Seed.ico" Title="Maple Seed Lite" IsMaxRestoreButtonEnabled="False" SaveWindowPosition="True" ShowMaxRestoreButton="False" BorderBrush="Black">
     <Controls:MetroWindow.DataContext>
         <ViewModels:MainWindowViewModel/>
     </Controls:MetroWindow.DataContext>

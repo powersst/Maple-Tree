@@ -53,9 +53,6 @@
       <HintPath>Resources\Cemu-UI.exe</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="ILMerge">
-      <HintPath>..\packages\ILMerge.2.14.1208\tools\ILMerge.exe</HintPath>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
