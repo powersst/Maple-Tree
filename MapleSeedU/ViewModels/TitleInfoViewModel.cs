@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Windows.Data;
 using MapleSeedU.Models;
 
@@ -19,36 +20,23 @@ namespace MapleSeedU.ViewModels
     {
         public TitleInfoViewModel()
         {
-            IList<TitleInfoEntry> list = new List<TitleInfoEntry>();
+            var path = MainWindowViewModel.Instance.LibraryPath.GetPath();
+            var files = Directory.EnumerateFiles(path, "*.rpx", SearchOption.AllDirectories);
 
-            var path = Presenter.LibraryPath.GetPath();
-            var files = Directory.GetDirectories(path, "code", SearchOption.AllDirectories);
-            foreach (var file in files) list.Add(new TitleInfoEntry(file));
+            IList<TitleInfoEntry> list = files.Select(file => new TitleInfoEntry(file)).ToList();
 
             TitleInfoEntries = new CollectionView(list);
         }
 
         public CollectionView TitleInfoEntries { get; }
-
-        private TitleInfoEntry _titleInfoEntry;
-        public TitleInfoEntry TitleInfoEntry {
-            get { return _titleInfoEntry; }
-            set {
-                if (_titleInfoEntry == value) return;
-                _titleInfoEntry = value;
-                _titleInfoEntry.SetBootTex();
-                Presenter.Instance.Status = _titleInfoEntry.Root;
-                OnPropertyChanged("TitleInfoEntry");
-            }
-        }
-
+        
         #region INotifyPropertyChanged Members
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion
 
-        private void OnPropertyChanged(string propertyName)
+        public void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

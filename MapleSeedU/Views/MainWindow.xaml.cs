@@ -3,6 +3,8 @@
 // Updated By: Jared
 // 
 
+using System.Windows.Controls;
+
 namespace MapleSeedU.Views
 {
     /// <summary>

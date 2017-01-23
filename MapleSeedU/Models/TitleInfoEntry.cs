@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml;
@@ -26,38 +25,30 @@ namespace MapleSeedU.Models
     {
         public TitleInfoEntry(string fullPath)
         {
-            Task.Run(() => {
-                try {
-                    fullPath = Path.GetDirectoryName(fullPath); //get parent
+            var folder = Path.GetDirectoryName(BootFile = fullPath);
+            Root = Path.GetDirectoryName(folder); //get parent
 
-                    if (fullPath == null) return;
-                    var dir = new DirectoryInfo(fullPath);
-                    Root = dir.FullName;
-                    Name = dir.Name;
+            if (Root == null) return;
+            Name = new DirectoryInfo(Root).Name;
 
-                    SetBootFile();
-                    SetTitleID();
-                    SetTitleKey();
-                }
-                catch (Exception e) {
-                    MessageBox.Show(e.StackTrace);
-                }
-            });
+            SetTitleID();
+            SetTitleKey();
         }
 
-        public string Name { get; set; }
-        public string Root { get; private set; }
-        private object BootFile { get; set; }
+        private string Name { get; }
+        private string Root { get; }
+        private string BootFile { get; }
         private string TitleID { get; set; }
         private string TitleKey { get; set; }
         private string Region { get; set; }
         private string Version { get; set; }
-        public BitmapSource BootTex { get; set; }
+        private BitmapSource BootTex { get; set; }
+        private System.Drawing.Color cachedColor { get; set; }
 
         public async void PlayTitle()
         {
             try {
-                var cemuPath = Presenter.CemuPath.GetPath();
+                var cemuPath = MainWindowViewModel.Instance.CemuPath.GetPath();
                 var workingDir = Path.GetDirectoryName(cemuPath);
 
                 var o1 = true ? "-f" : "";
@@ -79,41 +70,24 @@ namespace MapleSeedU.Models
                 };
 
                 process.Start();
-                Presenter.WriteLine($"Started playing {Name}!");
+                MainWindowViewModel.WriteLine($"Started playing {Name}!");
                 await Task.Run(() => {
                     process.WaitForExit();
-                    Presenter.WriteLine($"Stopped playing {Name}!");
+                    MainWindowViewModel.WriteLine($"Stopped playing {Name}!");
                 });
             }
             catch (Exception ex) {
-                Presenter.WriteLine("Error!\r\n" + ex.Message);
+                MainWindowViewModel.WriteLine("Error!\r\n" + ex.Message);
             }
-        }
-
-        public void SetBootTex()
-        {
-            var bootTvTexTGA = Path.Combine(Root, "meta//bootTvTex.tga");
-            using (var fs = new FileStream(bootTvTexTGA, FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (var reader = new BinaryReader(fs)) {
-                var tga = new TgaImage(reader);
-                var color = ImageAnalysis.GetRandomColour(BootTex = tga.GetBitmap());
-                ThemeManagerHelper.CreateAppStyleBy(Color.FromArgb(color.A, color.R, color.G, color.B));
-            }
-        }
-
-        private void SetBootFile()
-        {
-            var files = Directory.GetFiles(Root, "*.rpx", SearchOption.AllDirectories);
-            if (files.Length > 0) BootFile = files[0];
         }
 
         private void SetTitleID()
         {
-            var entries = Directory.GetFiles(Root, "meta.xml", SearchOption.AllDirectories);
-            if (entries.Length <= 0) return;
+            var metaxml = Path.Combine(Root, "meta", "meta.xml");
+            if (!File.Exists(metaxml)) return;
 
             var xml = new XmlDocument();
-            xml.Load(entries[0]);
+            xml.Load(metaxml);
             var titleIdTag = xml.GetElementsByTagName("title_id");
             var titleVersionTag = xml.GetElementsByTagName("title_version");
 
@@ -126,15 +100,50 @@ namespace MapleSeedU.Models
 
         private void SetTitleKey()
         {
-            var json = File.ReadAllText(Presenter.DbFile);
+            var json = File.ReadAllText(MainWindowViewModel.Instance.DbFile);
             var list = JsonConvert.DeserializeObject<List<WiiUTitle>>(json);
             var title = list.Find(t => string.Equals(t.TitleID, TitleID, StringComparison.CurrentCultureIgnoreCase));
             TitleKey = title.TitleKey;
         }
 
+        private string GetShaderHash()
+        {
+            if (new FileInfo(BootFile).Extension != ".rpx") return string.Empty;
+            var data = File.ReadAllBytes(BootFile);
+            return Helper.generateHashFromRawRPXData(data, data.Length).ToString("x8");
+        }
+
+        private void SetBootTex()
+        {
+            if (BootTex == null) {
+                var bootTvTexTGA = Path.Combine(Root, "meta//bootTvTex.tga");
+                if (!File.Exists(bootTvTexTGA)) return;
+
+                using (var fs = new FileStream(bootTvTexTGA, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (var reader = new BinaryReader(fs)) {
+                    var tga = new TgaImage(reader);
+                    BootTex = tga.GetBitmap();
+                }
+            }
+
+            MainWindowViewModel.Instance.BackgroundImage = BootTex;
+        }
+
+        public void UpdateTheme()
+        {
+            SetBootTex();
+
+            if (cachedColor.IsEmpty || cachedColor.Name == "ffffff" || cachedColor.Name == "0") {
+                cachedColor = ImageAnalysis.GetRandomColour(BootTex);
+            }
+
+            ThemeManagerHelper.CreateAppStyleBy(Color.FromArgb(cachedColor.A, cachedColor.R, cachedColor.G, cachedColor.B));
+            MainWindowViewModel.Instance.Status = Root;
+        }
+
         public override string ToString()
         {
-            return Helper.RIC($"{Name} {Region} v{Version}");
+            return Helper.RIC($"{Name} {Region} [v{Version}]");
         }
     }
 }

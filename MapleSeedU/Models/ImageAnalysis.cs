@@ -6,6 +6,7 @@
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using Point = System.Drawing.Point;
@@ -19,11 +20,11 @@ namespace MapleSeedU.Models
             var bmp = new Bitmap(
                 source.PixelWidth,
                 source.PixelHeight,
-                PixelFormat.Format32bppPArgb);
+                PixelFormat.Format24bppRgb);
             var data = bmp.LockBits(
                 new Rectangle(Point.Empty, bmp.Size),
                 ImageLockMode.WriteOnly,
-                PixelFormat.Format32bppPArgb);
+                PixelFormat.Format24bppRgb);
             source.CopyPixels(
                 Int32Rect.Empty,
                 data.Scan0,
@@ -37,18 +38,28 @@ namespace MapleSeedU.Models
         {
             while (true)
                 try {
-                    var x = new Random().Next(0, bitmapSource.PixelWidth);
-                    var y = new Random().Next(0, bitmapSource.PixelHeight);
+                    var random = new Random();
+                    var x = random.Next(0, 1280);
+                    var y = random.Next(0, 720);
                     var color = GetBitmap(bitmapSource).GetPixel(x, y);
 
-                    if (color.R == 255 && color.G == 255 && color.B == 255) return Color.FromArgb(0xffffff);
-                    if (color.R == 0 && color.G == 0 && color.B == 0) return Color.FromArgb(0xffffff);
+                    if (color.Name == "0") return Color.FromArgb(0xffffff);
+                    if (color.Name == "ffffff") return Color.FromArgb(0xffffff);
 
                     return color;
                 }
                 catch {
                     return Color.FromArgb(0xffffff);
                 }
+        }
+
+        public static void TargaToBitmap(BitmapSource bmpSource) {}
+
+        private static void SaveImage(BitmapSource bmp, string filename)
+        {
+            var encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(bmp));
+            encoder.Save(File.OpenWrite(filename));
         }
     }
 }
