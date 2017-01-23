@@ -2,6 +2,7 @@
 // File: ViewModelBase.cs
 // Updated By: Jared
 // 
+#pragma warning disable CS0067 // Naming Styles
 
 #region usings
 
@@ -56,13 +57,13 @@ namespace MapleSeedU.ViewModels
         {
             return _canExecute;
         }
-
-        public event EventHandler CanExecuteChanged;
-
+        
         public void Execute(object parameter)
         {
             _action();
         }
+        
+        public event EventHandler CanExecuteChanged;
 
         #endregion
     }

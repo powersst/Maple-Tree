@@ -2,6 +2,7 @@
 // File: TitleInfoEntry.cs
 // Updated By: Jared
 // 
+#pragma warning disable IDE1006 // Naming Styles
 
 #region usings
 
@@ -43,7 +44,7 @@ namespace MapleSeedU.Models
         private string Region { get; set; }
         private string Version { get; set; }
         private BitmapSource BootTex { get; set; }
-        private System.Drawing.Color cachedColor { get; set; }
+        private System.Drawing.Color CachedColor { get; set; }
 
         public async void PlayTitle()
         {
@@ -133,11 +134,11 @@ namespace MapleSeedU.Models
         {
             SetBootTex();
 
-            if (cachedColor.IsEmpty || cachedColor.Name == "ffffff" || cachedColor.Name == "0") {
-                cachedColor = ImageAnalysis.GetRandomColour(BootTex);
+            if (CachedColor.IsEmpty || CachedColor.Name == "ffffff" || CachedColor.Name == "0") {
+                CachedColor = ImageAnalysis.GetRandomColour(BootTex);
             }
 
-            ThemeManagerHelper.CreateAppStyleBy(Color.FromArgb(cachedColor.A, cachedColor.R, cachedColor.G, cachedColor.B));
+            ThemeManagerHelper.CreateAppStyleBy(Color.FromArgb(CachedColor.A, CachedColor.R, CachedColor.G, CachedColor.B));
             MainWindowViewModel.Instance.Status = Root;
         }
 
