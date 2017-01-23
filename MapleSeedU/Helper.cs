@@ -16,6 +16,18 @@ namespace MapleSeedU
 {
     public static class Helper
     {
+        public static UInt32 generateHashFromRawRPXData(byte[] rpxData, Int32 size)
+        {
+            UInt32 h = 0x3416DCBF;
+            for (Int32 i = 0; i < size; i++)
+            {
+                UInt32 c = rpxData[i];
+                h = (h << 3) | (h >> 29);
+                h += c;
+            }
+            return h;
+        }
+
         public static string RIC(string str)
         {
             return RemoveInvalidCharacters(str);
