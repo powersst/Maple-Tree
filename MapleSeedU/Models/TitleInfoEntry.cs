@@ -6,6 +6,8 @@
 
 #region usings
 
+using MapleSeedU.ViewModels;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,8 +16,6 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml;
-using MapleSeedU.ViewModels;
-using Newtonsoft.Json;
 using TgaLib;
 
 #endregion
@@ -43,7 +43,7 @@ namespace MapleSeedU.Models
         private string TitleKey { get; set; }
         private string Region { get; set; }
         private string Version { get; set; }
-        private BitmapSource BootTex { get; set; }
+        public BitmapSource BootTex { get; set; }
         private System.Drawing.Color CachedColor { get; set; }
 
         public async void PlayTitle()
@@ -126,20 +126,23 @@ namespace MapleSeedU.Models
                     BootTex = tga.GetBitmap();
                 }
             }
-
-            MainWindowViewModel.Instance.BackgroundImage = BootTex;
         }
 
         public void UpdateTheme()
         {
-            SetBootTex();
-
-            if (CachedColor.IsEmpty || CachedColor.Name == "ffffff" || CachedColor.Name == "0") {
-                CachedColor = ImageAnalysis.GetRandomColour(BootTex);
-            }
+            CacheTheme();
 
             ThemeManagerHelper.CreateAppStyleBy(Color.FromArgb(CachedColor.A, CachedColor.R, CachedColor.G, CachedColor.B));
+            
             MainWindowViewModel.Instance.Status = Root;
+        }
+
+        public void CacheTheme()
+        {
+            SetBootTex();
+
+            if (CachedColor.IsEmpty)
+                CachedColor = ImageAnalysis.GetRandomColour(BootTex);
         }
 
         public override string ToString()

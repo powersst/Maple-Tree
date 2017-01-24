@@ -43,8 +43,8 @@ namespace MapleSeedU.Models
                     var y = random.Next(0, 720);
                     var color = GetBitmap(bitmapSource).GetPixel(x, y);
 
-                    if (color.Name == "0") return Color.FromArgb(0xffffff);
-                    if (color.Name == "ffffff") return Color.FromArgb(0xffffff);
+                    if (color.Name == "0") return GetRandomColour(bitmapSource);
+                    if (color.Name == "ffffff") return GetRandomColour(bitmapSource);
 
                     return color;
                 }
@@ -52,8 +52,6 @@ namespace MapleSeedU.Models
                     return Color.FromArgb(0xffffff);
                 }
         }
-
-        public static void TargaToBitmap(BitmapSource bmpSource) {}
 
         private static void SaveImage(BitmapSource bmp, string filename)
         {

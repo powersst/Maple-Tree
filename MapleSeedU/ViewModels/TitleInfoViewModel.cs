@@ -5,12 +5,13 @@
 
 #region usings
 
+using MapleSeedU.Models;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Data;
-using MapleSeedU.Models;
+using System.Windows.Threading;
 
 #endregion
 
@@ -18,25 +19,35 @@ namespace MapleSeedU.ViewModels
 {
     public class TitleInfoViewModel : INotifyPropertyChanged
     {
-        public TitleInfoViewModel()
-        {
-            var path = MainWindowViewModel.Instance.LibraryPath.GetPath();
-            var files = Directory.EnumerateFiles(path, "*.rpx", SearchOption.AllDirectories);
+        public CollectionView TitleInfoEntries { get; set; }
 
-            IList<TitleInfoEntry> list = files.Select(file => new TitleInfoEntry(file)).ToList();
-
-            TitleInfoEntries = new CollectionView(list);
-        }
-
-        public CollectionView TitleInfoEntries { get; }
-        
         #region INotifyPropertyChanged Members
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion
 
-        public void OnPropertyChanged(string propertyName)
+        public void CacheUpdate()
+        {
+            var path = MainWindowViewModel.Instance.LibraryPath.GetPath();
+            var files = Directory.EnumerateFiles(path, "*.rpx", SearchOption.AllDirectories);
+
+            var list = new List<TitleInfoEntry>();
+
+            foreach (var file in files) {
+                var entry = new TitleInfoEntry(file);
+                entry.CacheTheme();
+                list.Add(entry);
+            }
+
+            TitleInfoEntries = new CollectionView(list);
+            OnPropertyChanged("TitleInfoEntries");
+
+            MainWindowViewModel.Instance.CacheUpdateEnabled = true;
+            MainWindowViewModel.Instance.RaisePropertyChangedEvent("CacheUpdateEnabled");
+        }
+
+        private void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

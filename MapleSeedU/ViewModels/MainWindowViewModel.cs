@@ -6,8 +6,10 @@
 #region usings
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using MapleSeedU.Models;
@@ -22,9 +24,8 @@ namespace MapleSeedU.ViewModels
 
         public readonly string DbFile = Path.Combine(Path.GetTempPath(), "MapleTree.json");
 
-        private BitmapSource _backgroundImage;
-
         private string _status = "Github.com/Tsume/Maple-Tree";
+        private CollectionView _titleInfoEntries;
 
         private TitleInfoEntry _titleInfoEntry;
 
@@ -39,12 +40,18 @@ namespace MapleSeedU.ViewModels
         }
 
         public string LogText { get; set; }
-
-        public TitleInfoViewModel TitleInfoViewModel => new TitleInfoViewModel();
-
+        
         public CemuPath CemuPath => new CemuPath();
 
         public LibraryPath LibraryPath => new LibraryPath();
+
+        public CollectionView TitleInfoEntries {
+            get { return _titleInfoEntries; }
+            set {
+                _titleInfoEntries = value;
+                RaisePropertyChangedEvent("TitleInfoEntries");
+            }
+        }
 
         public TitleInfoEntry TitleInfoEntry {
             get { return _titleInfoEntry; }
@@ -52,17 +59,12 @@ namespace MapleSeedU.ViewModels
                 if (_titleInfoEntry == value) return;
                 _titleInfoEntry = value;
                 value.UpdateTheme();
-                TitleInfoViewModel.OnPropertyChanged("TitleInfoEntry");
-            }
-        }
-
-        public BitmapSource BackgroundImage {
-            get { return _backgroundImage; }
-            set {
-                _backgroundImage = value;
+                RaisePropertyChangedEvent("TitleInfoEntry");
                 RaisePropertyChangedEvent("BackgroundImage");
             }
         }
+
+        public BitmapSource BackgroundImage => TitleInfoEntry?.BootTex;
 
         public string Status {
             get { return _status; }
@@ -72,8 +74,10 @@ namespace MapleSeedU.ViewModels
             }
         }
 
-        public ICommand CacheUpdateCommand => new CommandHandler(CacheUpdate);
         public ICommand PlayTitleCommand => new CommandHandler(PlayTitle);
+        public ICommand CacheUpdateCommand => new CommandHandler(CacheUpdate);
+
+        public bool CacheUpdateEnabled { get; set; } = true;
 
         private void UpdateDatabase()
         {
@@ -97,6 +101,26 @@ namespace MapleSeedU.ViewModels
             TitleInfoEntry.PlayTitle();
         }
 
-        private void CacheUpdate() {}
+        private void CacheUpdate()
+        {
+            CacheUpdateEnabled = false;
+            RaisePropertyChangedEvent("CacheUpdateEnabled");
+
+            var path = LibraryPath.GetPath();
+            var files = Directory.EnumerateFiles(path, "*.rpx", SearchOption.AllDirectories);
+
+            var list = new List<TitleInfoEntry>();
+
+            foreach (var file in files) {
+                var entry = new TitleInfoEntry(file);
+                entry.CacheTheme();
+                list.Add(entry);
+            }
+
+            TitleInfoEntries = new CollectionView(list);
+
+            CacheUpdateEnabled = true;
+            RaisePropertyChangedEvent("CacheUpdateEnabled");
+        }
     }
 }
