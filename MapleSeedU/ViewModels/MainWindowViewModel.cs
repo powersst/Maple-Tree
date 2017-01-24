@@ -8,6 +8,7 @@
 using System;
 using System.IO;
 using System.Net;
+using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using MapleSeedU.Models;
 
@@ -71,6 +72,9 @@ namespace MapleSeedU.ViewModels
             }
         }
 
+        public ICommand CacheUpdateCommand => new CommandHandler(CacheUpdate);
+        public ICommand PlayTitleCommand => new CommandHandler(PlayTitle);
+
         private void UpdateDatabase()
         {
             if (File.Exists(DbFile) && DateTime.Now <= new FileInfo(DbFile).LastWriteTime.AddDays(1)) return;
@@ -88,9 +92,11 @@ namespace MapleSeedU.ViewModels
             Instance.RaisePropertyChangedEvent("LogText");
         }
 
-        protected override void MyAction()
+        private void PlayTitle()
         {
             TitleInfoEntry.PlayTitle();
         }
+
+        private void CacheUpdate() {}
     }
 }

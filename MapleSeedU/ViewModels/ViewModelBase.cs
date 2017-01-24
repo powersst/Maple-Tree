@@ -2,6 +2,7 @@
 // File: ViewModelBase.cs
 // Updated By: Jared
 // 
+
 #pragma warning disable CS0067 // Naming Styles
 
 #region usings
@@ -16,17 +17,6 @@ namespace MapleSeedU.ViewModels
 {
     public abstract class ViewModelBase : INotifyPropertyChanged
     {
-
-        protected ViewModelBase()
-        {
-            _canExecute = true;
-        }
-
-        private readonly bool _canExecute;
-        private ICommand _clickCommand;
-        public ICommand ClickCommand => _clickCommand ?? (_clickCommand = new CommandHandler(MyAction, _canExecute));
-        protected abstract void MyAction();
-
         #region INotifyPropertyChanged Members
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -45,7 +35,7 @@ namespace MapleSeedU.ViewModels
         private readonly Action _action;
         private readonly bool _canExecute;
 
-        public CommandHandler(Action action, bool canExecute)
+        public CommandHandler(Action action, bool canExecute = true)
         {
             _action = action;
             _canExecute = canExecute;
@@ -57,12 +47,12 @@ namespace MapleSeedU.ViewModels
         {
             return _canExecute;
         }
-        
+
         public void Execute(object parameter)
         {
             _action();
         }
-        
+
         public event EventHandler CanExecuteChanged;
 
         #endregion
