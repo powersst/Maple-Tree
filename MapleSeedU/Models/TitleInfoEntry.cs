@@ -83,7 +83,7 @@ namespace MapleSeedU.Models
         private void Save()
         {
             if (!Directory.Exists(CacheLocation)) Directory.CreateDirectory(CacheLocation);
-            using (Stream stream = new FileStream(Path.Combine(CacheLocation, TitleID), FileMode.Create, FileAccess.Write, FileShare.None)) {
+            using (Stream stream = new FileStream(Path.Combine(CacheLocation, TitleID), FileMode.Create, FileAccess.Write, FileShare.Read)) {
                 IFormatter formatter = new BinaryFormatter();
                 formatter.Serialize(stream, this);
             }
@@ -188,8 +188,10 @@ namespace MapleSeedU.Models
 
             if (CachedColor.IsEmpty)
                 CachedColor = ImageAnalysis.GetRandomColour(bmp);
-
+            
             Save();
+
+            MainWindowViewModel.WriteLine(MainWindowViewModel.Instance.Status = $"Generating theme for {Name}, complete!");
         }
 
         public override string ToString()

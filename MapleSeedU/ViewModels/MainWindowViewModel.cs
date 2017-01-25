@@ -10,9 +10,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using MapleSeedU.Models;
 
 #endregion
@@ -32,14 +35,17 @@ namespace MapleSeedU.ViewModels
 
         public MainWindowViewModel()
         {
+            new DispatcherTimer(TimeSpan.Zero, DispatcherPriority.ApplicationIdle, dispatcherTimer_Tick,
+                Application.Current.Dispatcher);
+
             if (Instance == null)
                 Instance = this;
 
             UpdateDatabase();
 
-            Status = $"Library Path = {LibraryPath.GetPath()}";
+            Instance.LoadCache();
 
-            LoadCache();
+            Status = $"Library Path = {LibraryPath.GetPath()}";
         }
 
         public string Status {
@@ -78,9 +84,37 @@ namespace MapleSeedU.ViewModels
         public BitmapSource BackgroundImage => ImageAnalysis.FromBytes(TitleInfoEntry?.BootTex);
 
         public ICommand PlayTitleCommand => new CommandHandler(PlayTitle);
-        public ICommand CacheUpdateCommand => new CommandHandler(()=> CacheUpdate(true));
+        public ICommand CacheUpdateCommand => new CommandHandler(async () => await ThemeUpdate(true), CacheUpdateEnabled);
 
         public bool CacheUpdateEnabled { get; set; } = true;
+
+        private int _progressBarMax { get; set; } = 100;
+
+        public int ProgressBarMax {
+            get { return _progressBarMax; }
+            set {
+                _progressBarMax = value;
+                RaisePropertyChangedEvent("ProgressBarMax");
+            }
+        }
+
+        private int _progressBarCurrent { get; set; } = 100;
+
+        public int ProgressBarCurrent {
+            get { return _progressBarCurrent; }
+            set {
+                _progressBarCurrent = value;
+                RaisePropertyChangedEvent("ProgressBarCurrent");
+            }
+        }
+
+        private static async void dispatcherTimer_Tick(object sender, EventArgs e)
+        {
+            if (Instance.TitleInfoEntries == null || Instance.TitleInfoEntries.Count == 0)
+                await Instance.ThemeUpdate(true);
+
+            (sender as DispatcherTimer)?.Stop();
+        }
 
         private void UpdateDatabase()
         {
@@ -104,15 +138,24 @@ namespace MapleSeedU.ViewModels
             TitleInfoEntry.PlayTitle();
         }
 
-        private void LoadCache()
+        private async Task LoadCache()
         {
+            ProgressBarCurrent = 0;
             CacheUpdateEnabled = false;
             RaisePropertyChangedEvent("CacheUpdateEnabled");
 
-            var path = Path.Combine(Path.GetTempPath(), "MapleTree");
-            var files = Directory.GetFiles(path);
-            var list = files.Select(TitleInfoEntry.LoadCache).ToList();
-            list.Sort((t1, t2) => string.Compare(t1.Name, t2.Name, StringComparison.Ordinal));
+            var list = new List<TitleInfoEntry>();
+
+            await Task.Run(() => {
+                var files = Directory.GetFiles(Path.Combine(Path.GetTempPath(), "MapleTree"));
+                ProgressBarMax = files.Length;
+
+                foreach (var file in files) {
+                    list.Add(TitleInfoEntry.LoadCache(file));
+                    ProgressBarCurrent++;
+                }
+                list.Sort((t1, t2) => string.Compare(t1.Name, t2.Name, StringComparison.Ordinal));
+            });
 
             TitleInfoEntries = new CollectionView(list);
 
@@ -120,27 +163,31 @@ namespace MapleSeedU.ViewModels
             RaisePropertyChangedEvent("CacheUpdateEnabled");
         }
 
-        private void CacheUpdate(bool forceUpdate = false)
+        private async Task ThemeUpdate(bool forceUpdate = false)
         {
+            ProgressBarCurrent = 0;
             CacheUpdateEnabled = false;
             RaisePropertyChangedEvent("CacheUpdateEnabled");
 
-            var path = LibraryPath.GetPath();
-            var files = Directory.EnumerateFiles(path, "*.rpx", SearchOption.AllDirectories);
-
             var list = new List<TitleInfoEntry>();
 
-            foreach (var file in files) {
-                TitleInfoEntry cached;
-                var entry = new TitleInfoEntry(file);
-                if ((cached = entry.Load()) == null) {
-                    entry.CacheTheme();
-                    list.Add(entry);
+            await Task.Run(() => {
+                var files = Directory.GetFiles(LibraryPath.GetPath(), "*.rpx", SearchOption.AllDirectories);
+                ProgressBarMax = files.Length;
+
+                foreach (var file in files) {
+                    var entry = new TitleInfoEntry(file);
+
+                    if (forceUpdate) {
+                        entry.CacheTheme();
+                        list.Add(entry);
+                    }
+                    else {
+                        list.Add(entry);
+                    }
+                    ProgressBarCurrent++;
                 }
-                else {
-                    list.Add(cached);
-                }
-            }
+            });
 
             TitleInfoEntries = new CollectionView(list);
 
