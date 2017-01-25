@@ -13,7 +13,7 @@
 
     <Grid>
         <Image Source="{Binding BackgroundImage}" Height="auto" Width="auto" Margin="0,0,0,58"/>
-        <Rectangle Fill="#4C000000" Height="auto" Width="auto" Margin="0,0,0,58"/>
+        <Rectangle Fill="#26000000" Height="auto" Width="auto" Margin="0,0,0,58"/>
 
         <Label Content="{Binding Status, UpdateSourceTrigger=PropertyChanged}" Foreground="Gray" HorizontalAlignment="Left" Margin="0,0,0,4" VerticalAlignment="Bottom"/>
         <ProgressBar Margin="0,0,0,30" Height="28" VerticalAlignment="Bottom" Value="100" Background="{x:Null}" BorderBrush="{x:Null}"/>
@@ -34,7 +34,7 @@
                 </Paragraph>
             </FlowDocument>
         </RichTextBox>
-        <Button Command="{Binding CacheUpdateCommand}" IsEnabled="{Binding CacheUpdateEnabled, UpdateSourceTrigger=PropertyChanged}" Content="Refresh" HorizontalAlignment="Right" Margin="0,0,10,2" VerticalAlignment="Bottom" Width="67" Height="12" FontWeight="Bold"/>
+        <Button Command="{Binding CacheUpdateCommand}" IsEnabled="{Binding CacheUpdateEnabled, UpdateSourceTrigger=PropertyChanged}" Content="ReCache" HorizontalAlignment="Right" Margin="0,0,10,2" VerticalAlignment="Bottom" Width="67" Height="12" FontWeight="Bold"/>
         
     </Grid>
 </Controls:MetroWindow>

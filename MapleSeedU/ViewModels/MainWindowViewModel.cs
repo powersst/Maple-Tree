@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -37,10 +38,20 @@ namespace MapleSeedU.ViewModels
             UpdateDatabase();
 
             Status = $"Library Path = {LibraryPath.GetPath()}";
+
+            LoadCache();
+        }
+
+        public string Status {
+            get { return _status; }
+            set {
+                _status = value;
+                RaisePropertyChangedEvent("Status");
+            }
         }
 
         public string LogText { get; set; }
-        
+
         public CemuPath CemuPath => new CemuPath();
 
         public LibraryPath LibraryPath => new LibraryPath();
@@ -64,18 +75,10 @@ namespace MapleSeedU.ViewModels
             }
         }
 
-        public BitmapSource BackgroundImage => TitleInfoEntry?.BootTex;
-
-        public string Status {
-            get { return _status; }
-            set {
-                _status = value;
-                RaisePropertyChangedEvent("Status");
-            }
-        }
+        public BitmapSource BackgroundImage => ImageAnalysis.FromBytes(TitleInfoEntry?.BootTex);
 
         public ICommand PlayTitleCommand => new CommandHandler(PlayTitle);
-        public ICommand CacheUpdateCommand => new CommandHandler(CacheUpdate);
+        public ICommand CacheUpdateCommand => new CommandHandler(()=> CacheUpdate(true));
 
         public bool CacheUpdateEnabled { get; set; } = true;
 
@@ -101,7 +104,23 @@ namespace MapleSeedU.ViewModels
             TitleInfoEntry.PlayTitle();
         }
 
-        private void CacheUpdate()
+        private void LoadCache()
+        {
+            CacheUpdateEnabled = false;
+            RaisePropertyChangedEvent("CacheUpdateEnabled");
+
+            var path = Path.Combine(Path.GetTempPath(), "MapleTree");
+            var files = Directory.GetFiles(path);
+            var list = files.Select(TitleInfoEntry.LoadCache).ToList();
+            list.Sort((t1, t2) => string.Compare(t1.Name, t2.Name, StringComparison.Ordinal));
+
+            TitleInfoEntries = new CollectionView(list);
+
+            CacheUpdateEnabled = true;
+            RaisePropertyChangedEvent("CacheUpdateEnabled");
+        }
+
+        private void CacheUpdate(bool forceUpdate = false)
         {
             CacheUpdateEnabled = false;
             RaisePropertyChangedEvent("CacheUpdateEnabled");
@@ -112,9 +131,15 @@ namespace MapleSeedU.ViewModels
             var list = new List<TitleInfoEntry>();
 
             foreach (var file in files) {
+                TitleInfoEntry cached;
                 var entry = new TitleInfoEntry(file);
-                entry.CacheTheme();
-                list.Add(entry);
+                if ((cached = entry.Load()) == null) {
+                    entry.CacheTheme();
+                    list.Add(entry);
+                }
+                else {
+                    list.Add(cached);
+                }
             }
 
             TitleInfoEntries = new CollectionView(list);

@@ -15,6 +15,26 @@ namespace MapleSeedU.Models
 {
     public static class ImageAnalysis
     {
+        public static byte[] ToBytes(this BitmapSource bitmapSource)
+        {
+            if (bitmapSource == null) return null;
+            using (var stream = new MemoryStream()) {
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
+                encoder.Save(stream);
+                return stream.ToArray();
+            }
+        }
+
+        public static BitmapSource FromBytes(byte[] data)
+        {
+            if (data == null) return null;
+            var stream = new MemoryStream(data);
+            var decoder = new PngBitmapDecoder(stream, BitmapCreateOptions.PreservePixelFormat,
+                BitmapCacheOption.OnDemand);
+            return decoder.Frames[0];
+        }
+
         private static Bitmap GetBitmap(BitmapSource source)
         {
             var bmp = new Bitmap(
@@ -53,11 +73,13 @@ namespace MapleSeedU.Models
                 }
         }
 
-        private static void SaveImage(BitmapSource bmp, string filename)
+        public static void SaveImage(BitmapSource bmp, string filename)
         {
-            var encoder = new PngBitmapEncoder();
-            encoder.Frames.Add(BitmapFrame.Create(bmp));
-            encoder.Save(File.OpenWrite(filename));
+            using (var fs = File.OpenWrite(filename)) {
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(bmp));
+                encoder.Save(fs);
+            }
         }
     }
 }

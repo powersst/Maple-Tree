@@ -12,6 +12,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -22,10 +24,13 @@ using TgaLib;
 
 namespace MapleSeedU.Models
 {
+    [Serializable]
     public class TitleInfoEntry
     {
         public TitleInfoEntry(string fullPath)
         {
+            Raw = fullPath;
+
             var folder = Path.GetDirectoryName(BootFile = fullPath);
             Root = Path.GetDirectoryName(folder); //get parent
 
@@ -35,16 +40,54 @@ namespace MapleSeedU.Models
             SetTitleID();
             SetTitleKey();
         }
-
-        private string Name { get; }
+        
+        public byte[] BootTex { get; private set; }
+        private string Raw { get; }
+        public string Name { get; }
         private string Root { get; }
         private string BootFile { get; }
         private string TitleID { get; set; }
         private string TitleKey { get; set; }
         private string Region { get; set; }
         private string Version { get; set; }
-        public BitmapSource BootTex { get; set; }
         private System.Drawing.Color CachedColor { get; set; }
+        private string CacheLocation => Path.GetFullPath(Path.Combine(Path.GetTempPath(), "MapleTree"));
+
+        public static TitleInfoEntry LoadCache(string fullpath)
+        {
+            if (!Directory.Exists(Path.GetDirectoryName(fullpath))) {
+                var path = Path.GetDirectoryName(fullpath);
+                if (string.IsNullOrEmpty(path)) return null;
+                Directory.CreateDirectory(path);
+            }
+
+            using (Stream stream = new FileStream(fullpath, FileMode.Open, FileAccess.Read, FileShare.Read)) {
+                IFormatter formatter = new BinaryFormatter();
+                var tie = (TitleInfoEntry)formatter.Deserialize(stream);
+                return tie;
+            }
+        }
+
+        public TitleInfoEntry Load()
+        {
+            if (!Directory.Exists(CacheLocation)) Directory.CreateDirectory(CacheLocation);
+            if (!File.Exists(Path.Combine(CacheLocation, TitleID))) return null;
+
+            using (Stream stream = new FileStream(Path.Combine(CacheLocation, TitleID), FileMode.Open, FileAccess.Read, FileShare.Read)) {
+                IFormatter formatter = new BinaryFormatter();
+                var tie = (TitleInfoEntry)formatter.Deserialize(stream);
+                return tie;
+            }
+        }
+
+        private void Save()
+        {
+            if (!Directory.Exists(CacheLocation)) Directory.CreateDirectory(CacheLocation);
+            using (Stream stream = new FileStream(Path.Combine(CacheLocation, TitleID), FileMode.Create, FileAccess.Write, FileShare.None)) {
+                IFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(stream, this);
+            }
+        }
 
         public async void PlayTitle()
         {
@@ -123,7 +166,7 @@ namespace MapleSeedU.Models
                 using (var fs = new FileStream(bootTvTexTGA, FileMode.Open, FileAccess.Read, FileShare.Read))
                 using (var reader = new BinaryReader(fs)) {
                     var tga = new TgaImage(reader);
-                    BootTex = tga.GetBitmap();
+                    BootTex = tga.GetBitmap().ToBytes();
                 }
             }
         }
@@ -141,8 +184,12 @@ namespace MapleSeedU.Models
         {
             SetBootTex();
 
+            var bmp = ImageAnalysis.FromBytes(BootTex);
+
             if (CachedColor.IsEmpty)
-                CachedColor = ImageAnalysis.GetRandomColour(BootTex);
+                CachedColor = ImageAnalysis.GetRandomColour(bmp);
+
+            Save();
         }
 
         public override string ToString()
