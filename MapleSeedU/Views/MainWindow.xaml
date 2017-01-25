@@ -12,6 +12,9 @@
     </Controls:MetroWindow.DataContext>
 
     <Grid>
+        <Grid.Background>
+            <ImageBrush/>
+        </Grid.Background>
         <Image Source="{Binding BackgroundImage}" Height="auto" Width="auto" Margin="0,0,0,58"/>
 
         <RichTextBox HorizontalAlignment="Left" Height="415" Margin="10,10,0,0" VerticalAlignment="Top" Width="795" Background="{x:Null}" BorderThickness="0" IsReadOnly="True" Cursor="Arrow">

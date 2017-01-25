@@ -367,5 +367,8 @@
   <ItemGroup>
     <Resource Include="Seed.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\wiiu.jpg" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

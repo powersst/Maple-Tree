@@ -74,6 +74,7 @@ namespace MapleSeedU.ViewModels
         public BitmapSource BackgroundImage => ImageAnalysis.FromBytes(TitleInfoEntry?.BootTex);
 
         public ICommand PlayTitleCommand => new CommandHandler(PlayTitle);
+
         public ICommand CacheUpdateCommand => new CommandHandler(async () => await ThemeUpdate());
 
         public bool CacheUpdateEnabled { get; set; } = true;
