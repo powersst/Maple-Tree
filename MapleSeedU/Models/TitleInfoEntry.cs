@@ -2,22 +2,22 @@
 // File: TitleInfoEntry.cs
 // Updated By: Jared
 // 
+
 #pragma warning disable IDE1006 // Naming Styles
 
 #region usings
 
-using MapleSeedU.ViewModels;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Xml;
+using MapleSeedU.ViewModels;
+using Newtonsoft.Json;
 using TgaLib;
 
 #endregion
@@ -40,7 +40,7 @@ namespace MapleSeedU.Models
             SetTitleID();
             SetTitleKey();
         }
-        
+
         public byte[] BootTex { get; private set; }
         private string Raw { get; }
         public string Name { get; }
@@ -50,20 +50,26 @@ namespace MapleSeedU.Models
         private string TitleKey { get; set; }
         private string Region { get; set; }
         private string Version { get; set; }
-        private System.Drawing.Color CachedColor { get; set; }
-        private string CacheLocation => Path.GetFullPath(Path.Combine(Path.GetTempPath(), "MapleTree"));
-
-        public static TitleInfoEntry LoadCache(string fullpath)
+        private Color CachedColor { get; set; }
+        private static string CacheLocation => Path.GetFullPath(Path.Combine(Path.GetTempPath(), "MapleTree"));
+        
+        public static TitleInfoEntry LoadCache(string path, bool isCached)
         {
-            if (!Directory.Exists(Path.GetDirectoryName(fullpath))) {
-                var path = Path.GetDirectoryName(fullpath);
-                if (string.IsNullOrEmpty(path)) return null;
-                Directory.CreateDirectory(path);
+            if (!isCached) {
+                var entry = new TitleInfoEntry(path);
+                entry.CacheTheme();
+                return entry;
             }
 
-            using (Stream stream = new FileStream(fullpath, FileMode.Open, FileAccess.Read, FileShare.Read)) {
+            if (!Directory.Exists(Path.GetDirectoryName(path))) {
+                var dir = Path.GetDirectoryName(path);
+                if (string.IsNullOrEmpty(dir)) return null;
+                Directory.CreateDirectory(dir);
+            }
+
+            using (Stream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
                 IFormatter formatter = new BinaryFormatter();
-                var tie = (TitleInfoEntry)formatter.Deserialize(stream);
+                var tie = (TitleInfoEntry) formatter.Deserialize(stream);
                 return tie;
             }
         }
@@ -73,9 +79,11 @@ namespace MapleSeedU.Models
             if (!Directory.Exists(CacheLocation)) Directory.CreateDirectory(CacheLocation);
             if (!File.Exists(Path.Combine(CacheLocation, TitleID))) return null;
 
-            using (Stream stream = new FileStream(Path.Combine(CacheLocation, TitleID), FileMode.Open, FileAccess.Read, FileShare.Read)) {
+            using (
+                Stream stream = new FileStream(Path.Combine(CacheLocation, TitleID), FileMode.Open, FileAccess.Read,
+                    FileShare.Read)) {
                 IFormatter formatter = new BinaryFormatter();
-                var tie = (TitleInfoEntry)formatter.Deserialize(stream);
+                var tie = (TitleInfoEntry) formatter.Deserialize(stream);
                 return tie;
             }
         }
@@ -83,10 +91,18 @@ namespace MapleSeedU.Models
         private void Save()
         {
             if (!Directory.Exists(CacheLocation)) Directory.CreateDirectory(CacheLocation);
-            using (Stream stream = new FileStream(Path.Combine(CacheLocation, TitleID), FileMode.Create, FileAccess.Write, FileShare.Read)) {
+            using (
+                Stream stream = new FileStream(Path.Combine(CacheLocation, TitleID), FileMode.Create, FileAccess.Write,
+                    FileShare.Read)) {
                 IFormatter formatter = new BinaryFormatter();
                 formatter.Serialize(stream, this);
             }
+        }
+
+        public static void ClearCache()
+        {
+            foreach(var file in Directory.EnumerateFiles(CacheLocation))
+                File.Delete(file);
         }
 
         public async void PlayTitle()
@@ -175,8 +191,9 @@ namespace MapleSeedU.Models
         {
             CacheTheme();
 
-            ThemeManagerHelper.CreateAppStyleBy(Color.FromArgb(CachedColor.A, CachedColor.R, CachedColor.G, CachedColor.B));
-            
+            ThemeManagerHelper.CreateAppStyleBy(System.Windows.Media.Color.FromArgb(CachedColor.A, CachedColor.R,
+                CachedColor.G, CachedColor.B));
+
             MainWindowViewModel.Instance.Status = Root;
         }
 
@@ -188,10 +205,10 @@ namespace MapleSeedU.Models
 
             if (CachedColor.IsEmpty)
                 CachedColor = ImageAnalysis.GetRandomColour(bmp);
-            
-            Save();
 
-            MainWindowViewModel.WriteLine(MainWindowViewModel.Instance.Status = $"Generating theme for {Name}, complete!");
+            Save();
+            
+            MainWindowViewModel.WriteLine(MainWindowViewModel.Instance.Status = $"Caching theme for {Name}, complete!");
         }
 
         public override string ToString()

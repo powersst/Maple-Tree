@@ -35,15 +35,14 @@ namespace MapleSeedU.ViewModels
 
         public MainWindowViewModel()
         {
-            new DispatcherTimer(TimeSpan.Zero, DispatcherPriority.ApplicationIdle, dispatcherTimer_Tick,
+            var dispatcherTimer = new DispatcherTimer(TimeSpan.Zero, 
+                DispatcherPriority.ApplicationIdle, dispatcherTimer_Tick,
                 Application.Current.Dispatcher);
 
             if (Instance == null)
                 Instance = this;
 
             UpdateDatabase();
-
-            Instance.LoadCache();
 
             Status = $"Library Path = {LibraryPath.GetPath()}";
         }
@@ -151,7 +150,7 @@ namespace MapleSeedU.ViewModels
                 ProgressBarMax = files.Length;
 
                 foreach (var file in files) {
-                    list.Add(TitleInfoEntry.LoadCache(file));
+                    list.Add(TitleInfoEntry.LoadCache(file, true));
                     ProgressBarCurrent++;
                 }
                 list.Sort((t1, t2) => string.Compare(t1.Name, t2.Name, StringComparison.Ordinal));
@@ -163,7 +162,7 @@ namespace MapleSeedU.ViewModels
             RaisePropertyChangedEvent("CacheUpdateEnabled");
         }
 
-        private async Task ThemeUpdate(bool forceUpdate = false)
+        private async Task ThemeUpdate(bool forceUpdate)
         {
             ProgressBarCurrent = 0;
             CacheUpdateEnabled = false;
@@ -171,20 +170,17 @@ namespace MapleSeedU.ViewModels
 
             var list = new List<TitleInfoEntry>();
 
+            if (forceUpdate)
+                TitleInfoEntry.ClearCache();
+
             await Task.Run(() => {
                 var files = Directory.GetFiles(LibraryPath.GetPath(), "*.rpx", SearchOption.AllDirectories);
+
                 ProgressBarMax = files.Length;
 
                 foreach (var file in files) {
-                    var entry = new TitleInfoEntry(file);
+                    list.Add(TitleInfoEntry.LoadCache(file, false));
 
-                    if (forceUpdate) {
-                        entry.CacheTheme();
-                        list.Add(entry);
-                    }
-                    else {
-                        list.Add(entry);
-                    }
                     ProgressBarCurrent++;
                 }
             });
