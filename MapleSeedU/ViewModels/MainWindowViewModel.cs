@@ -8,11 +8,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
@@ -29,14 +27,13 @@ namespace MapleSeedU.ViewModels
         public readonly string DbFile = Path.Combine(Path.GetTempPath(), "MapleTree.json");
 
         private string _status = "Github.com/Tsume/Maple-Tree";
-        private CollectionView _titleInfoEntries;
 
         private TitleInfoEntry _titleInfoEntry;
 
         public MainWindowViewModel()
         {
-            var dispatcherTimer = new DispatcherTimer(TimeSpan.Zero, 
-                DispatcherPriority.ApplicationIdle, dispatcherTimer_Tick,
+            var dispatcherTimer = new DispatcherTimer(TimeSpan.Zero,
+                DispatcherPriority.ApplicationIdle, OnLoadComplete,
                 Application.Current.Dispatcher);
 
             if (Instance == null)
@@ -59,15 +56,9 @@ namespace MapleSeedU.ViewModels
 
         public CemuPath CemuPath => new CemuPath();
 
-        public LibraryPath LibraryPath => new LibraryPath();
+        private LibraryPath LibraryPath => new LibraryPath();
 
-        public CollectionView TitleInfoEntries {
-            get { return _titleInfoEntries; }
-            set {
-                _titleInfoEntries = value;
-                RaisePropertyChangedEvent("TitleInfoEntries");
-            }
-        }
+        public List<TitleInfoEntry> TitleInfoEntries => TitleInfoEntry.Entries;
 
         public TitleInfoEntry TitleInfoEntry {
             get { return _titleInfoEntry; }
@@ -83,7 +74,7 @@ namespace MapleSeedU.ViewModels
         public BitmapSource BackgroundImage => ImageAnalysis.FromBytes(TitleInfoEntry?.BootTex);
 
         public ICommand PlayTitleCommand => new CommandHandler(PlayTitle);
-        public ICommand CacheUpdateCommand => new CommandHandler(async () => await ThemeUpdate(true), CacheUpdateEnabled);
+        public ICommand CacheUpdateCommand => new CommandHandler(async () => await ThemeUpdate());
 
         public bool CacheUpdateEnabled { get; set; } = true;
 
@@ -107,12 +98,23 @@ namespace MapleSeedU.ViewModels
             }
         }
 
-        private static async void dispatcherTimer_Tick(object sender, EventArgs e)
+        private void LockControls()
         {
-            if (Instance.TitleInfoEntries == null || Instance.TitleInfoEntries.Count == 0)
-                await Instance.ThemeUpdate(true);
+            CacheUpdateEnabled = false;
+            RaisePropertyChangedEvent("CacheUpdateEnabled");
+        }
 
+        private void UnlockControls()
+        {
+            CacheUpdateEnabled = true;
+            RaisePropertyChangedEvent("CacheUpdateEnabled");
+            RaisePropertyChangedEvent("TitleInfoEntries");
+        }
+
+        private static async void OnLoadComplete(object sender, EventArgs e)
+        {
             (sender as DispatcherTimer)?.Stop();
+            await Instance.LoadCache();
         }
 
         private void UpdateDatabase()
@@ -140,55 +142,52 @@ namespace MapleSeedU.ViewModels
         private async Task LoadCache()
         {
             ProgressBarCurrent = 0;
-            CacheUpdateEnabled = false;
-            RaisePropertyChangedEvent("CacheUpdateEnabled");
-
-            var list = new List<TitleInfoEntry>();
+            LockControls();
 
             await Task.Run(() => {
                 var files = Directory.GetFiles(Path.Combine(Path.GetTempPath(), "MapleTree"));
                 ProgressBarMax = files.Length;
 
-                foreach (var file in files) {
-                    list.Add(TitleInfoEntry.LoadCache(file, true));
-                    ProgressBarCurrent++;
-                }
-                list.Sort((t1, t2) => string.Compare(t1.Name, t2.Name, StringComparison.Ordinal));
+                var list = new TitleInfoEntry[ProgressBarMax = files.Length];
+
+                for (var i = 0; i < files.Length; i++)
+                    try {
+                        var file = files[i];
+                        list[i] = TitleInfoEntry.LoadCache(file, true);
+                        ProgressBarCurrent++;
+                    }
+                    catch (Exception e) {
+                        WriteLine(e.StackTrace);
+                    }
+
+                TitleInfoEntry.Entries = new List<TitleInfoEntry>(list);
+                TitleInfoEntry.Entries.Sort((t1, t2) => string.Compare(t1.Name, t2.Name, StringComparison.Ordinal));
             });
 
-            TitleInfoEntries = new CollectionView(list);
-
-            CacheUpdateEnabled = true;
-            RaisePropertyChangedEvent("CacheUpdateEnabled");
+            UnlockControls();
         }
 
-        private async Task ThemeUpdate(bool forceUpdate)
+        private async Task ThemeUpdate()
         {
             ProgressBarCurrent = 0;
-            CacheUpdateEnabled = false;
-            RaisePropertyChangedEvent("CacheUpdateEnabled");
-
-            var list = new List<TitleInfoEntry>();
-
-            if (forceUpdate)
-                TitleInfoEntry.ClearCache();
+            LockControls();
 
             await Task.Run(() => {
                 var files = Directory.GetFiles(LibraryPath.GetPath(), "*.rpx", SearchOption.AllDirectories);
 
-                ProgressBarMax = files.Length;
+                var list = new TitleInfoEntry[ProgressBarMax = files.Length];
 
-                foreach (var file in files) {
-                    list.Add(TitleInfoEntry.LoadCache(file, false));
-
+                for (var i = 0; i < files.Length; i++) {
+                    var file = files[i];
+                    list[i] = TitleInfoEntry.LoadCache(file, false);
                     ProgressBarCurrent++;
                 }
+
+                TitleInfoEntry.Entries = new List<TitleInfoEntry>(list);
             });
 
-            TitleInfoEntries = new CollectionView(list);
-
-            CacheUpdateEnabled = true;
-            RaisePropertyChangedEvent("CacheUpdateEnabled");
+            TitleInfoEntry = TitleInfoEntry.Entries[0];
+            UnlockControls();
         }
     }
 }

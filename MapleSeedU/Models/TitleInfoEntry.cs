@@ -27,7 +27,7 @@ namespace MapleSeedU.Models
     [Serializable]
     public class TitleInfoEntry
     {
-        public TitleInfoEntry(string fullPath)
+        private TitleInfoEntry(string fullPath)
         {
             Raw = fullPath;
 
@@ -41,6 +41,8 @@ namespace MapleSeedU.Models
             SetTitleKey();
         }
 
+        public static List<TitleInfoEntry> Entries { get; set; }
+
         public byte[] BootTex { get; private set; }
         private string Raw { get; }
         public string Name { get; }
@@ -51,6 +53,7 @@ namespace MapleSeedU.Models
         private string Region { get; set; }
         private string Version { get; set; }
         private Color CachedColor { get; set; }
+        private bool IsCached { get; set; }
         private static string CacheLocation => Path.GetFullPath(Path.Combine(Path.GetTempPath(), "MapleTree"));
         
         public static TitleInfoEntry LoadCache(string path, bool isCached)
@@ -67,6 +70,7 @@ namespace MapleSeedU.Models
                 Directory.CreateDirectory(dir);
             }
 
+            if (!File.Exists(path) || new FileInfo(path).Length == 0) return null;
             using (Stream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
                 IFormatter formatter = new BinaryFormatter();
                 var tie = (TitleInfoEntry) formatter.Deserialize(stream);
@@ -97,12 +101,6 @@ namespace MapleSeedU.Models
                 IFormatter formatter = new BinaryFormatter();
                 formatter.Serialize(stream, this);
             }
-        }
-
-        public static void ClearCache()
-        {
-            foreach(var file in Directory.EnumerateFiles(CacheLocation))
-                File.Delete(file);
         }
 
         public async void PlayTitle()
@@ -197,8 +195,10 @@ namespace MapleSeedU.Models
             MainWindowViewModel.Instance.Status = Root;
         }
 
-        public void CacheTheme()
+        private void CacheTheme()
         {
+            if (IsCached) return;
+
             SetBootTex();
 
             var bmp = ImageAnalysis.FromBytes(BootTex);
@@ -207,8 +207,9 @@ namespace MapleSeedU.Models
                 CachedColor = ImageAnalysis.GetRandomColour(bmp);
 
             Save();
-            
-            MainWindowViewModel.WriteLine(MainWindowViewModel.Instance.Status = $"Caching theme for {Name}, complete!");
+
+            IsCached = true;
+            MainWindowViewModel.Instance.Status = $"Loading theme, {Name}";
         }
 
         public override string ToString()
