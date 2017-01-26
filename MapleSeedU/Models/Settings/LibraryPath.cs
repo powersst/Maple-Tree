@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 #endregion
 
-namespace MapleSeedU.Models
+namespace MapleSeedU.Models.Settings
 {
     public class LibraryPath
     {
@@ -37,7 +37,7 @@ namespace MapleSeedU.Models
             return _libraryPath.Value;
         }
 
-        private void ResetPath()
+        public void ResetPath()
         {
             _libraryPath.DeleteKey("LibraryPath");
         }

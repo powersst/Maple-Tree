@@ -97,9 +97,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Helper.cs" />
-    <Compile Include="Models\CemuPath.cs" />
+    <Compile Include="Models\Settings\CemuPath.cs" />
     <Compile Include="Models\ConfigurationEntry.cs" />
-    <Compile Include="Models\LibraryPath.cs" />
+    <Compile Include="Models\Settings\LibraryPath.cs" />
     <Compile Include="Models\ImageAnalysis.cs" />
     <Compile Include="Models\RegistryKeyEntry.cs" />
     <Compile Include="Models\ThemeManagerHelper.cs" />

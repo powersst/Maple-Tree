@@ -40,6 +40,7 @@
         <Button Command="{Binding PlayTitleCommand}" Content="Play!" HorizontalAlignment="Right" Margin="0,0,10,63" VerticalAlignment="Bottom" Width="67" Height="26"/>
         <Button Content="Update" Margin="0,0,82,63" VerticalAlignment="Bottom" Width="64" Height="26" HorizontalAlignment="Right" IsEnabled="False"/>
         <Button Command="{Binding CacheUpdateCommand}" IsEnabled="{Binding CacheUpdateEnabled, UpdateSourceTrigger=PropertyChanged}" Content="ReCache" HorizontalAlignment="Right" Margin="0,0,10,2" VerticalAlignment="Bottom" Width="67" Height="12" FontWeight="Bold"/>
+        <Button Command="{Binding ResetCommand}" Content="Reset" HorizontalAlignment="Right" Margin="0,0,80,2" VerticalAlignment="Bottom" Width="67" Height="12" FontWeight="Bold"/>
 
     </Grid>
 </Controls:MetroWindow>

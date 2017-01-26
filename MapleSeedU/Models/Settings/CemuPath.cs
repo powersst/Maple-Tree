@@ -6,7 +6,7 @@
 using System.IO;
 using System.Windows.Forms;
 
-namespace MapleSeedU.Models
+namespace MapleSeedU.Models.Settings
 {
     public class CemuPath
     {
@@ -38,7 +38,7 @@ namespace MapleSeedU.Models
             return _libraryPath.Value;
         }
 
-        private void ResetPath()
+        public void ResetPath()
         {
             _libraryPath.DeleteKey("CemuPath");
         }

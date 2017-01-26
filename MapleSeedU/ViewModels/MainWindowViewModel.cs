@@ -16,6 +16,7 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using MapleSeedU.Models;
+using MapleSeedU.Models.Settings;
 
 #endregion
 
@@ -41,8 +42,12 @@ namespace MapleSeedU.ViewModels
                 Instance = this;
 
             UpdateDatabase();
+        }
 
-            Status = $"Library Path = {LibraryPath.GetPath()}";
+        private void Reset()
+        {
+            CemuPath.ResetPath();
+            LibraryPath.ResetPath();
         }
 
         public string Status {
@@ -73,6 +78,8 @@ namespace MapleSeedU.ViewModels
         }
 
         public BitmapSource BackgroundImage => ImageAnalysis.FromBytes(TitleInfoEntry?.BootTex);
+
+        public ICommand ResetCommand => new CommandHandler(Reset);
 
         public ICommand PlayTitleCommand => new CommandHandler(PlayTitle);
 
@@ -116,6 +123,7 @@ namespace MapleSeedU.ViewModels
         private static async void OnLoadComplete(object sender, EventArgs e)
         {
             (sender as DispatcherTimer)?.Stop();
+            
             await Instance.ThemeUpdate();
         }
 
@@ -177,8 +185,9 @@ namespace MapleSeedU.ViewModels
             ProgressBarCurrent = 0;
             LockControls();
 
+            var files = Directory.GetFiles(LibraryPath.GetPath(), "*.rpx", SearchOption.AllDirectories);
+
             await Task.Run(() => {
-                var files = Directory.GetFiles(LibraryPath.GetPath(), "*.rpx", SearchOption.AllDirectories);
 
                 var list = new TitleInfoEntry[ProgressBarMax = files.Length];
 
@@ -205,6 +214,8 @@ namespace MapleSeedU.ViewModels
 
             TitleInfoEntry = TitleInfoEntry.Entries[0];
             UnlockControls();
+
+            Status = $"Library Path = {LibraryPath.GetPath()}";
         }
     }
 }
