@@ -23,7 +23,7 @@ namespace MapleSeedU.ViewModels
 
         #endregion
 
-        public void RaisePropertyChangedEvent(string propertyName)
+        protected void RaisePropertyChangedEvent(string propertyName)
         {
             var handler = PropertyChanged;
             handler?.Invoke(this, new PropertyChangedEventArgs(propertyName));

@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
@@ -65,7 +66,7 @@ namespace MapleSeedU.ViewModels
             set {
                 if (_titleInfoEntry == value) return;
                 _titleInfoEntry = value;
-                value.UpdateTheme();
+                value?.UpdateTheme();
                 RaisePropertyChangedEvent("TitleInfoEntry");
                 RaisePropertyChangedEvent("BackgroundImage");
             }
@@ -75,7 +76,7 @@ namespace MapleSeedU.ViewModels
 
         public ICommand PlayTitleCommand => new CommandHandler(PlayTitle);
 
-        public ICommand CacheUpdateCommand => new CommandHandler(async () => await ThemeUpdate());
+        public ICommand CacheUpdateCommand => new CommandHandler(async () => await ThemeUpdate(true));
 
         public bool CacheUpdateEnabled { get; set; } = true;
 
@@ -115,7 +116,7 @@ namespace MapleSeedU.ViewModels
         private static async void OnLoadComplete(object sender, EventArgs e)
         {
             (sender as DispatcherTimer)?.Stop();
-            await Instance.LoadCache();
+            await Instance.ThemeUpdate();
         }
 
         private void UpdateDatabase()
@@ -155,6 +156,7 @@ namespace MapleSeedU.ViewModels
                     try {
                         var file = files[i];
                         list[i] = TitleInfoEntry.LoadCache(file, true);
+                        list[i].IsCached = true;
                         ProgressBarCurrent++;
                     }
                     catch (Exception e) {
@@ -168,8 +170,10 @@ namespace MapleSeedU.ViewModels
             UnlockControls();
         }
 
-        private async Task ThemeUpdate()
+        private async Task ThemeUpdate(bool forceUpdate = false)
         {
+            await Instance.LoadCache();
+
             ProgressBarCurrent = 0;
             LockControls();
 
@@ -180,11 +184,23 @@ namespace MapleSeedU.ViewModels
 
                 for (var i = 0; i < files.Length; i++) {
                     var file = files[i];
+
+                    if (TitleInfoEntry.Entries == null) continue;
+                    var entries = TitleInfoEntry.Entries.FindAll(entry => entry.Raw == file).Count;
+                    if (entries > 0) continue;
+
                     list[i] = TitleInfoEntry.LoadCache(file, false);
+                    TitleInfoEntry.Entries?.Add(list[i]);
+
                     ProgressBarCurrent++;
                 }
 
-                TitleInfoEntry.Entries = new List<TitleInfoEntry>(list);
+                ProgressBarCurrent = 0;
+                if (TitleInfoEntry.Entries == null) return;
+                foreach (var t in TitleInfoEntry.Entries) {
+                    if (forceUpdate) t.CacheTheme(true);
+                    ProgressBarCurrent++;
+                }
             });
 
             TitleInfoEntry = TitleInfoEntry.Entries[0];

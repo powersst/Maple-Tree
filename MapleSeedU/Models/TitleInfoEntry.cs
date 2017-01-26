@@ -29,6 +29,9 @@ namespace MapleSeedU.Models
     {
         private TitleInfoEntry(string fullPath)
         {
+            if (Entries == null)
+                Entries = new List<TitleInfoEntry>();
+
             Raw = fullPath;
 
             var folder = Path.GetDirectoryName(BootFile = fullPath);
@@ -44,7 +47,7 @@ namespace MapleSeedU.Models
         public static List<TitleInfoEntry> Entries { get; set; }
 
         public byte[] BootTex { get; private set; }
-        private string Raw { get; }
+        public string Raw { get; }
         public string Name { get; }
         private string Root { get; }
         private string BootFile { get; }
@@ -53,9 +56,9 @@ namespace MapleSeedU.Models
         private string Region { get; set; }
         private string Version { get; set; }
         private Color CachedColor { get; set; }
-        private bool IsCached { get; set; }
+        internal bool IsCached { private get; set; }
         private static string CacheLocation => Path.GetFullPath(Path.Combine(Path.GetTempPath(), "MapleTree"));
-        
+
         public static TitleInfoEntry LoadCache(string path, bool isCached)
         {
             if (!isCached) {
@@ -72,20 +75,6 @@ namespace MapleSeedU.Models
 
             if (!File.Exists(path) || new FileInfo(path).Length == 0) return null;
             using (Stream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {
-                IFormatter formatter = new BinaryFormatter();
-                var tie = (TitleInfoEntry) formatter.Deserialize(stream);
-                return tie;
-            }
-        }
-
-        public TitleInfoEntry Load()
-        {
-            if (!Directory.Exists(CacheLocation)) Directory.CreateDirectory(CacheLocation);
-            if (!File.Exists(Path.Combine(CacheLocation, TitleID))) return null;
-
-            using (
-                Stream stream = new FileStream(Path.Combine(CacheLocation, TitleID), FileMode.Open, FileAccess.Read,
-                    FileShare.Read)) {
                 IFormatter formatter = new BinaryFormatter();
                 var tie = (TitleInfoEntry) formatter.Deserialize(stream);
                 return tie;
@@ -195,15 +184,16 @@ namespace MapleSeedU.Models
             MainWindowViewModel.Instance.Status = Root;
         }
 
-        private void CacheTheme()
+        public void CacheTheme(bool force = false)
         {
+            if (force) IsCached = false;
             if (IsCached) return;
 
             SetBootTex();
 
             var bmp = ImageAnalysis.FromBytes(BootTex);
 
-            if (CachedColor.IsEmpty)
+            if (CachedColor.IsEmpty || force)
                 CachedColor = ImageAnalysis.GetRandomColour(bmp);
 
             Save();
