@@ -12,14 +12,18 @@ namespace MapleSeedU.Models.Settings
     {
         public CemuPath()
         {
-            _libraryPath = new ConfigurationEntry("CemuPath");
+            ConfigEntry = new ConfigurationEntry("CemuPath");
         }
 
-        private ConfigurationEntry _libraryPath { get; }
+        private ConfigurationEntry ConfigEntry { get; }
 
         public string GetPath()
         {
-            return !string.IsNullOrEmpty(_libraryPath.Value) ? _libraryPath.Value : SetPath();
+            if (string.IsNullOrEmpty(ConfigEntry.Value)
+                   || !File.Exists(ConfigEntry.Value)) {
+                return SetPath();
+            }
+            return ConfigEntry.Value;
         }
 
         private string SetPath()
@@ -33,14 +37,14 @@ namespace MapleSeedU.Models.Settings
             var result = diaglog.ShowDialog();
 
             if (result == DialogResult.OK)
-                _libraryPath.Value = Path.GetFullPath(diaglog.FileName);
+                ConfigEntry.Value = Path.GetFullPath(diaglog.FileName);
 
-            return _libraryPath.Value;
+            return ConfigEntry.Value;
         }
 
         public void ResetPath()
         {
-            _libraryPath.DeleteKey("CemuPath");
+            ConfigEntry.DeleteKey("CemuPath");
         }
     }
 }

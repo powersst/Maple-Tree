@@ -16,14 +16,18 @@ namespace MapleSeedU.Models.Settings
     {
         public LibraryPath()
         {
-            _libraryPath = new ConfigurationEntry("LibraryPath");
+            ConfigEntry = new ConfigurationEntry("LibraryPath");
         }
 
-        private ConfigurationEntry _libraryPath { get; }
+        private ConfigurationEntry ConfigEntry { get; }
 
         public string GetPath()
         {
-            return !string.IsNullOrEmpty(_libraryPath.Value) ? _libraryPath.Value : SetPath();
+            if (string.IsNullOrEmpty(ConfigEntry.Value) 
+                || !Directory.Exists(ConfigEntry.Value)) {
+                return SetPath();
+            }
+            return ConfigEntry.Value;
         }
 
         private string SetPath()
@@ -32,14 +36,14 @@ namespace MapleSeedU.Models.Settings
             var result = diaglog.ShowDialog();
 
             if (result == DialogResult.OK)
-                _libraryPath.Value = Path.GetFullPath(diaglog.SelectedPath);
+                ConfigEntry.Value = Path.GetFullPath(diaglog.SelectedPath);
 
-            return _libraryPath.Value;
+            return ConfigEntry.Value;
         }
 
         public void ResetPath()
         {
-            _libraryPath.DeleteKey("LibraryPath");
+            ConfigEntry.DeleteKey("LibraryPath");
         }
     }
 }
