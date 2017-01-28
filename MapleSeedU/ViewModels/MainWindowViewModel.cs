@@ -154,8 +154,12 @@ namespace MapleSeedU.ViewModels
             ProgressBarCurrent = 0;
             LockControls();
 
+            string tempPath;
+            if (!Directory.Exists(tempPath = Path.Combine(Path.GetTempPath(), "MapleTree")))
+                Directory.CreateDirectory(tempPath);
+
             await Task.Run(() => {
-                var files = Directory.GetFiles(Path.Combine(Path.GetTempPath(), "MapleTree"));
+                var files = Directory.GetFiles(tempPath);
                 ProgressBarMax = files.Length;
 
                 var list = new TitleInfoEntry[ProgressBarMax = files.Length];
